@@ -6,10 +6,8 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graphs;
 import org.jgrapht.UndirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
 
-import bayonet.factors.GraphUtils;
+import bayonet.graphs.GraphUtils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -18,7 +16,6 @@ import com.google.common.collect.Maps;
 
 public class EdgeSorter<V>
 {
-//  private final V lastForwardVertex;
   private final Map<V, Integer> postorderMap;
   private final ArrayList<V> postorder;
   private final UndirectedGraph<V, ?> graph;
@@ -66,11 +63,9 @@ public class EdgeSorter<V>
   }
   
   private EdgeSorter(
-//      V lastForwardVertex, 
       Map<V, Integer> postorderMap,
       ArrayList<V> postorder, UndirectedGraph<V, ?> graph)
   {
-//    this.lastForwardVertex = lastForwardVertex;
     this.postorderMap = postorderMap;
     this.postorder = postorder;
     this.graph = graph;
@@ -95,25 +90,25 @@ public class EdgeSorter<V>
   
 
   
-  public static void main(String [] args)
-  {
-    
-    SimpleGraph<String,DefaultEdge>  graph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
-    graph.addVertex("z");
-    graph.addVertex("a");
-//    graph.addVertex("ab");
-//    graph.addVertex("ac");
-//    graph.addVertex("ad");
-//    graph.addVertex("aca");
-//    graph.addVertex("acb");
-    graph.addEdge("z", "a");
-//    graph.addEdge("a", "ab");
-//    graph.addEdge("a", "ac");
-//    graph.addEdge("a", "ad");
-//    graph.addEdge("ac", "aca");
-//    graph.addEdge("ac", "acb");
-    
-    System.out.println(EdgeSorter.newEdgeSorter(graph, "a").forwardMessages());
-    System.out.println(EdgeSorter.newEdgeSorter(graph, "a").backwardMessages());
-  }
+//  public static void main(String [] args)
+//  {
+//    
+//    SimpleGraph<String,DefaultEdge>  graph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
+//    graph.addVertex("z");
+//    graph.addVertex("a");
+////    graph.addVertex("ab");
+////    graph.addVertex("ac");
+////    graph.addVertex("ad");
+////    graph.addVertex("aca");
+////    graph.addVertex("acb");
+//    graph.addEdge("z", "a");
+////    graph.addEdge("a", "ab");
+////    graph.addEdge("a", "ac");
+////    graph.addEdge("a", "ad");
+////    graph.addEdge("ac", "aca");
+////    graph.addEdge("ac", "acb");
+//    
+//    System.out.println(EdgeSorter.newEdgeSorter(graph, "a").forwardMessages());
+//    System.out.println(EdgeSorter.newEdgeSorter(graph, "a").backwardMessages());
+//  }
 }

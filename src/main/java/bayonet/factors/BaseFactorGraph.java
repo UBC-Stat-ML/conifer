@@ -5,17 +5,14 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.UndirectedGraph;
 
-import bayonet.factors.discrete.DiscreteFactorGraph.DiscreteBinaryFactor;
-import bayonet.factors.discrete.DiscreteFactorGraph.DiscreteUnaryFactor;
-
 import com.google.common.collect.Maps;
 
 
 
 public abstract class BaseFactorGraph<V> implements FactorGraph<V>
 {
-  protected final Map<V, DiscreteUnaryFactor<V>> unaries = Maps.newHashMap();
-  protected final Map<Pair<V,V>, DiscreteBinaryFactor<V>> binaries = Maps.newHashMap();
+  protected final Map<V, UnaryFactor<V>> unaries = Maps.newHashMap();
+  protected final Map<Pair<V,V>, BinaryFactor<V>> binaries = Maps.newHashMap();
   protected final UndirectedGraph<V, ?> topology;
   
   public BaseFactorGraph(UndirectedGraph<V, ?> topology)

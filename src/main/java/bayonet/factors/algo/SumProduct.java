@@ -1,12 +1,9 @@
 package bayonet.factors.algo;
 
-import goblin.Taxon;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import nuts.io.IO;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graphs;
@@ -14,8 +11,9 @@ import org.jgrapht.Graphs;
 import bayonet.factors.BinaryFactor;
 import bayonet.factors.FactorGraph;
 import bayonet.factors.FactorOperation;
-import bayonet.factors.GraphUtils;
 import bayonet.factors.UnaryFactor;
+import bayonet.graphs.GraphUtils;
+import briefj.BriefCollections;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -35,12 +33,26 @@ public class SumProduct<V>
     this.factorOperations = factorGraph.marginalizationOperation();
   }
   
+  public double logNormalization()
+  {
+    double sum = 0.0;
+    
+    // add the logNormalization of each connected component
+    for (Set<V> cc : GraphUtils.connectedComponents(factorGraph.getTopology()))
+      sum += computeMarginal(BriefCollections.pick(cc)).logNormalization();
+    
+    return sum;
+  }
+  
   public UnaryFactor<V> computeMarginal(V queryNode)
   {
     computeMessages(queryNode, true);
     List<UnaryFactor<V>> queryIncomingMsgs = Lists.newArrayList();
     for (V neighbor : Graphs.neighborListOf(factorGraph.getTopology(), queryNode))
       queryIncomingMsgs.add(getFromCache(Pair.of(neighbor, queryNode), false));
+    UnaryFactor<V> modelFactor = factorGraph.getUnary(queryNode);
+    if (modelFactor != null)
+      queryIncomingMsgs.add(modelFactor);
     return factorOperations.pointwiseProduct(queryIncomingMsgs);
   }
   
@@ -83,8 +95,6 @@ public class SumProduct<V>
     checkIntegrity(messageToCompute, binaryFactor, toMultiply);
     return factorOperations.marginalize(binaryFactor, toMultiply);
   }
-  
-
 
   private void checkIntegrity(Pair<V, V> messageToCompute,
       BinaryFactor<V> binaryFactor, List<UnaryFactor<V>> toMultiply)

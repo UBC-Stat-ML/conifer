@@ -1,7 +1,8 @@
-package bayonet.factors;
+package bayonet.graphs;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graphs;
@@ -11,6 +12,8 @@ import org.jgrapht.event.ConnectedComponentTraversalEvent;
 import org.jgrapht.event.EdgeTraversalEvent;
 import org.jgrapht.event.TraversalListener;
 import org.jgrapht.event.VertexTraversalEvent;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.jgrapht.traverse.DepthFirstIterator;
 
 import com.google.common.collect.Lists;
@@ -20,6 +23,11 @@ import com.google.common.collect.Lists;
 
 public class GraphUtils
 {
+  public static <V> UndirectedGraph<V,DefaultEdge> newUndirectedGraph()
+  {
+    return new SimpleGraph<V, DefaultEdge>(DefaultEdge.class);
+  }
+  
   public static <V,E> ArrayList<V> postorder(UndirectedGraph<V, E> graph, final V root)
   {
     final ArrayList<V> result = Lists.newArrayList();
@@ -44,6 +52,12 @@ public class GraphUtils
       throw new RuntimeException("bad index: " + result.indexOf(root) + " out of " + result.size() + ", isConn=" + new ConnectivityInspector<V, E>(graph).connectedSets().size());
     
     return result;
+  }
+  
+  public static <V,E> List<Set<V>> connectedComponents(UndirectedGraph<V, E> graph)
+  {
+    ConnectivityInspector<V, E> connComponentsCalculator = new ConnectivityInspector<V,E>(graph);
+    return connComponentsCalculator.connectedSets();
   }
   
   /**

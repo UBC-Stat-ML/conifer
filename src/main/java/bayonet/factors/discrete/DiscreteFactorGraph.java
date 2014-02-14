@@ -1,12 +1,14 @@
 package bayonet.factors.discrete;
 
+import fig.basic.UnorderedPair;
+import goblin.Taxon;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import ma.RateMatrixLoader;
 import nuts.math.GMFct;
 import nuts.math.Graphs;
-import nuts.math.TreeSumProd;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
@@ -14,25 +16,18 @@ import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleGraph;
 
-import pty.SumT;
 import pty.learn.DiscreteBP;
 import pty.smc.models.CTMC.SimpleCTMC;
+import bayonet.factors.BaseFactorGraph;
+import bayonet.factors.BinaryFactor;
+import bayonet.factors.FactorOperation;
+import bayonet.factors.UnaryFactor;
+import bayonet.factors.algo.SumProduct;
 
 import com.google.common.collect.Lists;
 
 import conifer.ml.data.PhylogeneticHeldoutDataset;
 import conifer.ml.data.PhylogeneticHeldoutDataset.PhylogeneticHeldoutDatasetOptions;
-import conifer.ml.tests.TestRealData;
-
-import fig.basic.UnorderedPair;
-import goblin.Taxon;
-
-import bayonet.factors.BaseFactorGraph;
-import bayonet.factors.BinaryFactor;
-import bayonet.factors.FactorOperation;
-import bayonet.factors.UnaryFactor;
-import bayonet.factors.algo.EdgeSorter;
-import bayonet.factors.algo.SumProduct;
 
 
 
@@ -50,18 +45,34 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
   }
   
   public void setBinary(V mNode, V oNode, SimpleMatrix m2oPotentials)
-  {
+  { 
     binaries.put(Pair.of(mNode, oNode), new DiscreteBinaryFactor<V>(m2oPotentials.transpose(), mNode, oNode));
     binaries.put(Pair.of(oNode, mNode), new DiscreteBinaryFactor<V>(m2oPotentials, oNode, mNode));
   }
   
-  public void setUnary(V node, SimpleMatrix site2ValuePotentials)
+  public void setUnary(V node, double [] values)
   {
+    setUnaries(node, new SimpleMatrix(1, values.length, true, values));
+  }
+  
+  private int nSites = -1;
+  public void setUnaries(V node, SimpleMatrix site2ValuePotentials)
+  {
+    checkNSites(site2ValuePotentials.numRows());
     unaries.put(node, new DiscreteUnaryFactor<V>(node, site2ValuePotentials, new int[site2ValuePotentials.numRows()]));
   }
+  private void checkNSites(int tested)
+  {
+    if (nSites == -1)
+      nSites = tested;
+    else if (nSites != tested)
+      throw new RuntimeException();
+  }
 
-  private final FactorOperation<V> discreteFactorGraphOperations = new FactorOperation<V>() {
 
+
+  private final FactorOperation<V> discreteFactorGraphOperations = new FactorOperation<V>() 
+  {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public UnaryFactor<V> pointwiseProduct(final List<UnaryFactor<V>> unaries)
@@ -103,59 +114,67 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
         final BinaryFactor<V> _binary,
         final List<UnaryFactor<V>> unariesOnMarginalized)
     {
-      if (unariesOnMarginalized.size() == 0)
-        throw new RuntimeException(); // TODO: might be able to return identity in some cases
-      
       final int maxDegree = 2;
       if (unariesOnMarginalized.size() <= maxDegree)
       {
-        final boolean hasTwo = unariesOnMarginalized.size() == 2;
+        final int degree = unariesOnMarginalized.size();
         final DiscreteUnaryFactor<V> 
-          dbf0 =           (DiscreteUnaryFactor) unariesOnMarginalized.get(0),
-          dbf1 = hasTwo ? ((DiscreteUnaryFactor) unariesOnMarginalized.get(1)) : null;
+          dbf0 = degree >= 1 ? (DiscreteUnaryFactor) unariesOnMarginalized.get(0) : null,
+          dbf1 = degree == 2 ? (DiscreteUnaryFactor) unariesOnMarginalized.get(1) : null;
         
         final SimpleMatrix 
-          site2valuePotentials0 =          dbf0.site2valuePotentials,
-          site2valuePotentials1 = hasTwo ? dbf1.site2valuePotentials : null;
+          site2valuePotentials0 = degree >= 1 ? dbf0.site2valuePotentials : null,
+          site2valuePotentials1 = degree == 2 ? dbf1.site2valuePotentials : null;
           
         final int [] 
-          scales0 =          dbf0.scales,
-          scales1 = hasTwo ? dbf1.scales : null;
+          scales0 = degree >= 1 ? dbf0.scales : null,
+          scales1 = degree == 2 ? dbf1.scales : null;
         
         final DiscreteBinaryFactor<V> binary = (DiscreteBinaryFactor) _binary;
         final SimpleMatrix o2mPotentials = binary.o2mPotentials;
         
-        final int nSites = dbf0.nSites();
-        final SimpleMatrix newMatrix = new SimpleMatrix(dbf0.nSites(), binary.nOtherVariableValues());
+        final SimpleMatrix newMatrix = new SimpleMatrix(nSites, binary.nOtherVariableValues());
         final int [] newScales = new int[nSites];
         
         final int nOtherValues = binary.nOtherVariableValues();
         final int nMarginalizedValues = binary.nMarginalizedVariableValues();
         
-        for (int site = 0; site < nSites; site++)
-        {
-          // scales are in log scale, so simply add them
-          newScales[site] = hasTwo ? scales0[site] + scales1[site] : scales0[site];
-        }
-        
-        for (int site = 0; site < nSites; site++)
-        {
-          // do the pointwise and marginalization
-          for (int otherIndex = 0; otherIndex < nOtherValues; otherIndex++)
-          {
-            double sum = 0.0;
-            if (hasTwo)
-              for (int margIndex = 0; margIndex < nMarginalizedValues; margIndex++)
-                sum += o2mPotentials.get(otherIndex, margIndex) 
-                      * site2valuePotentials0.get(site, margIndex) 
-                      * site2valuePotentials1.get(site, margIndex);
-            else
-              for (int margIndex = 0; margIndex < nMarginalizedValues; margIndex++)
-                sum += o2mPotentials.get(otherIndex, margIndex) 
-                      * site2valuePotentials0.get(site, margIndex);
-            newMatrix.set(site, otherIndex, sum);
-          }
-        }
+        // Warning: this part of the code is less readable and easy to maintain
+        // because it is in the inner loop of phylogenetic computations
+             if (degree == 0) ;
+        else if (degree == 1) for (int site = 0; site < nSites; site++) newScales[site] = scales0[site];
+        else                  for (int site = 0; site < nSites; site++) newScales[site] = scales0[site] + scales1[site];
+             
+         if (degree == 0) 
+           for (int site = 0; site < nSites; site++)
+             for (int otherIndex = 0; otherIndex < nOtherValues; otherIndex++)
+             {
+               double sum = 0.0;
+               for (int margIndex = 0; margIndex < nMarginalizedValues; margIndex++)
+                 sum += o2mPotentials.get(otherIndex, margIndex);
+               newMatrix.set(site, otherIndex, sum);
+             }
+         else if (degree == 1) 
+           for (int site = 0; site < nSites; site++)
+             for (int otherIndex = 0; otherIndex < nOtherValues; otherIndex++)
+             {
+               double sum = 0.0;
+               for (int margIndex = 0; margIndex < nMarginalizedValues; margIndex++)
+                 sum += o2mPotentials.get(otherIndex, margIndex) 
+                       * site2valuePotentials0.get(site, margIndex);
+               newMatrix.set(site, otherIndex, sum);
+             }
+         else 
+           for (int site = 0; site < nSites; site++)
+             for (int otherIndex = 0; otherIndex < nOtherValues; otherIndex++)
+             {
+               double sum = 0.0;
+               for (int margIndex = 0; margIndex < nMarginalizedValues; margIndex++)
+                 sum += o2mPotentials.get(otherIndex, margIndex) 
+                       * site2valuePotentials0.get(site, margIndex) 
+                       * site2valuePotentials1.get(site, margIndex);
+               newMatrix.set(site, otherIndex, sum);
+             }
         
         return new DiscreteUnaryFactor<V>(binary.otherNode(), newMatrix, newScales);
       }
@@ -164,12 +183,13 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
     }
   };
   
-  public static <V> UnaryFactor<V> marginalizeOnReducedUnariesDegree(
+  private static <V> UnaryFactor<V> marginalizeOnReducedUnariesDegree(
       FactorOperation<V> operation, 
       int maxDegree,
       final BinaryFactor<V> binary,
       final List<UnaryFactor<V>> unariesOnMarginalized)
   {
+    System.out.println("hell");
     if (unariesOnMarginalized.size() <= maxDegree)
       throw new RuntimeException();
     ArrayList<UnaryFactor<V>> reducedList = Lists.newArrayList();
@@ -183,7 +203,7 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
     return operation.marginalize(binary, reducedList);
   }
   
-  public static class DiscreteBinaryFactor<V> implements BinaryFactor<V>
+  private static class DiscreteBinaryFactor<V> implements BinaryFactor<V>
   {
     private final SimpleMatrix o2mPotentials;
     private final V m, o;
@@ -209,7 +229,7 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
     @Override public V otherNode() { return o; }
   }
   
-  public static final class DiscreteUnaryFactor<V> implements UnaryFactor<V>
+  private static final class DiscreteUnaryFactor<V> implements UnaryFactor<V>
   {
     private static final int MIN_SCALE = -50;
     private static final double UNDERFLOW_THRESHOLD = Math.exp(MIN_SCALE);
@@ -246,10 +266,10 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
         // rescale if needed
         while (currentNorm < UNDERFLOW_THRESHOLD)
         {
-          scales[site] += scales[site] + MIN_SCALE;
+          scales[site] = scales[site] - MIN_SCALE;
           for (int valueIndex = 0; valueIndex < nVariableValues(); valueIndex++)
             site2valuePotentials.set(site, valueIndex, site2valuePotentials.get(site,valueIndex) * UNDERFLOW_THRESHOLD_INVERSE);
-          currentNorm = scales[site];
+          currentNorm = norm(site, site2valuePotentials); //scales[site];
         }
       }
       logNorm += Math.log(tempProd);
@@ -293,26 +313,35 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
   public static void main(String [] args)
   {
     PhylogeneticHeldoutDatasetOptions phyloOptions = new PhylogeneticHeldoutDatasetOptions();
-    phyloOptions.alignmentFile = "/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta";
-    phyloOptions.treeFile = "/Users/bouchard/Documents/data/utcs/23S.E.raxml.nwk"; 
+//    phyloOptions.alignmentFile = "/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta";
+//    phyloOptions.treeFile = "/Users/bouchard/Documents/data/utcs/23S.E.raxml.nwk"; 
+    phyloOptions.maxNSites = 100;
+    phyloOptions.minFractionObserved = 0.9;
     PhylogeneticHeldoutDataset phyloData = PhylogeneticHeldoutDataset.loadData(phyloOptions);
     
     SimpleCTMC ctmc = new SimpleCTMC(RateMatrixLoader.k2p(), 1);
     GMFct<Taxon> pots = DiscreteBP.toGraphicalModel(phyloData.rootedTree, ctmc, phyloData.obs, 0);
-    TreeSumProd<Taxon> tsp = new TreeSumProd<Taxon>(
-        pots);
-    
-    System.out.println("method1 = " + tsp.logZ());
     
     DiscreteFactorGraph<Taxon> converted = fromGM(pots);
     
-    System.out.println("Messages Fwd:" + EdgeSorter.newEdgeSorter(converted.getTopology(), new Taxon("internal66")).forwardMessages());
-//    System.out.println("Messages Bwd:" + EdgeSorter.newEdgeSorter(converted.getTopology(), new Taxon("internal66")).backwardMessages());
-    
-    
-    SumProduct<Taxon> sp = new SumProduct<Taxon>(converted);
-    System.out.println(converted.getTopology().toString());
-    System.out.println("method2 = " + sp.computeMarginal(new Taxon("internal66")).logNormalization());
+    for (int i = 0; i < 100; i++)
+    {
+      long start = System.currentTimeMillis();
+//      TreeSumProd<Taxon> tsp = new TreeSumProd<Taxon>(
+//          pots);
+//      
+//      
+//      System.out.println("method1 = " + tsp.logZ());
+//      System.out.println("time = " + (System.currentTimeMillis()-start));
+//      System.out.println();
+//      
+      
+      
+      start = System.currentTimeMillis();
+      SumProduct<Taxon> sp = new SumProduct<Taxon>(converted);
+      System.out.println("method2 = " + sp.computeMarginal(new Taxon("internal66")).logNormalization());
+      System.out.println("time = " + (System.currentTimeMillis()-start));
+    }
   }
   
   public static <V> DiscreteFactorGraph<V> fromGM(GMFct<V> model)
@@ -329,10 +358,16 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
       int nValues = model.nStates(vertex);
       SimpleMatrix newMatrix = new SimpleMatrix(1, nValues);
       
+      boolean shouldAdd = false;
       for (int valueIndex = 0; valueIndex < nValues; valueIndex++)
-        newMatrix.set(0, valueIndex, model.get(vertex, valueIndex));
-      
-      newFG.setUnary(vertex, newMatrix);
+      {
+        double value = model.get(vertex, valueIndex);
+        newMatrix.set(0, valueIndex, value);
+        if (value != 1.0)
+          shouldAdd = true;
+      }
+      if (shouldAdd)
+        newFG.setUnaries(vertex, newMatrix);
     }
     
     // add edges
