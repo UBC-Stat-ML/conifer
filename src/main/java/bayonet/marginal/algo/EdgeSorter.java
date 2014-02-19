@@ -1,4 +1,4 @@
-package bayonet.factors.algo;
+package bayonet.marginal.algo;
 
 import java.util.ArrayList;
 import java.util.Map;

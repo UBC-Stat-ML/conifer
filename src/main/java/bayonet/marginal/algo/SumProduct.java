@@ -1,4 +1,4 @@
-package bayonet.factors.algo;
+package bayonet.marginal.algo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,11 +8,11 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graphs;
 
-import bayonet.factors.BinaryFactor;
-import bayonet.factors.FactorGraph;
-import bayonet.factors.FactorOperation;
-import bayonet.factors.UnaryFactor;
 import bayonet.graphs.GraphUtils;
+import bayonet.marginal.BinaryFactor;
+import bayonet.marginal.FactorGraph;
+import bayonet.marginal.FactorOperation;
+import bayonet.marginal.UnaryFactor;
 import briefj.BriefCollections;
 
 import com.google.common.collect.Lists;

@@ -1,4 +1,4 @@
-package bayonet.factors;
+package bayonet.marginal;
 
 
 
