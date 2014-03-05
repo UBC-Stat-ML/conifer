@@ -125,11 +125,11 @@ public class SumProductTests
     Random rand = new Random(1);
     
     int len = 8000;
-    DiscreteFactorGraph<Integer> markov = buildRandomMarkov(rand, 2, len);
+    DiscreteFactorGraph<Integer> markov = buildRegularMarkov(2, len);
     long start = System.currentTimeMillis();
     SumProduct<Integer> sp = new SumProduct<Integer>(markov);
     System.out.println(sp.logNormalization());
-//    System.out.println(-len * Math.log(2.0));
+    System.out.println(-len * Math.log(2.0));
     System.out.println("Time: " + (System.currentTimeMillis() - start)/1000.0);
   }
 }

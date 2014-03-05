@@ -7,7 +7,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graphs;
 import org.jgrapht.UndirectedGraph;
 
-import bayonet.graphs.GraphUtils;
+import bayonet.graphs.GraphUtils; 
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -49,6 +49,7 @@ public class EdgeSorter<V>
     return result;
   }
   
+  // TODO change name of this to something more descriptive, in terms of orientation
   public ArrayList<Pair<V,V>> backwardMessages()
   {
     ArrayList<Pair<V,V>> result = Lists.newArrayList();

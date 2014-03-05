@@ -4,6 +4,7 @@ import fig.basic.UnorderedPair;
 import goblin.Taxon;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import ma.RateMatrixLoader;
@@ -11,7 +12,6 @@ import nuts.math.GMFct;
 import nuts.math.Graphs;
 import nuts.math.TreeSumProd;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
 import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -49,12 +49,9 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
   { 
     int nM = m2oPotentials.numRows();
     int nO = m2oPotentials.numCols();
-    Pair<V,V> key0 = Pair.of(mNode, oNode);
-    Pair<V,V> key1 = Pair.of(oNode, mNode);
-    if (binaries.containsKey(key0) || binaries.containsKey(key1))
-      throw new RuntimeException("Overwriting factors is forbidden");
-    binaries.put(key0, new DiscreteBinaryFactor<V>(m2oPotentials.transpose().getMatrix().data, mNode, oNode, nM, nO));
-    binaries.put(key1, new DiscreteBinaryFactor<V>(m2oPotentials.getMatrix().data, oNode, mNode, nO, nM));
+    
+    setBinary(mNode, oNode, new DiscreteBinaryFactor<V>(m2oPotentials.transpose().getMatrix().data, mNode, oNode, nM, nO));
+    setBinary(oNode, mNode, new DiscreteBinaryFactor<V>(m2oPotentials.getMatrix().data, oNode, mNode, nO, nM));
   }
   
   public void setUnary(V node, double [] values)
@@ -65,11 +62,22 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
   private int nSites = -1;
   public void setUnaries(V node, SimpleMatrix site2ValuePotentials)
   {
-    if (unaries.containsKey(node))
-      throw new RuntimeException("Overwriting factors is forbidden");
     checkNSites(site2ValuePotentials.numRows());
-    unaries.put(node, new DiscreteUnaryFactor<V>(node, site2ValuePotentials.getMatrix().data, new int[site2ValuePotentials.numRows()], site2ValuePotentials.numCols()));
+    setUnary(node, new DiscreteUnaryFactor<V>(node, site2ValuePotentials.getMatrix().data, new int[site2ValuePotentials.numRows()], site2ValuePotentials.numCols()));
   }
+  
+  @SuppressWarnings("unchecked")
+  public void unariesTimesEqual(V node, SimpleMatrix site2ValuePotentials)
+  {
+    checkNSites(site2ValuePotentials.numRows());
+    DiscreteUnaryFactor<V> newOne = new DiscreteUnaryFactor<V>(node, site2ValuePotentials.getMatrix().data, new int[site2ValuePotentials.numRows()], site2ValuePotentials.numCols());
+    DiscreteUnaryFactor<V> oldOne = (DiscreteUnaryFactor<V>) unaries.get(node);
+    if (oldOne == null)
+      unaries.put(node, newOne);
+    else
+      unaries.put(node, discreteFactorGraphOperations.pointwiseProduct(Arrays.asList(newOne, oldOne)));
+  }
+  
   private void checkNSites(int tested)
   {
     if (nSites == -1)
@@ -78,13 +86,11 @@ public class DiscreteFactorGraph<V> extends BaseFactorGraph<V>
       throw new RuntimeException();
   }
 
-
-
   private final FactorOperation<V> discreteFactorGraphOperations = new FactorOperation<V>() 
   {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    public UnaryFactor<V> pointwiseProduct(final List<UnaryFactor<V>> unaries)
+    public UnaryFactor<V> pointwiseProduct(final List<? extends UnaryFactor<V>> unaries)
     {
       final int nFactors = unaries.size();
       final DiscreteUnaryFactor [] cast = new DiscreteUnaryFactor[nFactors];

@@ -34,11 +34,26 @@ public abstract class BaseFactorGraph<V> implements FactorGraph<V>
     return unaries.get(node);
   }
   
+  public void setUnary(V node, UnaryFactor<V> unary)
+  {
+    if (unaries.containsKey(node))
+      throw new RuntimeException("Overwriting factors is forbidden");
+    unaries.put(node, unary);
+  }
+  
   @Override
   public BinaryFactor<V> getBinary(V marginalizedNode, V otherNode)
   {
     if (!topology.containsEdge(marginalizedNode, otherNode))
       throw new RuntimeException();
     return binaries.get(Pair.of(marginalizedNode, otherNode));
+  }
+  
+  public void setBinary(V marginalizedNode, V otherNode, BinaryFactor<V> factor)
+  {
+    Pair<V,V> key = Pair.of(marginalizedNode, otherNode);
+    if (binaries.containsKey(key))
+      throw new RuntimeException("Overwriting factors is forbidden");
+    binaries.put(key, factor);
   }
 }
