@@ -1,4 +1,4 @@
-package blang;
+package conifer;
 
 import java.io.File;
 import java.util.List;
@@ -12,6 +12,7 @@ import bayonet.distributions.Exponential.MeanParameterization;
 import bayonet.distributions.Uniform;
 import bayonet.distributions.Uniform.MinMaxParameterization;
 import bayonet.rplot.PlotHistogram;
+import blang.MCMCRunner;
 import blang.annotations.DefineFactor;
 import blang.processing.ProcessorContext;
 import  blang.variables.RealVariable;

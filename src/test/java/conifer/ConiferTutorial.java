@@ -2,13 +2,13 @@ package conifer;
 
 import java.util.Random;
 
+import conifer.ctmc.CTMC;
+import conifer.factors.TreeLikelihood;
+
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Uniform;
 import bayonet.distributions.Exponential.MeanParameterization;
 import bayonet.distributions.Uniform.MinMaxParameterization;
-import blang.BlangSmallExample;
-import blang.BlangTutorial;
-import blang.TestBlangSmallExample;
 import blang.annotations.DefineFactor;
 import tutorialj.Tutorial;
 
@@ -75,7 +75,7 @@ public class ConiferTutorial
   
   
   /**
-   * # Extending Blang
+   * ### Extending Blang
    * 
    * Let us see now Blang can be extended beyond its (currently very minimal) set of built-in 
    * factor and variables. At the same time, some more advanced programming concepts will be 
@@ -191,4 +191,21 @@ public class ConiferTutorial
   @Tutorial(showSource = false, nextStep = TestBlangSmallExample.class)
   public void extendingBlang() {}
   
+  /**
+   * Bayesian Phylogenetic inference
+   * -------------------------------
+   * 
+   * We will now apply this framework to a more complex problem, Bayesian phylogenetic
+   * inference. We start with the core of the likelihood calculation, the matrix exponential.
+   * 
+   * #### Implementing the matrix exponential
+   */
+  @Tutorial(showSource = false, nextStep = CTMC.class)
+  public void phyloApplicationPart1() {}
+  
+  /**
+   * #### Computing the likelihood on a tree
+   */
+  @Tutorial(showSource = false, nextStep = TreeLikelihood.class)
+  public void phyloApplicationPart2() {}
 }

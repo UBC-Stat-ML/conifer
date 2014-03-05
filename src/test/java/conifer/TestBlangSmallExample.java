@@ -1,4 +1,4 @@
-package blang;
+package conifer;
 
 
 import static blang.variables.RealVariable.real;
@@ -10,12 +10,20 @@ import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.MeanParameterization;
 import bayonet.distributions.Uniform;
 import bayonet.distributions.Uniform.MinMaxParameterization;
+import blang.MCMCAlgorithm;
+import blang.MCMCRunner;
 import blang.annotations.DefineFactor;
+import blang.validation.CheckFixedRandomness;
 import blang.validation.CheckStationarity;
 
 
 
-
+/**
+ * Testing the BlangSmallExample model.
+ * 
+ * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+ *
+ */
 public class TestBlangSmallExample extends MCMCRunner
 {
   @DefineFactor
@@ -42,7 +50,7 @@ public class TestBlangSmallExample extends MCMCRunner
    */
   @Test
   @Tutorial(showSource = true, showSignature = false, showLink = true, linkPrefix = "src/test/java/")
-  public static void main(String [] args)
+  public void checkStationarity()
   {
     // Creates a model similar to the small example, but with no observations
     // (forward simulation requires that there be no observations).
@@ -87,10 +95,25 @@ public class TestBlangSmallExample extends MCMCRunner
    * When it is not possible, do as many as possible, focusing on corner and degenerate 
    * cases.
    * 
-   * 
+   * Also, make sure you test your test: commit your code, introduce one small bug, 
+   * and see if your test can detect it.
    */
   @Tutorial(showSource = false)
-  private static void moreInfo() {}
+  static void moreInfo() {}
   
-  
+  /**
+   * To conclude this section, a second test, which makes sure that the randomness is
+   * fixed, meaning that if you run two times the code with the same seed (as 
+   * encoded in the ``Random`` object), then the exact same result should be obtained.
+   * 
+   * Very important for reproducibility and debugging.
+   */
+  @Test
+  @Tutorial(showSource = true, showSignature = false, showLink = true, linkPrefix = "src/test/java/")
+  public void checkFixedRandomness()
+  {
+    TestBlangSmallExample runner = new TestBlangSmallExample();
+    CheckFixedRandomness checkRand = new CheckFixedRandomness(runner.factory);
+    checkRand.check(runner);
+  }
 }

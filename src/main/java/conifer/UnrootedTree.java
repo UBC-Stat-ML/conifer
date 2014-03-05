@@ -21,6 +21,20 @@ public class UnrootedTree
 {
   private final UndirectedGraph<TreeNode, UnorderedPair<TreeNode, TreeNode>> topology = GraphUtils.newUndirectedGraph();
   private final Map<UnorderedPair<TreeNode, TreeNode>,Double> branchLengths = Maps.newLinkedHashMap();
+  
+  public void addNode(TreeNode node)
+  {
+    this.topology.addVertex(node);
+  }
+  
+  public void addEdge(TreeNode node1, TreeNode node2, double length)
+  {
+    this.topology.addEdge(node1, node2);
+    branchLengths.put(new UnorderedPair<TreeNode, TreeNode>(node1, node2), length);
+  }
+  
+  
+  
   public UndirectedGraph<TreeNode, UnorderedPair<TreeNode, TreeNode>> getTopology()
   {
     return topology;
