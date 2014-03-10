@@ -5,33 +5,41 @@ import java.util.Random;
 
 import org.jgrapht.Graphs;
 
+import tutorialj.Tutorial;
+
 import bayonet.distributions.DiscreteUniform;
 import blang.factors.Factor;
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.MHProposalDistribution;
 import blang.mcmc.SampledVariable;
+import briefj.collections.UnorderedPair;
 
 import com.google.common.collect.Lists;
 
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
-import fig.basic.UnorderedPair;
 
 
 
 public class SingleNNI implements MHProposalDistribution
 {
-  // TODO: use constructor signature instead
-  // rationale: removes the unused warning issue
-  // allows for different behavior in the same compilation unit
-  // note: still use annotations in the constructor signature?
-  // con: makes code more verbose
-  
   @SampledVariable UnrootedTree tree;
   
   @ConnectedFactor List<Factor> factors;
 
+  /**
+   * This is the core of the tree sampling procedure, and also illustrate the simplest way
+   * of creating new samplers in Blang:
+   * - create a class that implements HMProposalDistribution
+   * - add a field annotated with ``@SampledVariable`` which will be automatically populated with the variable to resample.
+   * - add a list of factor fields annotated with ``@ConnectedFactor``
+   * - implement the ``propose()`` method to modify the variable in place.
+   * 
+   * Your exercise here is to prove that the combination of SingleBranchNNI's and SingleBranchScaling's make
+   * the sampler irreducible.
+   */
+  @Tutorial(showSource = true, showLink = true)
   @Override
   public Proposal propose(Random rand)
   {

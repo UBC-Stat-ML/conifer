@@ -4,12 +4,15 @@ import java.util.Random;
 
 import conifer.ctmc.CTMC;
 import conifer.factors.TreeLikelihood;
+import conifer.moves.SingleBranchScaling;
+import conifer.moves.SingleNNI;
 
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Uniform;
 import bayonet.distributions.Exponential.MeanParameterization;
 import bayonet.distributions.Uniform.MinMaxParameterization;
 import blang.annotations.DefineFactor;
+import blang.annotations.Samplers;
 import tutorialj.Tutorial;
 
 
@@ -178,6 +181,7 @@ public class ConiferTutorial
    * ```
    * 
    * To do this, proceed as follows:
+   * 
    * 1. Declare a generic type in the class declaration: ``public class Gamma<P extends Parameters>``. Here P is what is 
    *    called a *generic*. It is like a variable, but instead of holding a value, it holds a type (class or interface name).
    *    The part ``extends Parameters`` is called a type bound: it means that P is has to implement Parameters.
@@ -208,4 +212,55 @@ public class ConiferTutorial
    */
   @Tutorial(showSource = false, nextStep = TreeLikelihood.class)
   public void phyloApplicationPart2() {}
+  
+  /**
+   * #### Sampling the tree
+   * 
+   * We now have a working likelihood factor, but note the tree random variable it is connected
+   * to is not of type supported by default in Blang. This brings us to the next topic, how to 
+   * create samplers for new datatypes. Notice that at the top of the class declaration of UnrootedTree,
+   * there is an annotation ``@Samplers({SingleNNI.class, SingleBranchScaling.class})``, which 
+   * specifies which samplers to use for this type of object. 
+   * 
+   * Let us look at one of them, SingleNNI.
+   */
+  @Tutorial(showSource = false, nextStep = SingleNNI.class)
+  public void phyloApplicationPart3() {}
+  
+  /**
+   * #### Running the phylogenetic sampler
+   * 
+   * Finally, you can now run the phylogenetic sampler. 
+   */
+  @Tutorial(showSource = false, nextStep = SimplePhyloModel.class)
+  public void runningPhylo() {}
+  
+  /**
+   * You can look at these trees using for example [FigTree](http://tree.bio.ed.ac.uk/software/figtree/)
+   * 
+   * #### Optional: summarizing the trees
+   * 
+   * **Warning:** For this part, you may need to update your git repository to the latest
+   * version of the scaffold code. (code updated on March 10)
+   * 
+   * Finally, summarize all these trees using a consensus tree. Recall that 
+   * we discuss in class that the consensus tree corresponds to a Bayes estimator,
+   * see [http://sysbio.oxfordjournals.org/content/57/5/814.full](http://sysbio.oxfordjournals.org/content/57/5/814.full)
+   * for the details.
+   * 
+   * You can use existing implementations of consensus tree software, for example 
+   * [hashcs](https://code.google.com/p/hashcs/):
+   * 
+   * 1. Download the software at [https://code.google.com/p/hashcs/downloads/list](https://code.google.com/p/hashcs/downloads/list)
+   * 2. Unzip, configure using ``./configure`` from the unzipped directory
+   * 3. ``make``
+   * 4. You can now compute consensus using ``./hashcs path/to/treefile 0``, where path/to/treefile
+   *    should be replaced by the path to the file containing the newick files, one per line.
+   *    
+   * Use a strict consensus. See the [documentation](https://code.google.com/p/hashcs/downloads/detail?name=hashcs-howto.pdf&can=2&q=) for more info.
+   * 
+   * Include a visualization of the consensus tree in your report.
+   */
+  @Tutorial(showSource = false)
+  public void consensus() {}
 }

@@ -1,7 +1,13 @@
 package conifer;
 
 
-
+/**
+ * The name of a node on a tree. Can be an informative string for the leaves of the 
+ * tree, or some id for the internal nodes.
+ * 
+ * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+ *
+ */
 public final class TreeNode
 {
   public static TreeNode withLabel(String name)
@@ -9,6 +15,10 @@ public final class TreeNode
     return new TreeNode(name);
   }
   
+  /**
+   * Creates a unique internal node.
+   * @return
+   */
   public static TreeNode nextUnlabelled()
   {
     synchronized (INTERNAL_PREFIX)

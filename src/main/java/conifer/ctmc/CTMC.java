@@ -1,9 +1,6 @@
 package conifer.ctmc;
 
-/* startRem  */
 import tutorialj.Tutorial;
-//import nuts.math.RateMtxUtils;
-/* endRem */
 
 
 public class CTMC

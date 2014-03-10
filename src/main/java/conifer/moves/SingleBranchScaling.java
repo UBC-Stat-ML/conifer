@@ -10,13 +10,13 @@ import com.google.common.collect.Lists;
 
 import conifer.TreeNode;
 import conifer.UnrootedTree;
-import fig.basic.UnorderedPair;
 
 import bayonet.distributions.DiscreteUniform;
 import blang.factors.Factor;
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.MHProposalDistribution;
 import blang.mcmc.SampledVariable;
+import briefj.collections.UnorderedPair;
 
 
 

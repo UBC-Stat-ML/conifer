@@ -3,6 +3,8 @@ package conifer;
 import java.io.File;
 import java.util.List;
 
+import tutorialj.Tutorial;
+
 import com.google.common.collect.Lists;
 
 import conifer.ctmc.JukeCantorRateMatrix;
@@ -43,7 +45,13 @@ public class SimplePhyloModel extends MCMCRunner
     PlotHistogram.from(runner.samples).toPDF(plotFile);
   }
 
-
+  /**
+   * Modify the ``process()`` function below to save the output trees to a file.
+   * Use ``UnrootedTreeUtils.toNewick()`` to save the files in the 
+   * [newick format](http://en.wikipedia.org/wiki/Newick_format), a standard 
+   * way of saving tree.
+   */
+  @Tutorial(showSource = true, showLink = true, showSignature = true)
   protected void process(ProcessorContext context)
   {
     samples.add(treePrior.branchDistribution.parameters.rate.getValue());
