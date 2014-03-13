@@ -2,11 +2,29 @@ package conifer.ctmc;
 
 import tutorialj.Tutorial;
 
-
+/**
+ * A continuous time Markov chain. The main functionalities consists
+ * in computing a marginal transition probability and a stationary distibution
+ * (see below).
+ * 
+ * This implementation is based on caching the eigendecomposition
+ * of the provided rate matrix.
+ * 
+ * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+ *
+ */
 public class CTMC
 {
   private final RateMatrix rateMatrix;
-  
+ 
+  /**
+   * Note: if the RateMatrix is changed in place,
+   * these changes will not be mirrored by this class.
+   * 
+   * It should be recreated each time a likelihood 
+   * calculation is performed.
+   * @param rateMatrix
+   */
   public CTMC(RateMatrix rateMatrix)
   {
     this.rateMatrix = rateMatrix;
@@ -18,14 +36,14 @@ public class CTMC
    * 
    * Use the diagonalization method covered in class, using 
    * the eigen-decomposition functionalities provided by EJML.
+   * 
+   * See EJMLUtils.java in the bayonet project (v. 2.0.3).
    */
   @Tutorial(showSource = false, showLink = true)
   public double [][] marginalTransitionProbability(double branchLength)
   {
     throw new RuntimeException();
-    /* startRem   */
-//    return RateMtxUtils.marginalTransitionMtx(rateMatrix.getMatrix(), branchLength);
-    /* endRem */
+ 
   }
 
   /**
@@ -39,9 +57,7 @@ public class CTMC
   public double [] stationaryDistribution()
   {
     throw new RuntimeException();
-    /* startRem   */
-//    return RateMtxUtils.getStationaryDistribution(rateMatrix.getMatrix());
-    /* endRem */
+
   }
   
 
