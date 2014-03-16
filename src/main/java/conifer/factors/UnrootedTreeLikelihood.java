@@ -1,6 +1,7 @@
 package conifer.factors;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -9,27 +10,29 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
 
 import tutorialj.Tutorial;
+import bayonet.distributions.Exponential;
+import bayonet.marginal.UnaryFactor;
+import bayonet.marginal.algo.EdgeSorter;
+import bayonet.marginal.algo.ExactSampler;
+import bayonet.marginal.algo.SumProduct;
+import bayonet.marginal.discrete.DiscreteFactorGraph;
+import blang.annotations.FactorArgument;
+import blang.annotations.FactorComponent;
+import blang.factors.GenerativeFactor;
+import blang.variables.RealVariable;
+import briefj.BriefCollections;
+import briefj.BriefIO;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.ctmc.CTMC;
 import conifer.ctmc.JukeCantorRateMatrix;
 import conifer.ctmc.RateMatrix;
 import conifer.io.PhylogeneticObservationFactory;
-import bayonet.distributions.Exponential;
-import bayonet.marginal.UnaryFactor;
-import bayonet.marginal.algo.EdgeSorter;
-import bayonet.marginal.algo.SumProduct;
-import bayonet.marginal.discrete.DiscreteFactorGraph;
-import blang.annotations.FactorArgument;
-import blang.annotations.FactorComponent;
-import blang.factors.Factor;
-import blang.variables.RealVariable;
-import briefj.BriefCollections;
-import briefj.BriefIO;
 
 
 /**
@@ -37,11 +40,13 @@ import briefj.BriefIO;
  * viewed as the leaves of a CTMC along a tree shaped branching 
  * process.
  * 
+ * Note: assumes reversible evolutionary models.
+ * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  *
  * @param <R> The type of rate matrix used.
  */
-public class TreeLikelihood<R extends RateMatrix> implements Factor
+public class UnrootedTreeLikelihood<R extends RateMatrix> implements GenerativeFactor
 {
   /**
    * 
@@ -55,7 +60,8 @@ public class TreeLikelihood<R extends RateMatrix> implements Factor
   @FactorComponent
   public final R rateMatrix;
   
-  private final Map<TreeNode, UnaryFactor<TreeNode>> observationFactors;
+  @FactorArgument(makeStochastic = true)
+  public final Map<TreeNode, UnaryFactor<TreeNode>> observationFactors;
   
   /**
    * The number of sites (columns in the sequence alignment). Each is
@@ -89,7 +95,7 @@ public class TreeLikelihood<R extends RateMatrix> implements Factor
    * can root the tree arbitrarily).
    */
   @Tutorial(showSource = false, showLink = true)
-  public DiscreteFactorGraph<TreeNode> buildFactorGraph()
+  public DiscreteFactorGraph<TreeNode> buildFactorGraph(TreeNode arbitraryRoot)
   {
     /* startRem throw new RuntimeException(); */
     
@@ -97,7 +103,7 @@ public class TreeLikelihood<R extends RateMatrix> implements Factor
     DiscreteFactorGraph<TreeNode> result = new DiscreteFactorGraph<TreeNode>(tree.getTopology());
     
     // orient edges away from root
-    TreeNode arbitraryRoot = BriefCollections.pick(tree.getTopology().vertexSet());
+    
     List<Pair<TreeNode,TreeNode>> orientedEdges = EdgeSorter.newEdgeSorter(tree.getTopology(), arbitraryRoot).backwardMessages();
     
     // observations
@@ -117,8 +123,32 @@ public class TreeLikelihood<R extends RateMatrix> implements Factor
     /* endRem */
   }
   
+  /**
+   * 
+   * @return The factor graph built relative to an arbitrary rooting.
+   */
+  public DiscreteFactorGraph<TreeNode> buildFactorGraph()
+  {
+    return buildFactorGraph(arbitraryNode());
+  }
+  
+  /**
+   * 
+   * @return An arbitrary rooting. Does not matter as long as the model is reversible.
+   */
+  public TreeNode arbitraryNode()
+  {
+    return BriefCollections.pick(tree.getTopology().vertexSet());
+  }
+  
   /* startRem  */
 
+  /**
+   * Add the transition.
+   * @param result Modified factor graph
+   * @param orientedEdges Edges going away from the arbitrarily picked root.
+   * @param ctmc The continuous time Markov chain model
+   */
   private void addTransitions(DiscreteFactorGraph<TreeNode> result, List<Pair<TreeNode, TreeNode>> orientedEdges, CTMC ctmc)
   {
     for (Pair<TreeNode,TreeNode> edge : orientedEdges)
@@ -129,6 +159,14 @@ public class TreeLikelihood<R extends RateMatrix> implements Factor
     }
   }
 
+  /**
+   * Add the initial distribution factor to the factor graph.
+   * 
+   * @param result Modified factor graph.
+   * @param arbitraryRoot
+   * @param nSites
+   * @param ctmc
+   */
   private void addInitialDistribution(DiscreteFactorGraph<TreeNode> result, TreeNode arbitraryRoot, int nSites, CTMC ctmc)
   {
     double [] stationary = ctmc.stationaryDistribution();
@@ -138,6 +176,10 @@ public class TreeLikelihood<R extends RateMatrix> implements Factor
     result.unariesTimesEqual(arbitraryRoot, new SimpleMatrix(allStatios));
   }
 
+  /**
+   * Add the observation factor (dirac delta) to the factor graph.
+   * @param result Modified factor graph.
+   */
   private void addObservationFactors(DiscreteFactorGraph<TreeNode> result)
   {
     for (TreeNode observedNode : observationFactors.keySet())
@@ -160,7 +202,7 @@ public class TreeLikelihood<R extends RateMatrix> implements Factor
    * 
    * @param inputFile The file containing the sequence data.
    */
-  public static TreeLikelihood<JukeCantorRateMatrix> fromObservations(File inputFile)
+  public static UnrootedTreeLikelihood<JukeCantorRateMatrix> fromObservations(File inputFile)
   {
     // TODO: make this detect the type of observation
     PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.nucleotidesFactory();
@@ -182,13 +224,56 @@ public class TreeLikelihood<R extends RateMatrix> implements Factor
         leafLikelihoods.put(leafNode, factor);
       }
     // pick an arbitrary tree
-    Random rand = new Random(1);
     List<TreeNode> leaves = Lists.newArrayList(leafLikelihoods.keySet());
-    UnrootedTree randomTree = NonClockTreePrior.generate(rand, Exponential.on(RealVariable.real()), leaves);
-    return new TreeLikelihood<JukeCantorRateMatrix>(randomTree, new JukeCantorRateMatrix(factory.nSymbols()), leafLikelihoods, nSites);
+    UnrootedTree randomTree = defaultTree(leaves);
+    return new UnrootedTreeLikelihood<JukeCantorRateMatrix>(randomTree, defaultRateMatrix(factory.nSymbols()), leafLikelihoods, nSites);
   }
   
-  private TreeLikelihood(UnrootedTree tree, R rateMatrix,
+  /**
+   * 
+   * @param leaves
+   * @return A default tree obtained by sampling a nonclock tree with an exponential rate one
+   *         and a fixed seed.
+   */
+  public static UnrootedTree defaultTree(List<TreeNode> leaves)
+  {
+    Random rand = new Random(1);
+    return NonClockTreePrior.generate(rand, Exponential.on(RealVariable.real()), leaves);
+  }
+  
+  /**
+   * 
+   * @param nSymbols
+   * @return A default rate matrix based on Juke Cantor
+   */
+  public static JukeCantorRateMatrix defaultRateMatrix(int nSymbols)
+  {
+    return new JukeCantorRateMatrix(nSymbols);
+  }
+  
+  public static UnrootedTreeLikelihood<JukeCantorRateMatrix> createEmptySyntheticNucleotideLikelihood(int nSites, List<TreeNode> leaves)
+  {
+    Random rand = new Random(1);
+    UnrootedTree randomTree = NonClockTreePrior.generate(rand, Exponential.on(RealVariable.real()), leaves);
+    return new UnrootedTreeLikelihood<JukeCantorRateMatrix>(randomTree, defaultRateMatrix(4), new HashMap<TreeNode, UnaryFactor<TreeNode>>(), nSites);
+  }
+  
+  /**
+   * Samples the observations at the leaves given the tree and the evolutionary parameters.
+   */
+  @Override
+  public void generate(Random random)
+  {
+    observationFactors.clear();
+    TreeNode pseudoRoot = arbitraryNode();
+    DiscreteFactorGraph<TreeNode> factorGraph = buildFactorGraph(pseudoRoot);
+    ExactSampler<TreeNode> sampler = ExactSampler.priorSampler(factorGraph, factorGraph.getSampler());
+    Map<TreeNode, UnaryFactor<TreeNode>> samples = sampler.sample(random, pseudoRoot);
+    for (TreeNode leaf : TopologyUtils.leaves(tree.getTopology()))
+      observationFactors.put(leaf, samples.get(leaf));
+  }
+  
+  private UnrootedTreeLikelihood(UnrootedTree tree, R rateMatrix,
       Map<TreeNode, UnaryFactor<TreeNode>> observationFactors, int nSites)
   {
     this.tree = tree;
@@ -196,4 +281,6 @@ public class TreeLikelihood<R extends RateMatrix> implements Factor
     this.observationFactors = observationFactors;
     this.nSites = nSites;
   }
+
+
 }

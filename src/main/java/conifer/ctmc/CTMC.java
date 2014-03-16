@@ -1,6 +1,14 @@
 package conifer.ctmc;
 
+import org.ejml.data.Eigenpair;
+import org.ejml.ops.EigenOps;
+import org.ejml.simple.SimpleMatrix;
+
 import tutorialj.Tutorial;
+import bayonet.distributions.Multinomial;
+import bayonet.math.EJMLUtils;
+import bayonet.math.EJMLUtils.SimpleEigenDecomposition;
+import bayonet.math.NumericalUtils;
 
 /**
  * A continuous time Markov chain. The main functionalities consists
@@ -15,8 +23,9 @@ import tutorialj.Tutorial;
  */
 public class CTMC
 {
-  private final RateMatrix rateMatrix;
- 
+  private final SimpleEigenDecomposition eigenDecomp;
+  private final double [] stationaryDistribution;
+
   /**
    * Note: if the RateMatrix is changed in place,
    * these changes will not be mirrored by this class.
@@ -27,23 +36,40 @@ public class CTMC
    */
   public CTMC(RateMatrix rateMatrix)
   {
-    this.rateMatrix = rateMatrix;
+    RateMatrixUtils.checkValidRateMatrix(rateMatrix);
+    this.eigenDecomp = EJMLUtils.simpleEigenDecomposition(new SimpleMatrix(rateMatrix.getMatrix()));
+    this.stationaryDistribution = computeStationary();
   }
   
+  /**
+   * Compute and cache the stationary (called by the constructor)
+   * @return
+   */
+  private double[] computeStationary()
+  {
+    SimpleMatrix marginal = new SimpleMatrix(marginalTransitionProbability(1.0));
+    SimpleMatrix exponentiatedTranspose = marginal.transpose();
+    Eigenpair eigenPair = EigenOps.computeEigenVector(exponentiatedTranspose.getMatrix(), 1.0);
+    double [] result = eigenPair.vector.data;
+    Multinomial.normalize(result);
+    return result;
+  }
+
   /**
    * 
    * Fill in ``marginalTransitionProbability()``.
    * 
    * Use the diagonalization method covered in class, using 
    * the eigen-decomposition functionalities provided by EJML.
-   * 
-   * See EJMLUtils.java in the bayonet project (v. 2.0.3).
    */
   @Tutorial(showSource = false, showLink = true)
   public double [][] marginalTransitionProbability(double branchLength)
   {
-    throw new RuntimeException();
- 
+    double [][] result =  EJMLUtils.copyMatrixToArray(EJMLUtils.matrixExponential(eigenDecomp, branchLength));
+    NumericalUtils.checkIsTransitionMatrix(result);
+    for (int row = 0; row < result.length; row++)
+      Multinomial.normalize(result[row]);
+    return result;
   }
 
   /**
@@ -56,9 +82,7 @@ public class CTMC
   @Tutorial(showSource = false, showLink = true)
   public double [] stationaryDistribution()
   {
-    throw new RuntimeException();
-
+    return stationaryDistribution;
   }
   
-
 }

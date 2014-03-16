@@ -4,12 +4,6 @@ import java.io.File;
 import java.util.List;
 
 import tutorialj.Tutorial;
-
-import com.google.common.collect.Lists;
-
-import conifer.ctmc.JukeCantorRateMatrix;
-import conifer.factors.NonClockTreePrior;
-import conifer.factors.TreeLikelihood;
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
 import bayonet.rplot.PlotHistogram;
@@ -18,20 +12,26 @@ import blang.annotations.DefineFactor;
 import blang.processing.ProcessorContext;
 import briefj.tomove.Results;
 
+import com.google.common.collect.Lists;
+
+import conifer.ctmc.JukeCantorRateMatrix;
+import conifer.factors.NonClockTreePrior;
+import conifer.factors.UnrootedTreeLikelihood;
+
 
 
 public class SimplePhyloModel extends MCMCRunner
 {
   File inputFile = new File("primates.data");
   
-  @DefineFactor 
-  TreeLikelihood<JukeCantorRateMatrix> treeLikelihood = TreeLikelihood.fromObservations(inputFile);
+  @DefineFactor(onObservations = true)
+  UnrootedTreeLikelihood<JukeCantorRateMatrix> treeLikelihood = UnrootedTreeLikelihood.fromObservations(inputFile);
   
   @DefineFactor
-  NonClockTreePrior<Exponential<RateParameterization>> treePrior = NonClockTreePrior.on(treeLikelihood.tree);
+  NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(treeLikelihood.tree);
 
   @DefineFactor
-  Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(treePrior.branchDistribution.parameters.rate).withMean(10.0);
+  Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(treePrior.branchDistributionParameters.rate).withMean(10.0);
   
   
   
@@ -54,8 +54,10 @@ public class SimplePhyloModel extends MCMCRunner
   @Tutorial(showSource = true, showLink = true, showSignature = true)
   protected void process(ProcessorContext context)
   {
-    samples.add(treePrior.branchDistribution.parameters.rate.getValue());
+    samples.add(treePrior.branchDistributionParameters.rate.getValue());
   }
   
   List<Double> samples = Lists.newArrayList();
+  
+
 }

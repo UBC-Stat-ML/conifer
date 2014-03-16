@@ -44,6 +44,8 @@ public class SingleNNI implements MHProposalDistribution
   public Proposal propose(Random rand)
   {
     List<UnorderedPair<TreeNode, TreeNode>> nonTerminalEdges = TopologyUtils.nonTerminalEdges(tree.getTopology());
+    if (nonTerminalEdges.isEmpty())
+      return null; // If its just a pair of sequence, we do not need to propose anything.
     UnorderedPair<TreeNode, TreeNode> referenceEdge = DiscreteUniform.sample(nonTerminalEdges, rand);
     TreeNode moved1 = sampleMovedEndpoint(referenceEdge, referenceEdge.getFirst(), rand);
     TreeNode moved2 = sampleMovedEndpoint(referenceEdge, referenceEdge.getSecond(), rand);

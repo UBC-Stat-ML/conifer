@@ -1,17 +1,22 @@
 package conifer;
 
+import java.util.List;
 import java.util.Map;
 
 import org.jgrapht.UndirectedGraph;
 
 import bayonet.graphs.GraphUtils;
+import blang.annotations.Processors;
 import blang.annotations.Samplers;
+import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
 
 import com.google.common.collect.Maps;
 
 import conifer.moves.SingleBranchScaling;
 import conifer.moves.SingleNNI;
+import conifer.processors.TotalTreeLengthProcessor;
+import conifer.processors.TreeDiameterProcessor;
 
 
 /**
@@ -20,11 +25,21 @@ import conifer.moves.SingleNNI;
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  *
  */
-@Samplers({SingleNNI.class, SingleBranchScaling.class})
+@Samplers({
+  SingleNNI.class, 
+  SingleBranchScaling.class
+})
+@Processors({
+  TotalTreeLengthProcessor.class,
+  TreeDiameterProcessor.class
+})
 public class UnrootedTree
 {
-  private final UndirectedGraph<TreeNode, UnorderedPair<TreeNode, TreeNode>> topology = GraphUtils.newUndirectedGraph();
-  private final Map<UnorderedPair<TreeNode, TreeNode>,Double> branchLengths = Maps.newLinkedHashMap();
+  /**
+   * Note if other fields are added, setTo() should be modified as well.
+   */
+  private UndirectedGraph<TreeNode, UnorderedPair<TreeNode, TreeNode>> topology = GraphUtils.newUndirectedGraph();
+  private Map<UnorderedPair<TreeNode, TreeNode>,Double> branchLengths = Maps.newLinkedHashMap();
   
   /**
    * Add a node (species)
@@ -117,6 +132,33 @@ public class UnrootedTree
     branchLengths.put(new UnorderedPair<TreeNode,TreeNode>(moved, newFixed), branchLength);
   }
 
+  /**
+   * Set the value of the topology and branch length of this tree to those of the provided
+   * tree (no copy performed, just two references set)
+   * @param otherTree
+   */
+  public void setTo(UnrootedTree otherTree)
+  {
+    this.topology = otherTree.topology;
+    this.branchLengths = otherTree.branchLengths;
+  }
+
+  /**
+   * @see UnrootedTreeUtils.leaves()
+   * @return
+   */
+  public List<TreeNode> leaves()
+  {
+    return TopologyUtils.leaves(getTopology());
+  }
   
+  /**
+   * @see UnrootedTreeUtils.allTotalBranchLengthDistances()
+   * @return
+   */
+  public Counter<UnorderedPair<TreeNode,TreeNode>> allTotalBranchLengthDistances()
+  {
+    return UnrootedTreeUtils.allTotalBranchLengthDistances(this);
+  }
   
 }

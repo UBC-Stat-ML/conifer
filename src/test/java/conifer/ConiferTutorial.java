@@ -3,7 +3,7 @@ package conifer;
 import java.util.Random;
 
 import conifer.ctmc.CTMC;
-import conifer.factors.TreeLikelihood;
+import conifer.factors.UnrootedTreeLikelihood;
 import conifer.moves.SingleBranchScaling;
 import conifer.moves.SingleNNI;
 
@@ -210,7 +210,7 @@ public class ConiferTutorial
   /**
    * #### Computing the likelihood on a tree
    */
-  @Tutorial(showSource = false, nextStep = TreeLikelihood.class)
+  @Tutorial(showSource = false, nextStep = UnrootedTreeLikelihood.class)
   public void phyloApplicationPart2() {}
   
   /**
@@ -232,7 +232,7 @@ public class ConiferTutorial
    * 
    * Finally, you can now run the phylogenetic sampler. 
    */
-  @Tutorial(showSource = false, nextStep = SimplePhyloModel.class)
+  @Tutorial(showSource = false, nextStep = TestSimplePhyloModel.class)
   public void runningPhylo() {}
   
   /**

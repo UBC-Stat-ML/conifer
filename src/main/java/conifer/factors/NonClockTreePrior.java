@@ -10,36 +10,39 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.Lists;
 
 
+import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
 import bayonet.distributions.UnivariateRealDistribution;
-import bayonet.distributions.Exponential.MeanParameterization;
 import blang.annotations.FactorArgument;
 import blang.annotations.FactorComponent;
-import blang.factors.Factor;
 import blang.factors.GenerativeFactor;
 import blang.variables.RealVariable;
 
 
 
-public class NonClockTreePrior<P extends UnivariateRealDistribution> implements Factor
+public class NonClockTreePrior<P> implements GenerativeFactor
 {
   @FactorArgument(makeStochastic = true)
   public final UnrootedTree tree;
   
   @FactorComponent
-  public final P branchDistribution;
+  public final P branchDistributionParameters;
+  
+  private final UnivariateRealDistribution branchDistribution;
 
   
   public NonClockTreePrior(
       UnrootedTree tree,
-      P branchDistribution)
+      P branchDistributionParameters,
+      UnivariateRealDistribution branchDistribution)
   {
     this.tree = tree;
     this.branchDistribution = branchDistribution;
+    this.branchDistributionParameters = branchDistributionParameters;
   }
 
   /**
@@ -135,12 +138,23 @@ public class NonClockTreePrior<P extends UnivariateRealDistribution> implements 
     return result;
   }
   
-  public static NonClockTreePrior<Exponential<RateParameterization>> on(UnrootedTree tree)
+  public static NonClockTreePrior<RateParameterization> on(UnrootedTree tree)
   {
     Exponential<RateParameterization> branchDist = Exponential.on(RealVariable.real());
-    return new NonClockTreePrior<Exponential<RateParameterization>>(tree, branchDist);
+    return new NonClockTreePrior<RateParameterization>(tree,branchDist.parameters, branchDist);
+  }
+
+  /**
+   * Creates a new tree in place according to the prior.
+   * The labels at the leaves of the current tree will be the same as
+   * those before.
+   */
+  @Override
+  public void generate(Random random)
+  {
+    List<TreeNode> leaves = TopologyUtils.leaves(tree.getTopology());
+    UnrootedTree sampled = generate(random, branchDistribution, leaves);
+    this.tree.setTo(sampled);
   }
   
-//  public <> NonClockTreePrior withBranchDistribution()
-
 }

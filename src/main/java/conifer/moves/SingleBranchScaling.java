@@ -26,7 +26,7 @@ public class SingleBranchScaling implements MHProposalDistribution
   
   @ConnectedFactor List<Factor> factors;
   
-  private static final double maxMultiplier = 2.0;
+  private static final double lambda = 2.0 * Math.log(2.0);
 
   @Override
   public Proposal propose(Random rand)
@@ -34,7 +34,8 @@ public class SingleBranchScaling implements MHProposalDistribution
     List<UnorderedPair<TreeNode, TreeNode>> allEdges = Lists.newArrayList(tree.getTopology().edgeSet());
     final UnorderedPair<TreeNode, TreeNode> edge = DiscreteUniform.sample(allEdges, rand);
     final double oldValue = tree.getBranchLengths().get(edge);
-    final double m = nextDouble(rand, 1.0/maxMultiplier, maxMultiplier);
+    double u = rand.nextDouble();
+    final double m = Math.exp(lambda * (u - 0.5));
     final double newValue = m * oldValue;
     tree.updateBranchLength(edge, newValue);
     return new Proposal() {
