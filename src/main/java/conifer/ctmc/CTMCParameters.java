@@ -5,7 +5,7 @@ import briefj.Indexer;
 
 
 /**
- * Note: this is an interface so that various parameterizations can 
+ * Note: this is an interface so that various parameterizations can be 
  * maintained.
  * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)

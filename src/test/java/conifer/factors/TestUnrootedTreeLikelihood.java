@@ -2,6 +2,7 @@ package conifer.factors;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -12,11 +13,13 @@ import conifer.models.MultiCategorySubstitutionModel;
 import blang.ForwardSampler;
 import blang.MCMCAlgorithm;
 import blang.MCMCRunner;
+import blang.ProbabilityModel;
 import blang.annotations.DefineFactor;
+import blang.validation.CheckDiscreteNormalization;
 
 
 
-public class TestUnrootedTreeLikelihood extends MCMCRunner
+public class TestUnrootedTreeLikelihood
 {
   
   @DefineFactor
@@ -27,23 +30,25 @@ public class TestUnrootedTreeLikelihood extends MCMCRunner
   public static void main(String [] args)
   {
     TestUnrootedTreeLikelihood runner = new TestUnrootedTreeLikelihood();
-    runner.factory.setCheckAllNodesCoveredByMCMCMoves(false);
-    
-    Map<String,Double> prs = Maps.newHashMap();
-    for (int i = 0; i < 10000; i++)
-    {
-      MCMCAlgorithm mcmc = runner.buildMCMCAlgorithm();
-      ForwardSampler forwardSampler = new ForwardSampler(mcmc.model);
-      forwardSampler.simulate(mcmc.options.random);
-      String current = runner.likelihood.observations.toString();
-      double pr = Math.exp( runner.likelihood.logDensity() );
-      prs.put(current, pr);
-  //    System.out.println(runner.likelihood.observations);
-    }
-    System.out.println(prs);
-    double sum = 0.0;
-    for (double value : prs.values())
-      sum += value;
-    System.out.println(sum);
+    ProbabilityModel model = new ProbabilityModel(runner);
+    Random rand = new Random(1);
+    CheckDiscreteNormalization.check(model, rand, 10000);
+//    runner.factory.setCheckAllNodesCoveredByMCMCMoves(false);
+//    MCMCAlgorithm mcmc = runner.buildMCMCAlgorithm();
+//    ForwardSampler forwardSampler = new ForwardSampler(mcmc.model);
+//    Map<String,Double> prs = Maps.newHashMap();
+//    for (int i = 0; i < 10000; i++)
+//    {
+//      forwardSampler.simulate(mcmc.options.random);
+//      String current = runner.likelihood.observations.toString();
+//      double pr = Math.exp( runner.likelihood.logDensity() );
+//      prs.put(current, pr);
+//  //    System.out.println(runner.likelihood.observations);
+//    }
+//    System.out.println(prs);
+//    double sum = 0.0;
+//    for (double value : prs.values())
+//      sum += value;
+//    System.out.println(sum);
   }
 }

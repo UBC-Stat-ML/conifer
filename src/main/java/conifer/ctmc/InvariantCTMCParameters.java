@@ -29,6 +29,6 @@ public class InvariantCTMCParameters implements CTMCParameters
   @Override
   public double[][] getRateMatrix()
   {
-    throw new RuntimeException();
+    return new double[initialDistribution.length][initialDistribution.length];
   }
 }

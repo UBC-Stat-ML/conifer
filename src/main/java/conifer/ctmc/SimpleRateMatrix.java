@@ -40,6 +40,8 @@ public class SimpleRateMatrix implements CTMCParameters
     return emissionModel;
   }
   
+  public int nStates() { return rateMatrix.length; }
+  
   public static SimpleRateMatrix fromJSONFile(File jsonFile)
   {
     String jsonString = BriefIO.fileToString(jsonFile);

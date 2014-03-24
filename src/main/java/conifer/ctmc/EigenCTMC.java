@@ -26,6 +26,7 @@ public class EigenCTMC implements CTMC
 {
   private final SimpleEigenDecomposition eigenDecomp;
   private final double [] stationaryDistribution;
+  private final double [][] rates;
 
   /**
    * Note: if the RateMatrix is changed in place,
@@ -40,6 +41,7 @@ public class EigenCTMC implements CTMC
     RateMatrixUtils.checkValidRateMatrix(rates);
     this.eigenDecomp = EJMLUtils.simpleEigenDecomposition(new SimpleMatrix(rates));
     this.stationaryDistribution = computeStationary();
+    this.rates = rates;
   }
   
   /**
@@ -82,6 +84,12 @@ public class EigenCTMC implements CTMC
   public double [] stationaryDistribution()
   {
     return stationaryDistribution;
+  }
+
+  @Override
+  public double[][] getRateMatrix()
+  {
+    return rates;
   }
   
 }

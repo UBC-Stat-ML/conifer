@@ -39,4 +39,10 @@ public class InvariantCTMC implements CTMC
   {
     return stationary;
   }
+
+  @Override
+  public double[][] getRateMatrix()
+  {
+    return new double[stationary.length][stationary.length];
+  }
 }

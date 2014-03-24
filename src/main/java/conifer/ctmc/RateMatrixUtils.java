@@ -1,5 +1,6 @@
 package conifer.ctmc;
 
+import bayonet.distributions.Multinomial;
 import bayonet.math.NumericalUtils;
 
 
@@ -29,6 +30,20 @@ public class RateMatrixUtils
         throw new RuntimeException();
       rate[i][i] = -sum;
     }
+  }
+  
+  public static double [][] getJumpProcess(double [][] rate)
+  {
+    final int size = rate.length;
+    double [][] result = new double[size][size];
+    for (int i = 0; i < size; i++)
+    {
+      for (int j = 0; j < size; j++)
+        if (i!=j)
+          result[i][j] = rate[i][j];
+      Multinomial.normalize(result[i]);
+    }
+    return result;
   }
 
   /**

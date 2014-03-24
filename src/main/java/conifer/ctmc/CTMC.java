@@ -25,4 +25,5 @@ public interface CTMC
 {
   public double [][] marginalTransitionProbability(double branchLength);
   public double [] stationaryDistribution();
+  public double [][] getRateMatrix();
 }
