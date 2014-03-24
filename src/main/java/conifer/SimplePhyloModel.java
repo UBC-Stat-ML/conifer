@@ -16,7 +16,7 @@ import com.google.common.collect.Lists;
 
 import conifer.ctmc.JukeCantorRateMatrix;
 import conifer.factors.NonClockTreePrior;
-import conifer.factors.UnrootedTreeLikelihood;
+import conifer.factors.OldUnrootedTreeLikelihood;
 
 
 
@@ -25,7 +25,7 @@ public class SimplePhyloModel extends MCMCRunner
   File inputFile = new File("primates.data");
   
   @DefineFactor(onObservations = true)
-  UnrootedTreeLikelihood<JukeCantorRateMatrix> treeLikelihood = UnrootedTreeLikelihood.fromObservations(inputFile);
+  OldUnrootedTreeLikelihood<JukeCantorRateMatrix> treeLikelihood = OldUnrootedTreeLikelihood.fromObservations(inputFile);
   
   @DefineFactor
   NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(treeLikelihood.tree);

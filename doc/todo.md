@@ -19,11 +19,40 @@ TODO
   - That's it! Run the test! (**DONE**)
   - Check what went wrong. (**DONE**)
 5. A few more stats  <-- entropy on clade distribution? pr of largest non-trivial clade?
-**OK, one more implemented, but how to ensure our test is non-trivial?**
+**OK for now, NNI code is pretty simple**
 
 ### Investigate gradient code
 
-See why penalized likelihood is decreasing
+**Problem potentially identified:** normalization incorrect in the multi-category case? 
+
+### Planning
+
+Potential solution for above 
+
+1. Fix normalization
+   - Java **Too (programming) time consuming?**
+   - Stan **Too much plumbing**
+   - Just rescale the holding time statistics **Yes!**
+2. Use only unnormalized matrices **No, too non-standard**
+
+So to summarize, in the CTMC learning code, we will still assume a single rate matrix, but with two tricks:
+
+- an actual category will be sampled for each site, so only the counts for this category will be accumulated
+- waiting times can then be interprete rescaled with respect to the selected category (so that the full problem is seen as a single normalized matrix from the point of view of the CTMC training code)
+
+**Actually:** wait for talking with Crystal, but there is probably no problem with the code on our side.
+
+### Implementing and testing new tree likelihood class
+
+Next: 
+- fixed rate matrix:
+  - load and save
+  - use easy kimura
+  - std gamma rate cat
+
+### Simplest weight-based sampler
+
+Use MH
 
 ### Compare to MrBayes by using logGamma priors?
 
@@ -36,6 +65,17 @@ Test on simple example.
 Start with naive (slow) HMC way
 
 ### Write fast uniformization-based sampler
+
+
+### Refactor FactorGraph
+
+**NO:** actually, the DiscreteFactorGraph does have some fields, i.e. keeping track of the number of sites. Also make add binary factor calls simplers.
+ 
+- should be class instead of interface
+- add invert in binary factors instead
+- basically, main behavior is to pointwise multiply things
+- remove newFactorGraph in interface EvolutionaryModel. called by sumprod
+
 
 ### Build consensus code
 
@@ -86,3 +126,29 @@ Try to get students involved!
 
 Try to get students involved!
 
+
+Topics of each paper
+--------------------
+
+### Models and algorithms for large substitution matrix estimation
+
+**Journal:** Sys bio
+
+**Topics:**
+
+- Normalized exponential family model
+- Applications: 
+  - hierarchical, site-specific iid model
+  - non-hierarchical: codon interaction evolution: features:
+    - protein marginal features
+    - codon marginal features
+    - same for interaction features
+  - non-exponential waiting times?
+- Estimation
+  - Frequentist: 
+    - EM
+    - gradient method
+  - Bayesian:
+    - HMC background; including new method based on Bayesian optimization
+    - Auxiliary variable construction (applies Neal's paper)
+    - Trick

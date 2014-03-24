@@ -9,7 +9,7 @@ import blang.annotations.DefineFactor;
 import blang.validation.CheckStationarity;
 import conifer.ctmc.JukeCantorRateMatrix;
 import conifer.factors.NonClockTreePrior;
-import conifer.factors.UnrootedTreeLikelihood;
+import conifer.factors.OldUnrootedTreeLikelihood;
 
 
 /**
@@ -21,7 +21,7 @@ import conifer.factors.UnrootedTreeLikelihood;
 public class TestSimplePhyloModel extends MCMCRunner
 {
   @DefineFactor
-  UnrootedTreeLikelihood<JukeCantorRateMatrix> treeLikelihood = UnrootedTreeLikelihood.createEmptySyntheticNucleotideLikelihood(2, TopologyUtils.syntheticTaxaList(5));
+  OldUnrootedTreeLikelihood<JukeCantorRateMatrix> treeLikelihood = OldUnrootedTreeLikelihood.createEmptySyntheticNucleotideLikelihood(2, TopologyUtils.syntheticTaxaList(5));
   
   @DefineFactor
   NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(treeLikelihood.tree);

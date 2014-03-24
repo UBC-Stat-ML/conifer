@@ -35,9 +35,8 @@ public class RateMatrixUtils
    * Check off diagonals are non-negative and  sum to the negative of diagonals.
    * @param rateMatrix
    */
-  public static void checkValidRateMatrix(RateMatrix rateMatrix)
+  public static void checkValidRateMatrix(double [][] rates)
   {
-    double [][] rates = rateMatrix.getMatrix();
     int size = rates.length;
     for (int row = 0; row < size; row++)
     {

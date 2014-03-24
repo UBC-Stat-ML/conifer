@@ -1,37 +1,74 @@
 package conifer.io;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.ejml.simple.SimpleMatrix;
-
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
-
-import bayonet.math.EJMLUtils;
 import briefj.BriefCollections;
 import briefj.BriefIO;
 import briefj.BriefLog;
 import briefj.Indexer;
 
+import com.google.common.collect.Maps;
+import com.google.gson.Gson;
 
 
+/**
+ * A PhylogeneticObservationFactory contains the information required to 
+ * parse sequence to turn them into indicator variables sitting at the leaves
+ * of a phylogenetic likelihood model.
+ * 
+ * The main ingredient is an indexer between the integer and strings.
+ * e.g. 0 - A, 1 - C, ... Or a more involved example could be codons,
+ * e.g. 0 - AAA, 1 - AAC, ...
+ * Note that all strings in the indexer should have the same length (the 
+ * chunk length).
+ * 
+ * Note also that some letters read in the strings could correspond to several 
+ * symbols in the indexer (these are called ambiguous symbols). For example,
+ * for nucleotides, 'S' could be either 'C' or 'G' (representing uncertainty
+ * in the read).
+ * 
+ * Terminology: we call a chunk a string that can be either an actual symbol or 
+ * an ambiguous symbol.
+ * 
+ * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+ *
+ */
 public class PhylogeneticObservationFactory
 {
-  private final List<String> orderedSymbols;
-  private final Map<String, Set<String>> ambiguousSymbols;
-  private final boolean caseSensitive;
+  /**
+   * 
+   * @return The PhylogeneticObservationFactory corresponding to the standard iupac encodings.
+   */
+  public static PhylogeneticObservationFactory nucleotidesFactory()
+  {
+    if (_nucleotideFactory == null)
+      _nucleotideFactory = fromResource("/conifer/io/dna-iupac-encoding.txt");
+    return _nucleotideFactory;
+  }
   
-  private transient Integer chunkLength = null;
-  private transient Indexer<String> _indexer;
-  private transient Map<String,double[]> _indicators;
-  private transient double[] _unknownIndicator;
+  /**
+   * Reads the specifications of a PhylogeneticObservationFactory from a JSON file.
+   * 
+   * @see src/main/resources/conifer/io/dna-iupac-encoding.txt for an example of the format.
+   * 
+   * @param jsonFile
+   * @return
+   */
+  public static PhylogeneticObservationFactory fromJSONFile(File jsonFile)
+  {
+    String jsonString = BriefIO.fileToString(jsonFile);
+    return fromJSONString(jsonString);
+  }
   
+  /**
+   * 
+   * @param sequence To be chunked and indexed.
+   * @return An array with rows indexing sites and columns indexing actual symbols, filled with one
+   *         if the actual symbol is permitted at that site or zero otherwise.
+   */
   public double [][] site2CharacterIndicators(String sequence)
   {
     Map<String,double[]> indicators = getIndicators();
@@ -52,29 +89,32 @@ public class PhylogeneticObservationFactory
     }
     return result;
   }
-  
-  private double[] handleMissing(String currentChunk)
-  { 
-    BriefLog.warnOnce("WARNING: symbol " + currentChunk + " is unknown (setting to unknown)");
-    return getUnknownIndicator();
-  }
 
-  public double[] getUnknownIndicator()
-  {
-    if (_unknownIndicator == null)
-    {
-      _unknownIndicator = new double[nSymbols()];
-      for (int symbolIndex = 0; symbolIndex < nSymbols(); symbolIndex++)
-        _unknownIndicator[symbolIndex] = 1.0;
-    }
-    return _unknownIndicator;
-  }
-  
+  /**
+   * 
+   * @return The number of symbols permitted in the observations.
+   */
   public int nSymbols() 
   {
     return orderedSymbols.size();
   }
   
+  /**
+   * 
+   * @return
+   */
+  public Indexer<String> getIndexer()
+  {
+    if (_indexer == null) 
+      _indexer = new Indexer<String>(orderedSymbols);
+    return _indexer;
+  }
+  
+  /**
+   * 
+   * @return A map from chunk to arrays filled with one
+   *         if this actual symbol is permitted at that site or zero otherwise.
+   */
   public Map<String,double[]> getIndicators()
   {
     if (_indicators == null)
@@ -100,19 +140,49 @@ public class PhylogeneticObservationFactory
     return _indicators;
   }
   
+  private final List<String> orderedSymbols;
+  private final Map<String, Set<String>> ambiguousSymbols;
+  private final boolean caseSensitive;
+  
+  private transient Integer chunkLength = null;
+  private transient Indexer<String> _indexer;
+  private transient Map<String,double[]> _indicators;
+  private transient double[] _unknownIndicator;
+  
+  private double[] getUnknownIndicator()
+  {
+    if (_unknownIndicator == null)
+    {
+      _unknownIndicator = new double[nSymbols()];
+      for (int symbolIndex = 0; symbolIndex < nSymbols(); symbolIndex++)
+        _unknownIndicator[symbolIndex] = 1.0;
+    }
+    return _unknownIndicator;
+  }
+  
+  private static PhylogeneticObservationFactory fromResource(String resourceURL)
+  {
+    String jsonString = BriefIO.resourceToString(resourceURL); 
+    return fromJSONString(jsonString);
+  }
+  
+  private static PhylogeneticObservationFactory fromJSONString(String jsonString)
+  {
+    return new Gson().fromJson(jsonString, PhylogeneticObservationFactory.class);
+  }
+  
+  private double[] handleMissing(String currentChunk)
+  { 
+    BriefLog.warnOnce("WARNING: symbol " + currentChunk + " is unknown (setting to unknown)");
+    return getUnknownIndicator();
+  }
+
   private void checkChunkLength(int length)
   {
     if (chunkLength == null)
       chunkLength = length;
     if (chunkLength != length)
       throw new RuntimeException();
-  }
-
-  public Indexer<String> getIndexer()
-  {
-    if (_indexer == null) 
-      _indexer = new Indexer<String>(orderedSymbols);
-    return _indexer;
   }
   
   private PhylogeneticObservationFactory(List<String> orderedSymbols,
@@ -123,19 +193,5 @@ public class PhylogeneticObservationFactory
     this.caseSensitive = caseSensitive;
   }
   
-  public static PhylogeneticObservationFactory nucleotidesFactory()
-  {
-    return fromResource("/conifer/io/dna-iupac-encoding.txt");
-  }
-  
-  public static PhylogeneticObservationFactory fromResource(String resourceURL)
-  {
-    String jsonString = BriefIO.resourceToString(resourceURL); 
-    return new Gson().fromJson(jsonString, PhylogeneticObservationFactory.class);
-  }
-
-  public static void main(String [] args)
-  {
-    System.out.println(EJMLUtils.toString(new SimpleMatrix(nucleotidesFactory().site2CharacterIndicators("asldkfjaslkfasdf"))));
-  }
+  private static PhylogeneticObservationFactory _nucleotideFactory = null;
 }
