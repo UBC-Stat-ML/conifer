@@ -20,4 +20,6 @@ public interface TreeObservations
   public void set(TreeNode leaf, Object data);
   
   public void clear();
+
+  public int nSites();
 }

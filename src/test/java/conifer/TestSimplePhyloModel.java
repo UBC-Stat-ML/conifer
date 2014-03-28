@@ -7,9 +7,9 @@ import blang.MCMCAlgorithm;
 import blang.MCMCRunner;
 import blang.annotations.DefineFactor;
 import blang.validation.CheckStationarity;
-import conifer.ctmc.JukeCantorRateMatrix;
 import conifer.factors.NonClockTreePrior;
-import conifer.factors.OldUnrootedTreeLikelihood;
+import conifer.factors.UnrootedTreeLikelihood;
+import conifer.models.MultiCategorySubstitutionModel;
 
 
 /**
@@ -20,18 +20,20 @@ import conifer.factors.OldUnrootedTreeLikelihood;
  */
 public class TestSimplePhyloModel extends MCMCRunner
 {
+
   @DefineFactor
-  OldUnrootedTreeLikelihood<JukeCantorRateMatrix> treeLikelihood = OldUnrootedTreeLikelihood.createEmptySyntheticNucleotideLikelihood(2, TopologyUtils.syntheticTaxaList(5));
+  public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel> likelihood = 
+    UnrootedTreeLikelihood.createEmptyDefaultLikelihood(1, TopologyUtils.syntheticTaxaList(4));
+  
   
   @DefineFactor
-  NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(treeLikelihood.tree);
+  NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
 
   @Test
   public void checkStationarity()
   {
     this.factory.setCheckAllNodesCoveredByMCMCMoves(false);
     MCMCAlgorithm algo = buildMCMCAlgorithm();
-    
 
     System.out.println(algo);
     
@@ -45,12 +47,7 @@ public class TestSimplePhyloModel extends MCMCRunner
     
     // Here: 1000 is the number of test iterations (different than MCMC sweeps, see below)
     //       0.05 is a p-value threshold
-    check.check(algo, 10000, 0.05);
-    
-//    next: 
-//      - debug to check why TreeLenPro stat are NaN
-//      - investigate one sampler at the time
-//      - Later: notes simplify the exclude/move mechanism, Variable class
+    check.check(algo, 1000, 0.05);
     
   }
 }

@@ -2,8 +2,8 @@ package conifer.models;
 
 import java.util.Map;
 
+import bayonet.marginal.DiscreteFactorGraph;
 import bayonet.marginal.FactorGraph;
-import bayonet.marginal.discrete.DiscreteFactorGraph;
 
 import com.google.common.collect.Maps;
 

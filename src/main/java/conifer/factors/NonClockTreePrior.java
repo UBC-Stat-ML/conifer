@@ -1,6 +1,7 @@
 package conifer.factors;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
@@ -70,7 +71,7 @@ public class NonClockTreePrior<P> implements GenerativeFactor
   public static UnrootedTree generate(
       Random random, 
       UnivariateRealDistribution branchDistribution,
-      List<TreeNode> leaves)
+      Collection<TreeNode> leaves)
   {
     UnrootedTree result = new UnrootedTree();
     for (TreeNode leaf : leaves)

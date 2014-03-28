@@ -1,6 +1,9 @@
 package conifer.factors;
 
+import java.io.File;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import bayonet.distributions.Exponential;
@@ -13,7 +16,9 @@ import briefj.BriefCollections;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.ctmc.SimpleRateMatrix;
+import conifer.io.FastaUtils;
 import conifer.io.FixedTreeObservations;
+import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
 import conifer.models.DiscreteGammaMixture;
 import conifer.models.EvolutionaryModel;
@@ -83,13 +88,26 @@ public class UnrootedTreeLikelihood
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel>(tree, subModel, new FixedTreeObservations());
   }
   
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel> createFromFasts(File fastaFile)
+  {
+    Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
+    UnrootedTree tree = defaultTree(data.keySet());
+    SimpleRateMatrix baseRateMatrix = SimpleRateMatrix.kimura1980();
+    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0.1), RealVariable.real(1.0), baseRateMatrix, 4);
+    PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.nucleotidesFactory();
+    TreeObservations observations = new FixedTreeObservations();
+    MultiCategorySubstitutionModel.loadObservations(observations, data, factory); 
+    MultiCategorySubstitutionModel subModel = new MultiCategorySubstitutionModel(gammaMixture, observations.nSites());
+    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel>(tree, subModel, observations);
+  }
+  
   /**
    * 
    * @param leaves
    * @return A default tree obtained by sampling a nonclock tree with an exponential rate one
    *         and a fixed seed.
    */
-  public static UnrootedTree defaultTree(List<TreeNode> leaves)
+  public static UnrootedTree defaultTree(Collection<TreeNode> leaves)
   {
     Random rand = new Random(1);
     return NonClockTreePrior.generate(rand, Exponential.on(RealVariable.real()), leaves);
@@ -129,5 +147,16 @@ public class UnrootedTreeLikelihood
     if (!observations.getObservedTreeNodes().isEmpty())
       throw new RuntimeException("The method clear() seems to be incorrectly implemented in " + observations.getClass().getName());
     evolutionaryModel.generateObservationsInPlace(random, observations, tree, arbitraryNode());
+  }
+  
+  public static void main(String [] args)
+  {
+    UnrootedTreeLikelihood<MultiCategorySubstitutionModel> ll = createFromFasts(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"));
+    System.out.println("nSites=" + ll.observations.nSites());
+    System.out.println("nNodes=" + ll.tree.getTopology().vertexSet().size());
+    Random rand = new Random(1);
+    ll.evolutionaryModel.samplePosteriorPaths(rand, ll.observations, ll.tree, BriefCollections.pick(ll.tree.getTopology().vertexSet()), null);
+    System.out.println("done!");
+//    ll.
   }
 }

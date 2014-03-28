@@ -2,15 +2,29 @@ package conifer.ctmc;
 
 import java.util.Random;
 
+import org.ejml.simple.SimpleMatrix;
+import org.junit.Test;
+
 import bayonet.math.EJMLUtils;
-import briefj.BriefLog;
 
 
 
-
+/**
+ * Test the agreement between pure forward sampler vs.
+ * forward+end point sampler.
+ * 
+ * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+ *
+ */
 public class TestForwardAndEndPointSamplers
 {
   public static void main(String [] args)
+  {
+    new TestForwardAndEndPointSamplers().test();
+  }
+  
+  @Test
+  public void test()
   {
     SimpleRateMatrix k80 = SimpleRateMatrix.kimura1980();
     Random rand = new Random(1);
@@ -32,8 +46,11 @@ public class TestForwardAndEndPointSamplers
     }
     System.out.println("Cache size: " + postSampler.cacheSize());
     
-    System.out.println(EJMLUtils.toString(pathStat1.getCountsAsSimpleMatrix().scale(1.0/nIters)));
+    SimpleMatrix m1 = pathStat1.getCountsAsSimpleMatrix().scale(1.0/nIters);
+    SimpleMatrix m2 = pathStat2.getCountsAsSimpleMatrix().scale(1.0/nIters);
+    System.out.println(EJMLUtils.toString(m1));
     System.out.println();
-    System.out.println(EJMLUtils.toString(pathStat2.getCountsAsSimpleMatrix().scale(1.0/nIters)));
+    System.out.println(EJMLUtils.toString(m2));
+    EJMLUtils.checkIsClose(m1, m2, 0.05);
   }
 }

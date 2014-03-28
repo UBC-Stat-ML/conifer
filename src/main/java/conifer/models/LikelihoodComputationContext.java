@@ -52,14 +52,8 @@ public class LikelihoodComputationContext
     if (useDirectSpec())
       return rootMarginals;
     else
-    {
-      List<UnaryFactor<TreeNode>> result = Lists.newArrayList();
-      for (FactorGraph<TreeNode> factorGraph : factorGraphs)
-      {
-        SumProduct<TreeNode> sumProd = new SumProduct<TreeNode>(factorGraph);
-        result.add(sumProd.computeMarginal(arbitraryRoot));
-      }
-      return result;
-    }
+      return EvolutionaryModelUtils.getRootMarginalsFromFactorGraphs(factorGraphs, arbitraryRoot);
   }
+  
+  
 }

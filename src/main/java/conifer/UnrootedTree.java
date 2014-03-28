@@ -3,9 +3,11 @@ package conifer;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.UndirectedGraph;
 
 import bayonet.graphs.GraphUtils;
+import bayonet.marginal.algo.EdgeSorter;
 import blang.annotations.Processors;
 import blang.annotations.Samplers;
 import briefj.collections.Counter;
@@ -102,6 +104,20 @@ public class UnrootedTree
     if (!branchLengths.containsKey(edge))
       throw new RuntimeException();
     branchLengths.put(edge, newValue);
+  }
+  
+  /**
+   * Orient the edges relative to the provided root.
+   * 
+   * For each pair p, p.getLeft() contains the parent,
+   * and p.getLeft() contains the children.
+   * 
+   * @param root
+   * @return The oriented edges
+   */
+  public List<Pair<TreeNode,TreeNode>> getRootedEdges(TreeNode root)
+  {
+    return EdgeSorter.newEdgeSorter(getTopology(), root).backwardMessages();
   }
   
   /**

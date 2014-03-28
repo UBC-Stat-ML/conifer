@@ -14,9 +14,9 @@ import briefj.tomove.Results;
 
 import com.google.common.collect.Lists;
 
-import conifer.ctmc.JukeCantorRateMatrix;
 import conifer.factors.NonClockTreePrior;
-import conifer.factors.OldUnrootedTreeLikelihood;
+import conifer.factors.UnrootedTreeLikelihood;
+import conifer.models.MultiCategorySubstitutionModel;
 
 
 
@@ -24,17 +24,18 @@ public class SimplePhyloModel extends MCMCRunner
 {
   File inputFile = new File("primates.data");
   
-  @DefineFactor(onObservations = true)
-  OldUnrootedTreeLikelihood<JukeCantorRateMatrix> treeLikelihood = OldUnrootedTreeLikelihood.fromObservations(inputFile);
+//  @DefineFactor(onObservations = true)
+//  OldUnrootedTreeLikelihood<JukeCantorRateMatrix> treeLikelihood = OldUnrootedTreeLikelihood.fromObservations(inputFile);
   
   @DefineFactor
-  NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(treeLikelihood.tree);
+  public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel> likelihood = 
+    UnrootedTreeLikelihood.createFromFasts(inputFile); //createEmptyDefaultLikelihood(1, TopologyUtils.syntheticTaxaList(4));
+  
+  @DefineFactor
+  NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
 
   @DefineFactor
   Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(treePrior.branchDistributionParameters.rate).withMean(10.0);
-  
-  
-  
   
   public static void main(String [] args)
   {

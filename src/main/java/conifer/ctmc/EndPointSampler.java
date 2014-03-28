@@ -13,7 +13,7 @@ import com.google.common.collect.Lists;
 
 
 /**
- * Not thread-safe
+ * WARNING: Not thread-safe.
  * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  *
@@ -37,9 +37,19 @@ public class EndPointSampler
     this.transitionWorkArray = new double[ctmc.getRateMatrix().length];
   }
   
+  /**
+   * Note: adds transitions and sojourns into statistics, but not initial counts.
+   * 
+   * @param rand
+   * @param startPoint
+   * @param endPoint
+   * @param T
+   * @param statistics
+   * @param path
+   */
   public void sample(Random rand, int startPoint, int endPoint, double T, PathStatistics statistics, Path path)
   {
-    if (!path.isEmpty() && path.lastState() != startPoint)
+    if (path != null && !path.isEmpty() && path.lastState() != startPoint)
       throw new RuntimeException("Incompatible extension of the provided path");
     int nTransitions = sampleNTransitions(rand, startPoint, endPoint, T);
     generatePath(rand, startPoint, endPoint, T, nTransitions, path, statistics);

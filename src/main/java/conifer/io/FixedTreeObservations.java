@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import briefj.BriefCollections;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -49,5 +51,11 @@ public class FixedTreeObservations implements TreeObservations
     for (TreeNode node : data.keySet())
       result.append(node.toString() + " : " + Arrays.deepToString(data.get(node)) + " ");
     return result.toString();
+  }
+
+  @Override
+  public int nSites()
+  {
+    return BriefCollections.pick(data.values()).length;
   }
 }

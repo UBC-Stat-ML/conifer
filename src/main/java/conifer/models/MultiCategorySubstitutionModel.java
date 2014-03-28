@@ -1,15 +1,27 @@
 package conifer.models;
 
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-
-
+import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
 import org.jgrapht.UndirectedGraph;
+
+import bayonet.distributions.Exponential;
+import bayonet.distributions.Multinomial;
+import bayonet.marginal.DiscreteFactorGraph;
+import bayonet.marginal.FactorGraph;
+import bayonet.marginal.Sampler;
+import bayonet.marginal.UnaryFactor;
+import bayonet.marginal.algo.ExactSampler;
+import bayonet.marginal.algo.SumProduct;
+import bayonet.math.NumericalUtils;
+import blang.annotations.FactorComponent;
+import briefj.collections.UnorderedPair;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -18,19 +30,13 @@ import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.ctmc.CTMC;
+import conifer.ctmc.EndPointSampler;
+import conifer.ctmc.Path;
+import conifer.ctmc.PathStatistics;
 import conifer.ctmc.RateMatrixToEmissionModel;
 import conifer.factors.NonClockTreePrior;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
-import bayonet.distributions.Exponential;
-import bayonet.distributions.Multinomial;
-import bayonet.marginal.FactorGraph;
-import bayonet.marginal.UnaryFactor;
-import bayonet.marginal.algo.ExactSampler;
-import bayonet.marginal.discrete.DiscreteFactorGraph;
-import bayonet.math.NumericalUtils;
-import blang.annotations.FactorComponent;
-import briefj.collections.UnorderedPair;
 
 
 /**
@@ -60,6 +66,114 @@ public class MultiCategorySubstitutionModel implements EvolutionaryModel
   {
     this.rateMatrixMixture = rateMatrixMixture;
     this.nSites = nSites;
+  }
+  
+  /*
+   * 2 choices for GLM integration:
+   * - stuff implemented as a Mixture <--- let's pick that
+   *    pro: closer to what was implemented before
+   * - gamma rates/managed multicategory, stuff implemented as a RateMatrix
+   *    pro: more familiar
+   *    con: need some hack to scale times
+   *    
+   * cache mechanism inside variable (revisit tree variable later? variables 
+   *  could be interfaces too/or caches could be via dispatch)
+   * 
+   * 
+   * TODO: simplify CTMC stuff: just put params into the matrix
+   */
+  
+  public static class TreePath
+  {
+    private final UnrootedTree tree;
+    private final TreeNode root;
+    /**
+     * site -> edge (pair) -> path
+     */
+    private final List<Map<Pair<TreeNode,TreeNode>, Path>> pathSegments;
+    
+    public TreePath(UnrootedTree tree, TreeNode root,
+        int nSites)
+    {
+      this.tree = tree;
+      this.root = root;
+      this.pathSegments = Lists.newArrayList();
+      for (int i = 0; i < nSites; i++)
+        pathSegments.add(new HashMap<Pair<TreeNode,TreeNode>, Path>());
+    }
+
+    public Path getPath(TreeNode topNode, TreeNode botNode, int site)
+    {
+      return pathSegments.get(site).get(Pair.of(topNode, botNode));
+    }
+    
+    public Path createPath(TreeNode topNode, TreeNode botNode, int site)
+    {
+      Path result = new Path();
+      pathSegments.get(site).put(Pair.of(topNode, botNode), result);
+      return result;
+    }
+  }
+  
+  /**
+   * 
+   * @param rand
+   * @param observations
+   * @param tree
+   * @param root
+   * @param paths
+   * @return list of statistics, one for each category
+   */
+  public List<PathStatistics> samplePosteriorPaths(
+      Random rand, 
+      TreeObservations observations,
+      UnrootedTree tree, 
+      TreeNode root, 
+      TreePath paths)
+  {
+    List<PathStatistics> categorySpecificStats = Lists.newArrayList();
+    for (int cat = 0; cat < nCategories(); cat++)
+      categorySpecificStats.add(new PathStatistics(rateMatrixMixture.getRateMatrix(cat).getRateMatrix().length));
+    
+    // sample posterior internal reconstructions and indicators
+    MultiCategoryInternalNodeSample internalSample = samplePosteriorInternalNodes(rand, observations, tree, root);
+    
+    // increment initial distributions
+    for (int site = 0; site < nSites; site++)
+      categorySpecificStats.get(internalSample.categoryIndicators[site]).addInitial(internalSample.getInternalState(root, site));
+    
+    // loop over edges, sites; sample paths using end-point conditioning
+    List<EndPointSampler> endPointSamplers = endPointSamplers();
+    for (Pair<TreeNode,TreeNode> edge : tree.getRootedEdges(root))
+    {
+      final TreeNode 
+        topNode = edge.getLeft(),
+        botNode = edge.getRight();
+      final double branchLength = tree.getBranchLength(topNode, botNode);
+      for (int s = 0; s < nSites; s++)
+      {
+        final int 
+          topState = internalSample.getInternalState(topNode, s),
+          botState = internalSample.getInternalState(botNode, s);
+        int category = internalSample.categoryIndicators[s];
+        Path curPath = (paths == null ? null : paths.createPath(topNode, botNode, s));
+        endPointSamplers.get(category).sample(rand, topState, botState, branchLength, categorySpecificStats.get(internalSample.categoryIndicators[s]), curPath);
+      }
+    }
+    return categorySpecificStats;
+  }
+
+  private List<EndPointSampler> endPointSamplers()
+  {
+    List<EndPointSampler> processes = Lists.newArrayList();
+    for (int cat = 0; cat < nCategories(); cat++)
+      processes.add(new EndPointSampler(rateMatrixMixture.getRateMatrix(cat).getProcess()));
+    return processes;
+  }
+  
+  public int nCategories()
+  {
+    return rateMatrixMixture.getLogPriorProbabilities().size();
   }
 
   @Override
@@ -130,13 +244,11 @@ public class MultiCategorySubstitutionModel implements EvolutionaryModel
   {
     // Note: not particularly efficient: lots of logs and array accessed in bad ways,
     // but this occurs only at one point of the tree, so should not be a huge bottleneck in large trees
-    // (but could be when the number of sites is large; then could rewrite this with scalings)
+    // (but could be when the number of sites is large; in which case we could rewrite this with scalings)
     List<UnaryFactor<TreeNode>> rootMarginals = context.getRootMarginals();
-    final int nCat = rootMarginals.size();
+    final int nCat = nCategories();
     List<Double> categoryPriorLogPrs = rateMatrixMixture.getLogPriorProbabilities(); 
-    double[][] categoryAndSiteSpecificLikelihoods = new double[nCat][];
-    for (int c = 0; c < rootMarginals.size(); c++)
-      categoryAndSiteSpecificLikelihoods[c] = DiscreteFactorGraph.siteLogNormalizations(rootMarginals.get(c));
+    double[][] categoryAndSiteSpecificLikelihoods = categoryAndSiteSpecificLikelihoods(rootMarginals);
     final int nSites = categoryAndSiteSpecificLikelihoods[0].length;
     final double [] workArray = new double[nCat];
     double sum = 0.0;
@@ -148,24 +260,72 @@ public class MultiCategorySubstitutionModel implements EvolutionaryModel
     }
     return sum;
   }
+  
+  /**
+   * Warning: slightly unusual order: category -> site
+   * @param rootMarginals
+   * @return
+   */
+  private double [][] categoryAndSiteSpecificLikelihoods(List<UnaryFactor<TreeNode>> rootMarginals)
+  {
+    double[][] categoryAndSiteSpecificLikelihoods = new double[nCategories()][];
+    for (int c = 0; c < rootMarginals.size(); c++)
+      categoryAndSiteSpecificLikelihoods[c] = DiscreteFactorGraph.siteLogNormalizations(rootMarginals.get(c));
+    return categoryAndSiteSpecificLikelihoods;
+  }
 
-  @SuppressWarnings({ "unchecked", "rawtypes" })
   @Override
   public void generateObservationsInPlace(
       Random rand, 
       TreeObservations destination,
       UnrootedTree tree, TreeNode root)
   {
+    MultiCategoryInternalNodeSample reconstructions = samplePriorInternalNodes(rand, tree, root);
+    for (TreeNode leaf : TopologyUtils.leaves(tree.getTopology()))
+      destination.set(leaf, reconstructions.internalIndicators.get(leaf));
+  }
+  
+  public MultiCategoryInternalNodeSample samplePosteriorInternalNodes(
+      Random rand,
+      TreeObservations observations,
+      UnrootedTree tree, 
+      TreeNode root)
+  {
+    return sampleInternal(rand, false, observations, tree, root);
+  }
+  
+  public MultiCategoryInternalNodeSample samplePriorInternalNodes(
+      Random rand,
+      UnrootedTree tree, 
+      TreeNode root)
+  {
+    return sampleInternal(rand, true, null, tree, root);
+  }
+
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  private MultiCategoryInternalNodeSample sampleInternal(
+      Random rand,
+      boolean isPrior, 
+      TreeObservations observations,
+      UnrootedTree tree, 
+      TreeNode root)
+  {
     // sample full paths for all categories (a bit wasteful, but not more costly than doing posterior inference)
-    List<FactorGraph<TreeNode>> factorGraphs = EvolutionaryModelUtils.buildFactorGraphs(this, tree, root, destination);
+    List<FactorGraph<TreeNode>> factorGraphs = EvolutionaryModelUtils.buildFactorGraphs(this, tree, root, observations);
     List<Map<TreeNode, double[][]>> allSamples = Lists.newArrayList();
     int nSites = -1;
+    List<SumProduct<TreeNode>> sumProds = Lists.newArrayList();
     for (FactorGraph<TreeNode> factorGraph : factorGraphs)
     {
-      ExactSampler<TreeNode> sampler = ExactSampler.priorSampler(factorGraph, ((DiscreteFactorGraph)factorGraph).getSampler());
+      Sampler<TreeNode> innerSampler = ((DiscreteFactorGraph)factorGraph).getSampler();
+      SumProduct<TreeNode> sumProd = isPrior ? null : new SumProduct<TreeNode>(factorGraph);
+      sumProds.add(sumProd);
+      ExactSampler<TreeNode> sampler = isPrior ?
+          ExactSampler.priorSampler(factorGraph, innerSampler) :
+          ExactSampler.posteriorSampler(sumProd, innerSampler);
       Map<TreeNode, UnaryFactor<TreeNode>> samples = sampler.sample(rand, root);
       Map<TreeNode, double[][]> transformedSamples = Maps.newHashMap();
-      for (TreeNode leaf : TopologyUtils.leaves(tree.getTopology()))
+      for (TreeNode leaf : tree.getTopology().vertexSet())
       {
         double [][] current = DiscreteFactorGraph.getNormalizedCopy(samples.get(leaf));
         nSites = current.length;
@@ -175,12 +335,22 @@ public class MultiCategorySubstitutionModel implements EvolutionaryModel
     }
     // sample category indicators
     final int nCat = factorGraphs.size();
-    int [] indicators = new int[nCat];
-    double [] prs = RateMatrixMixtureUtils.priorProbabilities(rateMatrixMixture);
-    for (int site = 0; site < nSites; site++)
-      indicators[site] = Multinomial.sampleMultinomial(rand, prs);
-    // compile the result
-    for (TreeNode leaf : TopologyUtils.leaves(tree.getTopology()))
+    int [] indicators = new int[nSites];
+    List<Double> categoryPriorLogPrs = rateMatrixMixture.getLogPriorProbabilities(); 
+    double [][] categoryAndSiteSpecificLikelihoods = isPrior ? 
+      null : 
+      categoryAndSiteSpecificLikelihoods(EvolutionaryModelUtils.getRootMarginals(sumProds, root));
+    // convert into a better data structure organization
+    final double [] workArray = new double[nCat];
+    for (int s = 0; s < nSites; s++)
+    {
+      for (int c = 0; c < nCat; c++)
+        workArray[c] =  categoryPriorLogPrs.get(c) + (isPrior ? 0.0 : categoryAndSiteSpecificLikelihoods[c][s]);
+      Multinomial.expNormalize(workArray);
+      indicators[s] = Multinomial.sampleMultinomial(rand, workArray);
+    }
+    Map<TreeNode, double[][]> reconstructions = Maps.newHashMap();
+    for (TreeNode leaf : tree.getTopology().vertexSet())
     {
       double [][][] allSamplesTransformed = new double[nCat][][]; // cat -> site -> state
       for (int cat = 0; cat < nCat; cat++)
@@ -190,13 +360,53 @@ public class MultiCategorySubstitutionModel implements EvolutionaryModel
       for (int site = 0; site < nSites; site++)
         result[site] = allSamplesTransformed[indicators[site]][site];
       
-      destination.set(leaf, result);
+      reconstructions.put(leaf, result);
+    }
+    return new MultiCategoryInternalNodeSample(indicators, reconstructions);
+  }
+  
+  public static class MultiCategoryInternalNodeSample
+  {
+    
+    /**
+     * Indexed by site. Entry categoryIndicators[s] gives the 
+     * category sampled at site s.
+     */
+    public final int [] categoryIndicators; 
+    
+    /**
+     * For any internal node n, site s, state x,
+     * reconstruction.get(n)[s][x] is equal to one if x is the
+     * sample state at that node and site, and zero otherwise.
+     */
+    private final Map<TreeNode, double[][]> internalIndicators;
+
+    public int getInternalState(TreeNode n, int site)
+    {
+      double [] array = internalIndicators.get(n)[site];
+      boolean found = false;
+      int result = -1;
+      for (int i = 0; i < array.length; i++)
+        if (array[i] == 1.0)
+        {
+          if (found) throw new RuntimeException();
+          found = true;
+          result = i;
+        }
+      return result;
+    }
+
+    private MultiCategoryInternalNodeSample(int[] categoryIndicators,
+        Map<TreeNode, double[][]> reconstructions)
+    {
+      this.categoryIndicators = categoryIndicators;
+      this.internalIndicators = reconstructions;
     }
   }
 
   public static void loadObservations(
       TreeObservations observations, 
-      LinkedHashMap<TreeNode, CharSequence> rawStrings, 
+      Map<TreeNode, ? extends CharSequence> rawStrings, 
       PhylogeneticObservationFactory observationFactory)
   {
     for (TreeNode treeNode : rawStrings.keySet())

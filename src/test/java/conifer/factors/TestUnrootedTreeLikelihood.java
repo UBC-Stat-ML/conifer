@@ -1,36 +1,34 @@
 package conifer.factors;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import org.junit.Test;
 
-import conifer.TopologyUtils;
-import conifer.TreeNode;
-import conifer.models.MultiCategorySubstitutionModel;
-import blang.ForwardSampler;
-import blang.MCMCAlgorithm;
-import blang.MCMCRunner;
 import blang.ProbabilityModel;
 import blang.annotations.DefineFactor;
 import blang.validation.CheckDiscreteNormalization;
+import conifer.TopologyUtils;
+import conifer.models.MultiCategorySubstitutionModel;
 
 
 
 public class TestUnrootedTreeLikelihood
 {
-  
   @DefineFactor
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel> likelihood = 
     UnrootedTreeLikelihood.createEmptyDefaultLikelihood(1, TopologyUtils.syntheticTaxaList(4));
   
-  
   public static void main(String [] args)
   {
     TestUnrootedTreeLikelihood runner = new TestUnrootedTreeLikelihood();
-    ProbabilityModel model = new ProbabilityModel(runner);
+    runner.runTest();
+  }
+  
+  @Test
+  public void runTest()
+  {
+    
+    ProbabilityModel model = new ProbabilityModel(this);
     Random rand = new Random(1);
     CheckDiscreteNormalization.check(model, rand, 10000);
 //    runner.factory.setCheckAllNodesCoveredByMCMCMoves(false);
