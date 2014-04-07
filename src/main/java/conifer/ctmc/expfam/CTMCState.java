@@ -16,7 +16,8 @@ public class CTMCState
    * Any other latent information that do not follow
    * connected component-ness.
    * 
-   * E.g.: there would be two of these in a covarion
+   * E.g.: there would be eight of these in a covarion,
+   * four of these in a GTR+Gamma2
    * model.
    */
   public final Object latent;
@@ -24,17 +25,28 @@ public class CTMCState
   /**
    * A partition is a subset of the dataset.
    * 
+   * Should be null iff there is a single partition.
+   * 
    * E.g.: Which gene this state belongs to. 
    * Or position index in a codon (e.g. for a CAT model).
    */
   public final Object partition;
   
-  public CTMCState(int categoryIndex, Object latent,
+  
+  public CTMCState(
+      int categoryIndex, 
+      Object latent,
       Object partition)
   {
     this.categoryIndex = categoryIndex;
     this.latent = latent;
     this.partition = partition;
+  }
+  
+  @Override
+  public String toString()
+  {
+    return latent + "(" + categoryIndex + (partition == null ? "" : "," + partition) + ")";
   }
 
   @Override

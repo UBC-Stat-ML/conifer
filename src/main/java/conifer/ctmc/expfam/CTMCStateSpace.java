@@ -6,12 +6,15 @@ import briefj.Indexer;
 
 public class CTMCStateSpace
 {
-  
+  /**
+   * The partition this space is representing (spaces could
+   * be different across different partitions)
+   * 
+   * Should be null iff there is a single partition in the study.
+   */
   public final Object currentPartition;
   
   /**
-   * Keys: partitions.
-   * 
    * An indexer for the observations (can be partition specific,
    * but is the same for all categories). 
    * 
@@ -21,21 +24,29 @@ public class CTMCStateSpace
   public final Indexer<String> observationsIndexer;
    
   /**
-   * Keys: partitions.
-   * 
    * An indexer for the latent states (can be partition specific,
    * but is the same for all categories).
    * 
    * Rationale: partitions could contain different data types 
    * (e.g. points of interaction, points not interacting).
    */
-  public final Indexer<Object> latentIndexer;
+  public final Indexer<?> latentIndexer;
   
   public final int nCategories;
-
-  public CTMCStateSpace(Object currentPartition,
-      Indexer<String> observationsIndexer, Indexer<Object> latentIndexer,
+  
+  public CTMCStateSpace(
+      Indexer<String> observationsIndexer, 
+      Indexer<?> latentIndexer,
       int nCategories)
+  {
+    this(observationsIndexer, latentIndexer, nCategories, null);
+  }
+
+  public CTMCStateSpace(
+      Indexer<String> observationsIndexer, 
+      Indexer<?> latentIndexer,
+      int nCategories, 
+      Object currentPartition)
   {
     this.currentPartition = currentPartition;
     this.observationsIndexer = observationsIndexer;

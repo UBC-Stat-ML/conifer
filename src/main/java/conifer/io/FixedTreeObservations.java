@@ -16,7 +16,13 @@ import conifer.TreeNode;
 public class FixedTreeObservations implements TreeObservations
 {
   private final LinkedHashMap<TreeNode, double[][]> data = Maps.newLinkedHashMap();
+  private final int nSites;
   
+  public FixedTreeObservations(int nSites)
+  {
+    this.nSites = nSites;
+  }
+
   @Override
   public List<TreeNode> getObservedTreeNodes()
   {
@@ -35,7 +41,10 @@ public class FixedTreeObservations implements TreeObservations
   @Override
   public void set(TreeNode leaf, Object point)
   {
-    data.put(leaf, (double[][])point);
+    double[][] cast = (double[][])point;
+    if (cast.length != nSites)
+      throw new RuntimeException();
+    data.put(leaf, cast);
   }
 
   @Override
@@ -56,6 +65,6 @@ public class FixedTreeObservations implements TreeObservations
   @Override
   public int nSites()
   {
-    return BriefCollections.pick(data.values()).length;
+    return nSites;
   }
 }

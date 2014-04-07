@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
+import conifer.models.DiscreteGammaMixture;
 import conifer.models.MultiCategorySubstitutionModel;
 
 
@@ -28,8 +29,8 @@ public class SimplePhyloModel extends MCMCRunner
 //  OldUnrootedTreeLikelihood<JukeCantorRateMatrix> treeLikelihood = OldUnrootedTreeLikelihood.fromObservations(inputFile);
   
   @DefineFactor
-  public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel> likelihood = 
-    UnrootedTreeLikelihood.createFromFasts(inputFile); //createEmptyDefaultLikelihood(1, TopologyUtils.syntheticTaxaList(4));
+  public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> likelihood = 
+    UnrootedTreeLikelihood.fromFastaFile(inputFile); //createEmptyDefaultLikelihood(1, TopologyUtils.syntheticTaxaList(4));
   
   @DefineFactor
   NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);

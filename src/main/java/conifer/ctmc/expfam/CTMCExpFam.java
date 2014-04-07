@@ -23,7 +23,6 @@ import conifer.ctmc.RateMatrixUtils;
 // TODO: make the base measure be a Counter; and center on e.g. multicategory gamma matrix
 public class CTMCExpFam<S>
 {
-
   public final Indexer<S> stateIndexer;
   final int [][] supports; // S index -> list of S indices
   private final SparseVector [][] bivariateFeatures; // S index -> index in support
@@ -65,11 +64,10 @@ public class CTMCExpFam<S>
 
   public static <S> CTMCExpFam<S> createModelWithFullSupport(Indexer<S> indexer, boolean isNormalized)
   {
-    
     return new CTMCExpFam<S>(GraphUtils.completeGraph(indexer.objects()), indexer, isNormalized);
   }
 
-  public void extractUnivariateFeatures(Collection<UnivariateFeatureExtractor<S>> univariateFeatureExtractors)
+  public void extractUnivariateFeatures(Collection<? extends UnivariateFeatureExtractor<S>> univariateFeatureExtractors)
   {
     _extractFeatures(true,  featuresIndexer, null, univariateFeatureExtractors);
   }
@@ -80,7 +78,7 @@ public class CTMCExpFam<S>
    * @param state1
    * @param state2
    */
-  public void extractReversibleBivariateFeatures(Collection<BivariateFeatureExtractor<S>> bivariateFeatureExtractors)
+  public void extractReversibleBivariateFeatures(Collection<? extends BivariateFeatureExtractor<S>> bivariateFeatureExtractors)
   {
     _extractFeatures(false, featuresIndexer, bivariateFeatureExtractors, null);
   }
@@ -171,12 +169,10 @@ public class CTMCExpFam<S>
 
     public double valueAt(double[] x) {
       ensureCache(x);
-      //      System.out.println("valueAt(" + Arrays.toString(x) + ") = " + lastValue);
       return lastValue;
     }
     public double[] derivativeAt(double[] x) {
       ensureCache(x);
-      //      System.out.println(Arrays.toString(x));
       return lastDerivative;
     }
     private void ensureCache(double[] x) {
@@ -197,13 +193,9 @@ public class CTMCExpFam<S>
       double [] result = new double[nFeatures];
       for (int startState = 0; startState < nStates; startState++)
       {
-        //        System.out.println("(4) startState(" + startState + ") = " + nInit[startState] + " . " + piFeatures[startState]);
         univariateFeatures[startState].linearIncrement(nInit[startState] + nTransStar[startState], result); // (4) & (7)
         for (int endStateIdx = 0; endStateIdx < supports[startState].length; endStateIdx++)
-        {
-          //          System.out.println("(6) statePair(" + startState + "," + endStateIdx + ") = " + nTrans[startState][endStateIdx] + qFeatures[startState][endStateIdx]);
           bivariateFeatures[startState][endStateIdx].linearIncrement(nTrans[startState][endStateIdx], result); // (6)
-        }
       }
       return result;
     }
@@ -289,8 +281,8 @@ public class CTMCExpFam<S>
   private void _extractFeatures(
       boolean statio, 
       Indexer featureIndexer,
-      Collection<BivariateFeatureExtractor<S>> transitionFeatureExtractors,
-      Collection<UnivariateFeatureExtractor<S>> stationaryFeatureExtractors)
+      Collection<? extends BivariateFeatureExtractor<S>> transitionFeatureExtractors,
+      Collection<? extends UnivariateFeatureExtractor<S>> stationaryFeatureExtractors)
   {
     track("Extracting features for the " + (statio ? "stationary distribution" : "transitions"));
     Counter counter = new Counter();
@@ -360,17 +352,6 @@ public class CTMCExpFam<S>
       return pi;
     }
 
-//    private SparseVector theta(int startState, int endState)
-//    {
-//      int [] support = supports[startState];
-//      final int supportSize = support.length;
-//      double [] values = new double[supportSize];
-//      for (int i = 0; i < supportSize; i++)
-//        values[i] = Math.exp(bivariateFeatures[startState][i].dotProduct(weights)) ;
-//      return new SparseVector(support, values);
-//    }
-
-
     private double normalization(double [] x)
     {
       if(isNormalized==false)
@@ -397,7 +378,6 @@ public class CTMCExpFam<S>
       return beta;
     }
 
-
     private SparseVector qs(int startState)
     {
       int [] support = supports[startState];
@@ -407,10 +387,7 @@ public class CTMCExpFam<S>
       for (int i = 0; i < supportSize; i++)
         values[i] = Math.exp(bivariateFeatures[startState][i].dotProduct(weights)) * pi[support[i]]*normalizedValue;
       return new SparseVector(support, values);  
-
     }
-
-
 
     public Counter<S> getRates(S source)
     {
@@ -453,18 +430,11 @@ public class CTMCExpFam<S>
 
       return result;
     }
-
-//    public String rateMatrixString()
-//    {
-//      return RateMtxUtils.toString(getRateMatrix(), stateIndexer);
-//    }
   }
-
 
   private void checkFeaturesInitialized()
   {
     if (featuresIndexer.size()== 0)
       throw new RuntimeException();
   }
-
 }

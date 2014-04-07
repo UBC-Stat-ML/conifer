@@ -8,6 +8,7 @@ import blang.ProbabilityModel;
 import blang.annotations.DefineFactor;
 import blang.validation.CheckDiscreteNormalization;
 import conifer.TopologyUtils;
+import conifer.models.DiscreteGammaMixture;
 import conifer.models.MultiCategorySubstitutionModel;
 
 
@@ -15,8 +16,8 @@ import conifer.models.MultiCategorySubstitutionModel;
 public class TestUnrootedTreeLikelihood
 {
   @DefineFactor
-  public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel> likelihood = 
-    UnrootedTreeLikelihood.createEmptyDefaultLikelihood(1, TopologyUtils.syntheticTaxaList(4));
+  public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> likelihood = 
+    UnrootedTreeLikelihood.createEmpty(1, TopologyUtils.syntheticTaxaList(4));
   
   public static void main(String [] args)
   {

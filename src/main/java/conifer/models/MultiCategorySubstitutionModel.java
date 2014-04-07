@@ -55,14 +55,14 @@ import conifer.io.TreeObservations;
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  *
  */
-public class MultiCategorySubstitutionModel implements EvolutionaryModel
+public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> implements EvolutionaryModel
 {
   @FactorComponent
-  public final RateMatrixMixture rateMatrixMixture;
+  public final T rateMatrixMixture;
   
   public final int nSites;
   
-  public MultiCategorySubstitutionModel(RateMatrixMixture rateMatrixMixture, int nSites)
+  public MultiCategorySubstitutionModel(T rateMatrixMixture, int nSites)
   {
     this.rateMatrixMixture = rateMatrixMixture;
     this.nSites = nSites;

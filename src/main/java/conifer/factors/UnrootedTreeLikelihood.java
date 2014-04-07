@@ -13,9 +13,16 @@ import blang.annotations.FactorComponent;
 import blang.factors.GenerativeFactor;
 import blang.variables.RealVariable;
 import briefj.BriefCollections;
+import briefj.collections.Counter;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
+import conifer.ctmc.RateMatrixToEmissionModel;
 import conifer.ctmc.SimpleRateMatrix;
+import conifer.ctmc.expfam.CTMCExpFam;
+import conifer.ctmc.expfam.CTMCState;
+import conifer.ctmc.expfam.CTMCStateSpace;
+import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.ExpFamParameters;
 import conifer.io.FastaUtils;
 import conifer.io.FixedTreeObservations;
 import conifer.io.PhylogeneticObservationFactory;
@@ -79,26 +86,46 @@ public class UnrootedTreeLikelihood
    * no data. Used mostly for simulation-based testing.
    * @return
    */
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel> createEmptyDefaultLikelihood(int nSites, List<TreeNode> leaves)
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmpty(int nSites, List<TreeNode> leaves)
   {
     UnrootedTree tree = defaultTree(leaves);
     SimpleRateMatrix baseRateMatrix = SimpleRateMatrix.kimura1980();
     DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0.1), RealVariable.real(1.0), baseRateMatrix, 4);
-    MultiCategorySubstitutionModel subModel = new MultiCategorySubstitutionModel(gammaMixture, nSites);
-    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel>(tree, subModel, new FixedTreeObservations());
+    MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
+    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
   }
   
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel> createFromFasts(File fastaFile)
+  /**
+   * Create a model from a FASTA file. Currently assumes nucleotides data and uses kimura 1980 as a default matrix, and a
+   * discrete gamma mixture of 4 rates.
+   * 
+   * @param fastaFile
+   * @return
+   */
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> fromFastaFile(File fastaFile)
   {
     Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
     UnrootedTree tree = defaultTree(data.keySet());
     SimpleRateMatrix baseRateMatrix = SimpleRateMatrix.kimura1980();
     DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0.1), RealVariable.real(1.0), baseRateMatrix, 4);
     PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.nucleotidesFactory();
-    TreeObservations observations = new FixedTreeObservations();
+    TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).length());
     MultiCategorySubstitutionModel.loadObservations(observations, data, factory); 
-    MultiCategorySubstitutionModel subModel = new MultiCategorySubstitutionModel(gammaMixture, observations.nSites());
-    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel>(tree, subModel, observations);
+    MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, observations.nSites());
+    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, observations);
+  }
+  
+  /**
+   * Chained method to change the evolutionary model into an exponential family mixture, keeping the other aspects (tree and
+   * observations) unchanged.
+   * 
+   * @param mixture
+   * @return
+   */
+  public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> withExpFamMixture(ExpFamMixture mixture)
+  {
+    MultiCategorySubstitutionModel<ExpFamMixture> subModel = new MultiCategorySubstitutionModel<ExpFamMixture>(mixture, this.observations.nSites());
+    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>>(this.tree, subModel, this.observations);
   }
   
   /**
@@ -151,7 +178,7 @@ public class UnrootedTreeLikelihood
   
   public static void main(String [] args)
   {
-    UnrootedTreeLikelihood<MultiCategorySubstitutionModel> ll = createFromFasts(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"));
+    UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> ll = fromFastaFile(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"));
     System.out.println("nSites=" + ll.observations.nSites());
     System.out.println("nNodes=" + ll.tree.getTopology().vertexSet().size());
     Random rand = new Random(1);

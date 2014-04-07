@@ -10,5 +10,6 @@ import briefj.collections.Counter;
  */
 public interface UnivariateFeatureExtractor<S>
 {
+  @SuppressWarnings("rawtypes")
   public void extract(Counter counts, S state);
 }

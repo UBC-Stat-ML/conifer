@@ -40,7 +40,9 @@ So to summarize, in the CTMC learning code, we will still assume a single rate m
 - an actual category will be sampled for each site, so only the counts for this category will be accumulated
 - waiting times can then be interprete rescaled with respect to the selected category (so that the full problem is seen as a single normalized matrix from the point of view of the CTMC training code)
 
-**Actually:** wait for talking with Crystal, but there is probably no problem with the code on our side.
+**Actually:** wait for talking with Crystal, but there is probably no problem with the code on our side. 
+
+**Cancel wait:** problem was probably that the rate over categories was not properly normalized there, making the true parameter not accessible in simulations.
 
 ### Implementing and testing new tree likelihood class
 
@@ -48,11 +50,11 @@ Next:
 - fixed rate matrix:
   - load and save
   - use easy kimura
-  - std gamma rate cat
+  - std gamma rate cat **DONE**
 
 ### Simplest weight-based sampler
 
-Use MH
+Use MH **This is the current pointer:** simple tests needed on the basic infrastructure pre-HMC.
 
 ### Compare to MrBayes by using logGamma priors?
 

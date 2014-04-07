@@ -1,15 +1,18 @@
-package conifer;
+package conifer.ctmc.expfam;
 
 import org.junit.Test;
 
+import bayonet.distributions.Normal;
 import bayonet.distributions.Exponential.RateParameterization;
+import bayonet.distributions.Normal.MeanVarianceParameterization;
 import blang.MCMCAlgorithm;
 import blang.MCMCRunner;
 import blang.annotations.DefineFactor;
+import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.validation.CheckStationarity;
+import conifer.TopologyUtils;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
-import conifer.models.DiscreteGammaMixture;
 import conifer.models.MultiCategorySubstitutionModel;
 
 
@@ -19,12 +22,16 @@ import conifer.models.MultiCategorySubstitutionModel;
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  *
  */
-public class TestSimplePhyloModel extends MCMCRunner
+public class TestExpFamPhyloModel extends MCMCRunner
 {
 
   @DefineFactor
-  public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> likelihood = 
-    UnrootedTreeLikelihood.createEmpty(1, TopologyUtils.syntheticTaxaList(4));
+  public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
+    UnrootedTreeLikelihood.createEmpty(1, TopologyUtils.syntheticTaxaList(2)).withExpFamMixture(ExpFamMixture.dnaGTR(2));
+  
+  @DefineFactor
+  public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior =
+    IIDRealVectorGenerativeFactor.iidNormalOn(likelihood.evolutionaryModel.rateMatrixMixture.parameters);
   
   
   @DefineFactor
@@ -48,7 +55,7 @@ public class TestSimplePhyloModel extends MCMCRunner
     
     // Here: 1000 is the number of test iterations (different than MCMC sweeps, see below)
     //       0.05 is a p-value threshold
-    check.check(algo, 1000, 0.05);
+    check.check(algo, 10000, 0.05);
     
   }
 }
