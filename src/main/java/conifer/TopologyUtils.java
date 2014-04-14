@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jgrapht.UndirectedGraph;
 
+import briefj.BriefCollections;
 import briefj.collections.UnorderedPair;
 
 import com.google.common.collect.Lists;
@@ -43,6 +44,11 @@ public class TopologyUtils
   public static <N> boolean isTip(UnorderedPair<N, N> edge, UndirectedGraph<N,UnorderedPair<N, N>> topology)
   {
     return topology.degreeOf(edge.getFirst()) == 1 || topology.degreeOf(edge.getSecond()) == 1;
+  }
+  
+  public static TreeNode arbitraryNode(UnrootedTree tree)
+  {
+    return BriefCollections.pick(tree.getTopology().vertexSet());
   }
   
   /**

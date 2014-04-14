@@ -1,36 +1,33 @@
 package conifer;
 
 import java.io.File;
-import java.util.List;
+import java.io.PrintWriter;
 
-import tutorialj.Tutorial;
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
-import bayonet.rplot.PlotHistogram;
+import bayonet.distributions.Normal.MeanVarianceParameterization;
 import blang.MCMCRunner;
 import blang.annotations.DefineFactor;
+import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.processing.ProcessorContext;
+import briefj.BriefIO;
 import briefj.tomove.Results;
-
-import com.google.common.collect.Lists;
-
+import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
-import conifer.models.DiscreteGammaMixture;
 import conifer.models.MultiCategorySubstitutionModel;
 
 
 
 public class SimplePhyloModel extends MCMCRunner
 {
-  File inputFile = new File("primates.data");
+  File inputFile 
+//    = new File("primates.fasta");
+    = new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta");
   
-//  @DefineFactor(onObservations = true)
-//  OldUnrootedTreeLikelihood<JukeCantorRateMatrix> treeLikelihood = OldUnrootedTreeLikelihood.fromObservations(inputFile);
-  
-  @DefineFactor
-  public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> likelihood = 
-    UnrootedTreeLikelihood.fromFastaFile(inputFile); //createEmptyDefaultLikelihood(1, TopologyUtils.syntheticTaxaList(4));
+  @DefineFactor(onObservations = true)
+  public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
+    UnrootedTreeLikelihood.fromFastaFile(inputFile).withExpFamMixture(ExpFamMixture.dnaGTR());
   
   @DefineFactor
   NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
@@ -38,28 +35,24 @@ public class SimplePhyloModel extends MCMCRunner
   @DefineFactor
   Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(treePrior.branchDistributionParameters.rate).withMean(10.0);
   
+  @DefineFactor
+  public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior =
+    IIDRealVectorGenerativeFactor.iidNormalOn(likelihood.evolutionaryModel.rateMatrixMixture.parameters);
+  
+  private final PrintWriter treeWriter = BriefIO.output(Results.getFileInResultFolder("trees.newick"));
+  
   public static void main(String [] args)
   {
     SimplePhyloModel runner = new SimplePhyloModel();
-    runner.factory.mcmcOptions.nMCMCSweeps = 10000;
+    runner.factory.mcmcOptions.nMCMCSweeps = 10000000;
     runner.run();
-    File plotFile = Results.getFileInResultFolder("density.pdf");
-    PlotHistogram.from(runner.samples).toPDF(plotFile);
+    
   }
 
-  /**
-   * Modify the ``process()`` function below to save the output trees to a file.
-   * Use ``UnrootedTreeUtils.toNewick()`` to save the files in the 
-   * [newick format](http://en.wikipedia.org/wiki/Newick_format), a standard 
-   * way of saving tree.
-   */
-  @Tutorial(showSource = true, showLink = true, showSignature = true)
   protected void process(ProcessorContext context)
   {
-    samples.add(treePrior.branchDistributionParameters.rate.getValue());
+    treeWriter.println(likelihood.tree.toNewick());
+    treeWriter.flush();
   }
-  
-  List<Double> samples = Lists.newArrayList();
-  
 
 }

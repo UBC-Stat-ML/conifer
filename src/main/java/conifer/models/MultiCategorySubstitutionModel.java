@@ -2,7 +2,6 @@ package conifer.models;
 
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -68,51 +67,19 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
     this.nSites = nSites;
   }
   
-  /*
-   * 2 choices for GLM integration:
-   * - stuff implemented as a Mixture <--- let's pick that
-   *    pro: closer to what was implemented before
-   * - gamma rates/managed multicategory, stuff implemented as a RateMatrix
-   *    pro: more familiar
-   *    con: need some hack to scale times
-   *    
-   * cache mechanism inside variable (revisit tree variable later? variables 
-   *  could be interfaces too/or caches could be via dispatch)
+  /**
    * 
-   * 
-   * TODO: simplify CTMC stuff: just put params into the matrix
+   * @param rand
+   * @param observations
+   * @param tree
+   * @return list of statistics, one for each category
    */
-  
-  public static class TreePath
+  public List<PathStatistics> samplePosteriorPaths(
+      Random rand, 
+      TreeObservations observations,
+      UnrootedTree tree)
   {
-    private final UnrootedTree tree;
-    private final TreeNode root;
-    /**
-     * site -> edge (pair) -> path
-     */
-    private final List<Map<Pair<TreeNode,TreeNode>, Path>> pathSegments;
-    
-    public TreePath(UnrootedTree tree, TreeNode root,
-        int nSites)
-    {
-      this.tree = tree;
-      this.root = root;
-      this.pathSegments = Lists.newArrayList();
-      for (int i = 0; i < nSites; i++)
-        pathSegments.add(new HashMap<Pair<TreeNode,TreeNode>, Path>());
-    }
-
-    public Path getPath(TreeNode topNode, TreeNode botNode, int site)
-    {
-      return pathSegments.get(site).get(Pair.of(topNode, botNode));
-    }
-    
-    public Path createPath(TreeNode topNode, TreeNode botNode, int site)
-    {
-      Path result = new Path();
-      pathSegments.get(site).put(Pair.of(topNode, botNode), result);
-      return result;
-    }
+    return samplePosteriorPaths(rand, observations, tree, TopologyUtils.arbitraryNode(tree), null);
   }
   
   /**
@@ -121,7 +88,7 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
    * @param observations
    * @param tree
    * @param root
-   * @param paths
+   * @param paths Modified in place: full information on sampled path written in this datastructure.
    * @return list of statistics, one for each category
    */
   public List<PathStatistics> samplePosteriorPaths(
@@ -144,6 +111,7 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
     
     // loop over edges, sites; sample paths using end-point conditioning
     List<EndPointSampler> endPointSamplers = endPointSamplers();
+    
     for (Pair<TreeNode,TreeNode> edge : tree.getRootedEdges(root))
     {
       final TreeNode 
@@ -427,6 +395,54 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
   {
     Random rand = new Random(1);
     return NonClockTreePrior.generate(rand, Exponential.newExponential(), leaves);
+  }
+  
+  /**
+   * Evolutionary paths along a tree and assuming a multi-category substitution model.
+   * 
+   * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+   *
+   */
+  public static class TreePath
+  {
+    private final UnrootedTree tree;
+    private final TreeNode root;
+    /**
+     * site -> edge (pair) -> path
+     */
+    private final List<Map<Pair<TreeNode,TreeNode>, Path>> pathSegments;
+    
+    public TreePath(UnrootedTree tree, TreeNode root,
+        int nSites)
+    {
+      this.tree = tree;
+      this.root = root;
+      this.pathSegments = Lists.newArrayList();
+      for (int i = 0; i < nSites; i++)
+        pathSegments.add(new HashMap<Pair<TreeNode,TreeNode>, Path>());
+    }
+
+    public Path getPath(TreeNode topNode, TreeNode botNode, int site)
+    {
+      return pathSegments.get(site).get(Pair.of(topNode, botNode));
+    }
+    
+    public Path createPath(TreeNode topNode, TreeNode botNode, int site)
+    {
+      Path result = new Path();
+      pathSegments.get(site).put(Pair.of(topNode, botNode), result);
+      return result;
+    }
+
+    public TreeNode getRoot()
+    {
+      return root;
+    }
+
+    public UnrootedTree getTree()
+    {
+      return tree;
+    }
   }
 
 }

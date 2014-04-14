@@ -43,6 +43,7 @@ dependencies {
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.3'
   compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24'
   compile 'com.google.code.gson:gson:2.2.4'
+  compile 'org.jblas:jblas:1.2.3'
 }
 
 task(tutorialj, dependsOn: ['build','testClasses'], type: JavaExec) {

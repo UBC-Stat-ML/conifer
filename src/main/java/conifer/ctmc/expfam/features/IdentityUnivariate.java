@@ -12,7 +12,7 @@ public class IdentityUnivariate<T> implements UnivariateFeatureExtractor<T>
   @Override
   public void extract(Counter counts, T state)
   {
-    counts.incrementCount("BivariateIdentity[" + state.toString() + "]", 1.0);
+    counts.incrementCount("UnivariateIdentity[" + state.toString() + "]", 1.0);
   }
 
 }

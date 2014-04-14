@@ -123,8 +123,6 @@ public class UnrootedTree
   /**
    * Performs a Nearest neighbor interchange move.
    * 
-   * TODO: add picture
-   * 
    * @param moved1
    * @param fixed1
    * @param moved2
@@ -177,4 +175,14 @@ public class UnrootedTree
     return UnrootedTreeUtils.allTotalBranchLengthDistances(this);
   }
   
+  public String toNewick()
+  {
+    return UnrootedTreeUtils.toNewick(this);
+  }
+  
+  @Override
+  public String toString()
+  {
+    return toNewick();
+  }
 }

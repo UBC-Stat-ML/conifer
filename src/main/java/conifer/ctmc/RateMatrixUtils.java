@@ -69,4 +69,40 @@ public class RateMatrixUtils
       NumericalUtils.checkIsClose(-rates[row][row], sum);
     }
   }
+  
+  /**
+   * Build a GTR from parameterized vectors
+   * 
+   * For example, with DNA (n=4), use an array stat[] of length 4 (summing to one),
+   * and an array subRates[] of length 6
+   * 
+   * Note: this does not take care of normalizing it to an expected number of change
+   * equal to one.
+   */
+  public static double [][] gtrFromOverParam(double [] stat, double [] subRates, int n)
+  {
+    if (stat.length != n || subRates.length != n*(n-1)/2)
+      throw new RuntimeException();
+    
+    NumericalUtils.checkIsProb(stat);
+    
+    double [][] result = new double[n][n];
+    
+    int cur = 0;
+    for (int col = 0; col < n; col++)
+      for (int row = 0; row < n; row++)
+        if (col < row)
+          result[row][col] = subRates[cur++] * stat[col];
+          
+    cur = 0;
+    for (int row = 0; row < n; row++)
+      for (int col = 0; col < n; col++)
+        if (col > row)
+          result[row][col] = subRates[cur++] * stat[col];
+    
+    
+    fillRateMatrixDiagonalEntries(result);
+    
+    return result;
+  }
 }

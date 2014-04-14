@@ -48,26 +48,16 @@ public class SimpleRateMatrix implements CTMCParameters
     return fromJSONString(jsonString);
   }
   
-  public static SimpleRateMatrix kimura1980()
-  {
-    return fromResource("/conifer/ctmc/kimura1980.txt");
-  }
-  
   private static SimpleRateMatrix fromJSONString(String jsonString)
   {
     return new Gson().fromJson(jsonString, SimpleRateMatrix.class);
   }
-  private static SimpleRateMatrix fromResource(String resourceURL)
+  public static SimpleRateMatrix fromResource(String resourceURL)
   {
     String jsonString = BriefIO.resourceToString(resourceURL); 
     return fromJSONString(jsonString);
   }
   
-  public static void main(String [] args)
-  {
-    System.out.println(kimura1980());
-  }
-
   @Override
   public String toString()
   {

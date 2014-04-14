@@ -5,8 +5,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.jblas.DoubleMatrix;
 import org.jgrapht.Graphs;
 import org.jgrapht.UndirectedGraph;
+
+import utils.MultiVariateObj;
+import utils.Objective;
 
 import bayonet.distributions.Multinomial;
 import bayonet.graphs.GraphUtils;
@@ -116,13 +120,23 @@ public class CTMCExpFam<S>
     return w;
   }
 
+  /**
+   * 
+   * @param kappa Precision parameter (reciprocal of variance).
+   * @param stats
+   * @return
+   */
   public ExpectedCompleteReversibleObjective getExpectedCompleteReversibleObjective(double kappa, ExpectedStatistics<S> stats)
   {
     checkFeaturesInitialized();
     return new ExpectedCompleteReversibleObjective(kappa, stats);
   }
 
-  public class ExpectedCompleteReversibleObjective implements DifferentiableFunction
+  public class ExpectedCompleteReversibleObjective 
+    implements 
+      DifferentiableFunction,
+      MultiVariateObj,
+      Objective
   {
     private final double kappa; // regularization strength
 
@@ -271,6 +285,24 @@ public class CTMCExpFam<S>
       }
       return false;
     }
+
+    /**
+     * Used by AHMC
+     */
+    @Override
+    public double functionValue(DoubleMatrix vec)
+    {
+      return valueAt(vec.data);
+    }
+
+    /**
+     * Used by AHMC
+     */
+    @Override
+    public DoubleMatrix mFunctionValue(DoubleMatrix vec)
+    {
+      return new DoubleMatrix(dimension(),1, derivativeAt(vec.data));
+    }
   }
 
   private void track(Object c) {}
@@ -335,12 +367,13 @@ public class CTMCExpFam<S>
   {
     public final double [] weights;
     public final double [] pi;
-    public final double normalizedValue;
+    public final double normalization;
+    
     private LearnedReversibleModel(double [] w, boolean isNormalized)
     {
       this.weights = w;
       this.pi = _buildPi();
-      this.normalizedValue=isNormalized?normalization(w):1;
+      this.normalization = isNormalized ? normalization(w) : 1.0;
     }
 
     private double [] _buildPi()
@@ -354,28 +387,20 @@ public class CTMCExpFam<S>
 
     private double normalization(double [] x)
     {
-      if(isNormalized==false)
-      {
+      if (!isNormalized)
         throw new RuntimeException();
-      }
       LearnedReversibleModel w = new LearnedReversibleModel(x, false);
-      double betainv=0;
-      double beta=0;
+      double betainv = 0;
       for (int startState=0; startState < nStates; startState++)
       {
         final int [] curSupports = supports[startState];
         final SparseVector qs = w.qs(startState);
         double sumQs = 0.0;
         for (int endStateIdx=0; endStateIdx < curSupports.length; endStateIdx++)
-        {
-          final double currentQ = qs.values[endStateIdx];
-          sumQs +=currentQ;
-        }
-        betainv = betainv+w.pi[startState]*sumQs;
+          sumQs += qs.values[endStateIdx];
+        betainv = betainv + w.pi[startState]*sumQs;
       }
-
-      beta = 1/betainv ;
-      return beta;
+      return 1.0/betainv;
     }
 
     private SparseVector qs(int startState)
@@ -385,7 +410,7 @@ public class CTMCExpFam<S>
       double [] values = new double[supportSize];
 
       for (int i = 0; i < supportSize; i++)
-        values[i] = Math.exp(bivariateFeatures[startState][i].dotProduct(weights)) * pi[support[i]]*normalizedValue;
+        values[i] = Math.exp(bivariateFeatures[startState][i].dotProduct(weights)) * pi[support[i]]*normalization;
       return new SparseVector(support, values);  
     }
 
@@ -399,6 +424,7 @@ public class CTMCExpFam<S>
         result.setCount(stateIndexer.i2o(support[j]), qs.values[j]);
       return result;
     }    
+    
     public Counter<S> getStationaryDistribution()
     {
       Counter<S> result = new Counter<S>();

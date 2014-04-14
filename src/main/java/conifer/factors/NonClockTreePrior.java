@@ -65,8 +65,6 @@ public class NonClockTreePrior<P> implements GenerativeFactor
     branchDistribution.getRealization().setValue(length);
     return branchDistribution.logDensity();
   }
-
-
   
   public static UnrootedTree generate(
       Random random, 
@@ -120,6 +118,7 @@ public class NonClockTreePrior<P> implements GenerativeFactor
    * Returns n samples from {0, ..., s-1}, without replacement
    * 
    * TODO: could be more efficient
+   * TODO: move to Bayonet
    * 
    * @param n
    * @param s

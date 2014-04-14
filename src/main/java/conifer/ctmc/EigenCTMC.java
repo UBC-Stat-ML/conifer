@@ -1,6 +1,9 @@
 package conifer.ctmc;
 
+import org.ejml.data.DenseMatrix64F;
 import org.ejml.data.Eigenpair;
+import org.ejml.factory.DecompositionFactory;
+import org.ejml.factory.EigenDecomposition;
 import org.ejml.ops.EigenOps;
 import org.ejml.simple.SimpleMatrix;
 
@@ -52,8 +55,19 @@ public class EigenCTMC implements CTMC
   {
     SimpleMatrix marginal = new SimpleMatrix(marginalTransitionProbability(1.0));
     SimpleMatrix exponentiatedTranspose = marginal.transpose();
-    Eigenpair eigenPair = EigenOps.computeEigenVector(exponentiatedTranspose.getMatrix(), 1.0);
-    double [] result = eigenPair.vector.data;
+    
+    double [] result = null;
+    final int dim = marginal.numCols();
+    EigenDecomposition<DenseMatrix64F> eigenDecomp = DecompositionFactory.eig(exponentiatedTranspose.numCols(), true);
+    eigenDecomp.decompose(exponentiatedTranspose.getMatrix());
+    // Find an eigen value equal to one (up to numerical precision)
+    // result will hold the corresponding eigenvalue
+    for (int i = 0; i < dim; i++)
+      if (eigenDecomp.getEigenvalue(i).isReal() && 
+          NumericalUtils.isClose(1.0, eigenDecomp.getEigenvalue(i).getReal(), NumericalUtils.THRESHOLD))
+        result = eigenDecomp.getEigenVector(i).data;
+    if (result == null)
+      throw new RuntimeException("Could not find an eigenvalue equal to one. Not a proper rate matrix?");
     double sum = NumericalUtils.getNormalization(result);
     if (sum < 0.0)
       for (int i = 0; i < result.length; i++)
@@ -61,7 +75,6 @@ public class EigenCTMC implements CTMC
     Multinomial.normalize(result);
     return result;
   }
-  
 
   /**
    * 

@@ -14,8 +14,10 @@ import blang.factors.GenerativeFactor;
 import blang.variables.RealVariable;
 import briefj.BriefCollections;
 import briefj.collections.Counter;
+import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
+import conifer.ctmc.RateMatrices;
 import conifer.ctmc.RateMatrixToEmissionModel;
 import conifer.ctmc.SimpleRateMatrix;
 import conifer.ctmc.expfam.CTMCExpFam;
@@ -89,7 +91,7 @@ public class UnrootedTreeLikelihood
   public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmpty(int nSites, List<TreeNode> leaves)
   {
     UnrootedTree tree = defaultTree(leaves);
-    SimpleRateMatrix baseRateMatrix = SimpleRateMatrix.kimura1980();
+    SimpleRateMatrix baseRateMatrix = RateMatrices.kimura1980();
     DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0.1), RealVariable.real(1.0), baseRateMatrix, 4);
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
@@ -106,7 +108,7 @@ public class UnrootedTreeLikelihood
   {
     Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
     UnrootedTree tree = defaultTree(data.keySet());
-    SimpleRateMatrix baseRateMatrix = SimpleRateMatrix.kimura1980();
+    SimpleRateMatrix baseRateMatrix = RateMatrices.kimura1980();
     DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0.1), RealVariable.real(1.0), baseRateMatrix, 4);
     PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.nucleotidesFactory();
     TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).length());
@@ -146,8 +148,9 @@ public class UnrootedTreeLikelihood
    */
   public TreeNode arbitraryNode()
   {
-    return BriefCollections.pick(tree.getTopology().vertexSet());
+    return TopologyUtils.arbitraryNode(tree);
   }
+  
   
   public List<FactorGraph<TreeNode>> buildFactorGraphs()
   {
