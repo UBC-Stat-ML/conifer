@@ -37,8 +37,6 @@ public final class TreeNode
   
   private static int nextId = 0;
   
-  // Note: no need for toString, hashCode because strings are interned
-  
   private final String description;
   private final boolean isLabelled;
   
@@ -46,7 +44,41 @@ public final class TreeNode
   
   private TreeNode(String description)
   {
-    this.description = description.intern();
+    this.description = description;
     this.isLabelled = !description.startsWith(INTERNAL_PREFIX);
   }
+
+  @Override
+  public int hashCode()
+  {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result
+        + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + (isLabelled ? 1231 : 1237);
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    TreeNode other = (TreeNode) obj;
+    if (description == null)
+    {
+      if (other.description != null)
+        return false;
+    } else if (!description.equals(other.description))
+      return false;
+    if (isLabelled != other.isLabelled)
+      return false;
+    return true;
+  }
+  
+  
 }

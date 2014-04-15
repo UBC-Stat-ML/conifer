@@ -1,0 +1,105 @@
+options { JDK_VERSION = "1.5"; STATIC = false; LOOKAHEAD = 10; }
+PARSER_BEGIN(NewickParser)
+package conifer.io.newick;
+
+import briefj.collections.Tree;
+import conifer.TreeNode;
+import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.ArrayList;
+import java.io.StringBufferInputStream;
+
+public class NewickParser 
+{
+	private Tree<TreeNode> tree;
+	private Map<TreeNode, Double> branchLengths;
+
+	public Tree<TreeNode> parse() throws ParseException 
+	{
+		branchLengths = new LinkedHashMap<TreeNode, Double>();
+		return tree();
+	}
+	public NewickParser(String str)
+	{
+		this(new StringBufferInputStream(str));
+	}
+	public Map<TreeNode, Double> getBranchLengths() { return branchLengths; }
+}
+PARSER_END(NewickParser)
+
+SKIP : { " " |	"\r" |	"\t" |	"\n" }
+TOKEN : 
+{
+  < NUMBER_STRING: ( ["0"-"9",".","E","e","-"] )+ >
+|	
+  < NODE_NAME_STRING: ( ["a"-"z","A"-"Z","_","-","0"-"9","."] )+ >
+}
+private Tree<TreeNode> tree() :         { Tree<TreeNode> result; }
+{
+	result = subtree()     
+	";"
+	{ return result; }
+}
+private Tree<TreeNode> subtree() :      { Tree<TreeNode> result; }
+{
+	result = internal() 
+	{ return result; }
+|
+	result = leaf()     
+	{ return result; } 
+}
+private Tree<TreeNode> leaf() :         { String name; }
+{
+	name = name()     
+	{ if (name == null) throw new RuntimeException("Leaves should be named."); return new Tree(TreeNode.withLabel(name)); }
+}
+private Tree<TreeNode> internal() :     { List<Tree<TreeNode>> children; String name; }
+{
+	"("
+	children = branchList()
+	")"
+	name = name()				
+	{ return new Tree<TreeNode>(name == null ? TreeNode.nextUnlabelled() : TreeNode.withLabel(name), children); }
+}
+private List<Tree<TreeNode>> branchList() :   
+{ 
+	List<Tree<TreeNode>> branches = new ArrayList<Tree<TreeNode>>(); 
+	Tree<TreeNode> currentTree; 
+}
+{
+	currentTree = branch() 	
+	{ branches.add(currentTree); }
+	( 
+		","
+		currentTree = branch() 	
+		{ branches.add(currentTree); }
+	)*											
+	{ return branches; }
+}
+private Tree<TreeNode> branch() : 			{ Tree<TreeNode> result; }
+{
+	result = subtree()
+	[ length(result.getLabel()) ]
+	{ return result; }
+}
+private String name() : 			{ Token t; }
+{
+	t = <NODE_NAME_STRING> 	
+	{ return t.image; }
+|
+	{ return null; }
+}
+private void length(TreeNode label) : 			{ Token t; }
+{
+	":"
+	t = <NUMBER_STRING>
+	{ 
+		Double length = Double.parseDouble(t.image); 
+		branchLengths.put(label, length);
+	}
+}
+
+
+
+

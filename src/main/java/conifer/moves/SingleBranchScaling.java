@@ -28,6 +28,7 @@ public class SingleBranchScaling implements MHProposalDistribution
   @Override
   public Proposal propose(Random rand)
   {
+    System.out.println("Computing single branch scaling move");
     List<UnorderedPair<TreeNode, TreeNode>> allEdges = Lists.newArrayList(tree.getTopology().edgeSet());
     final UnorderedPair<TreeNode, TreeNode> edge = DiscreteUniform.sample(allEdges, rand);
     final double oldValue = tree.getBranchLengths().get(edge);

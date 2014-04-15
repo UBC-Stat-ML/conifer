@@ -9,7 +9,7 @@ import blang.mcmc.MHProposalDistribution;
 import blang.mcmc.SampledVariable;
 import blang.variables.RealVectorInterface;
 
-
+// TODO: this should go in blang!
 
 public class RealVectorMHProposal implements MHProposalDistribution
 {
@@ -22,6 +22,7 @@ public class RealVectorMHProposal implements MHProposalDistribution
   @Override
   public Proposal propose(Random rand)
   {
+    System.out.println("Computing RealVectorHMProposal");
     if (savedValue != null)
       throw new RuntimeException();
     double [] variableArray = variable.getVector();

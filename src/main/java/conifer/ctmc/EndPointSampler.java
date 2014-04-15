@@ -23,7 +23,7 @@ public class EndPointSampler
   private static final int MAX_N_TRANSITION = 1000000;
   private final CTMC ctmc;
   private final SimpleMatrix uniformizedTransition;
-  private final double maxDepartureRate;
+  public final double maxDepartureRate;
   private final List<SimpleMatrix> cache;
   private double [] sojournWorkArray = new double[10];
   private final double [] transitionWorkArray;
@@ -87,7 +87,7 @@ public class EndPointSampler
     return max;
   }
   
-  private int sampleNTransitions(Random rand, int startPoint, int endPoint, double T)
+  public int sampleNTransitions(Random rand, int startPoint, int endPoint, double T)
   {
     double[][] transitionMarginal = ctmc.marginalTransitionProbability(T);
     if (transitionMarginal[startPoint][endPoint] == 0)

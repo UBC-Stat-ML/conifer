@@ -13,18 +13,12 @@ import blang.annotations.FactorComponent;
 import blang.factors.GenerativeFactor;
 import blang.variables.RealVariable;
 import briefj.BriefCollections;
-import briefj.collections.Counter;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.ctmc.RateMatrices;
-import conifer.ctmc.RateMatrixToEmissionModel;
 import conifer.ctmc.SimpleRateMatrix;
-import conifer.ctmc.expfam.CTMCExpFam;
-import conifer.ctmc.expfam.CTMCState;
-import conifer.ctmc.expfam.CTMCStateSpace;
 import conifer.ctmc.expfam.ExpFamMixture;
-import conifer.ctmc.expfam.ExpFamParameters;
 import conifer.io.FastaUtils;
 import conifer.io.FixedTreeObservations;
 import conifer.io.PhylogeneticObservationFactory;
@@ -128,6 +122,11 @@ public class UnrootedTreeLikelihood
   {
     MultiCategorySubstitutionModel<ExpFamMixture> subModel = new MultiCategorySubstitutionModel<ExpFamMixture>(mixture, this.observations.nSites());
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>>(this.tree, subModel, this.observations);
+  }
+  
+  public UnrootedTreeLikelihood<M> withTree(File newickFile)
+  {
+    return new UnrootedTreeLikelihood<M>(UnrootedTree.fromNewick(newickFile), this.evolutionaryModel, this.observations);
   }
   
   /**

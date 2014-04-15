@@ -1,5 +1,6 @@
 package conifer;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 
@@ -173,6 +174,11 @@ public class UnrootedTree
   public Counter<UnorderedPair<TreeNode,TreeNode>> allTotalBranchLengthDistances()
   {
     return UnrootedTreeUtils.allTotalBranchLengthDistances(this);
+  }
+  
+  public static UnrootedTree fromNewick(File f)
+  {
+    return UnrootedTreeUtils.fromNewick(f);
   }
   
   public String toNewick()

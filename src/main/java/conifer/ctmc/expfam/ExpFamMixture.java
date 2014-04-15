@@ -37,20 +37,38 @@ public class ExpFamMixture implements RateMatrixMixture
     return result;
   }
   
-//  public static ExpFamMixture fromJSON()
-//  {
-//    CTMCExpFam<CTMCState> globalExponentialFamily = new CTMCExpFam<CTMCState>(support, indexer, true);
-//  }
+  public static ExpFamMixture fromSerialized(SerializedExpFamMixture serialized, Indexer<String> observationIndexer)
+  {
+    CTMCExpFam<CTMCState> globalExponentialFamily = new CTMCExpFam<CTMCState>(serialized.getSupport(), serialized.getCTMCStateIndexer(), true);
+    globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singletonList(serialized.getBivariateFeatureExtractor()));
+    globalExponentialFamily.extractUnivariateFeatures(Collections.singletonList(serialized.getUnivariateFeatureExtractor()));
+    
+    RateMatrixToEmissionModel emissionModel = serialized.getEmissionModel();
+    Indexer<String> latentIndexer = serialized.getLatentIndexer();
+    if (emissionModel == null)
+      if (!latentIndexer.equals(observationIndexer))
+        throw new RuntimeException();
+    CTMCStateSpace stateSpace = new CTMCStateSpace(observationIndexer, latentIndexer, serialized.nCategories, SerializedExpFamMixture.partition);
+    ExpFamParameters params = new ExpFamParameters(globalExponentialFamily, stateSpace);
+    ExpFamMixture mixture = new ExpFamMixture(params, emissionModel, stateSpace);
+    return mixture;
+  }
+  
+  public static ExpFamMixture kimura1980()
+  {
+    return fromSerialized(SerializedExpFamMixture.kimura1980(), Indexers.dnaIndexer());
+  }
   
   public static ExpFamMixture dnaGTR()
   {
-    CTMCExpFam<CTMCState> globalExponentialFamily = CTMCExpFam.createModelWithFullSupport(simpleDNAStateIndexer(1), true);
+    final int nCat = 1;
+    CTMCExpFam<CTMCState> globalExponentialFamily = CTMCExpFam.createModelWithFullSupport(simpleDNAStateIndexer(nCat), true);
     globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singleton(new IdentityBivariate<CTMCState>()));
     globalExponentialFamily.extractUnivariateFeatures(Collections.singleton(new IdentityUnivariate<CTMCState>()));
     
     RateMatrixToEmissionModel emissionModel = null;
     Indexer<String> dnaIndexer = Indexers.dnaIndexer();
-    CTMCStateSpace stateSpace = new CTMCStateSpace(dnaIndexer, dnaIndexer, 1);
+    CTMCStateSpace stateSpace = new CTMCStateSpace(dnaIndexer, dnaIndexer, nCat);
     ExpFamParameters params = new ExpFamParameters(globalExponentialFamily, stateSpace);
     ExpFamMixture mixture = new ExpFamMixture(params, emissionModel, stateSpace);
     return mixture;

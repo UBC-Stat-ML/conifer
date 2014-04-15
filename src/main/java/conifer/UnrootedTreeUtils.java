@@ -1,7 +1,9 @@
 package conifer;
 
 
+import java.io.File;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.jgrapht.Graphs;
@@ -9,18 +11,50 @@ import org.jgrapht.Graphs;
 import com.google.common.collect.Lists;
 
 import conifer.factors.NonClockTreePrior;
+import conifer.io.newick.NewickParser;
+import conifer.io.newick.ParseException;
 
 import bayonet.distributions.Exponential;
 import blang.variables.RealVariable;
 import briefj.BriefCollections;
+import briefj.BriefIO;
 import briefj.Indexer;
 import briefj.collections.Counter;
+import briefj.collections.Tree;
 import briefj.collections.UnorderedPair;
 
 
 
 public class UnrootedTreeUtils
 {
+  public static UnrootedTree fromNewick(File f)
+  {
+    NewickParser parser = new NewickParser(BriefIO.fileToString(f));
+    try
+    {
+      Tree<TreeNode> topo = parser.parse();
+      Map<TreeNode,Double> bls = parser.getBranchLengths();
+      UnrootedTree result = new UnrootedTree();
+      process(result, topo, bls, null);
+      return result;
+    } catch (ParseException e)
+    {
+      throw new RuntimeException(e);
+    }
+  }
+  
+  private static void process(
+      UnrootedTree result, Tree<TreeNode> topo,
+      Map<TreeNode, Double> bls, TreeNode ancestor)
+  {
+    TreeNode current = topo.getLabel();
+    result.addNode(current);
+    if (ancestor != null)
+      result.addEdge(ancestor, current, bls.get(current));
+    for (Tree<TreeNode> child : topo.getChildren())
+      process(result, child, bls, current);
+  }
+
   public static String toNewick(UnrootedTree tree)
   {
     StringBuilder result = new StringBuilder();

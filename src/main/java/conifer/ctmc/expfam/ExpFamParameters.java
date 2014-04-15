@@ -17,7 +17,7 @@ import briefj.collections.Counter;
 
 
 @Samplers({
-//  RealVectorMHProposal.class,
+  RealVectorMHProposal.class,
   PhyloHMCMove.class
 })
 @Processors({IIDRealVectorGenerativeFactor.VectorNormProcessor.class, ExpFamParamProcessor.class})

@@ -27,17 +27,26 @@ public class SimplePhyloModel extends MCMCRunner
   
   @DefineFactor(onObservations = true)
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
-    UnrootedTreeLikelihood.fromFastaFile(inputFile).withExpFamMixture(ExpFamMixture.dnaGTR());
+    UnrootedTreeLikelihood
+    .fromFastaFile(inputFile)
+    .withExpFamMixture(ExpFamMixture.kimura1980())
+    .withTree(new File("/Users/bouchard/Documents/data/utcs/23S.E.raxml.nwk"));
   
   @DefineFactor
-  NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
+  NonClockTreePrior<RateParameterization> treePrior = 
+    NonClockTreePrior
+    .on(likelihood.tree);
 
   @DefineFactor
-  Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(treePrior.branchDistributionParameters.rate).withMean(10.0);
+  Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = 
+    Exponential
+    .on(treePrior.branchDistributionParameters.rate)
+    .withMean(10.0);
   
   @DefineFactor
   public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior =
-    IIDRealVectorGenerativeFactor.iidNormalOn(likelihood.evolutionaryModel.rateMatrixMixture.parameters);
+    IIDRealVectorGenerativeFactor
+    .iidNormalOn(likelihood.evolutionaryModel.rateMatrixMixture.parameters);
   
   private final PrintWriter treeWriter = BriefIO.output(Results.getFileInResultFolder("trees.newick"));
   

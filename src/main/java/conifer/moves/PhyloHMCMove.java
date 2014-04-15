@@ -4,6 +4,7 @@ import hmc.AHMC;
 import hmc.DataStruct;
 import hmc.HMC;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -65,7 +66,12 @@ public class PhyloHMCMove extends NodeMove
       // expected stats fixed,
       // but may not be needed (already quite a bit of gains by doing large number of steps (L) 
       // within the doIter() method below
-      DataStruct hmcResult = HMC.doIter(rand, L, epsilon, new DoubleMatrix(initialPoint), objective, objective);
+      DataStruct hmcResult = null;
+      for (int i = 0; i < 1000; i++)
+      {
+        hmcResult = HMC.doIter(rand, L, epsilon, i == 0 ? new DoubleMatrix(initialPoint) : hmcResult.next_q, objective, objective);
+        System.out.println(hmcResult.energy + "\t" + Arrays.toString(hmcResult.next_q.data));
+      }
       newPoint = hmcResult.next_q.data;
     }
     else

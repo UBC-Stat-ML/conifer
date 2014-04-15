@@ -20,6 +20,8 @@ import bayonet.marginal.algo.ExactSampler;
 import bayonet.marginal.algo.SumProduct;
 import bayonet.math.NumericalUtils;
 import blang.annotations.FactorComponent;
+import briefj.BriefMath;
+import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
 
 import com.google.common.collect.Lists;
@@ -130,7 +132,66 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
     }
     return categorySpecificStats;
   }
+  
+  public List<PoissonAuxiliarySample> samplePoissonAuxiliaryVariables(Random rand, TreeObservations observations,
+      UnrootedTree tree, 
+      TreeNode root)
+  {
+    List<EndPointSampler> endPointSamplers = endPointSamplers();
+    
+    // sample posterior internal reconstructions and indicators
+    MultiCategoryInternalNodeSample internalSample = samplePosteriorInternalNodes(rand, observations, tree, root);
+    
+    
+    List<PoissonAuxiliarySample> result = Lists.newArrayList();
+    for (int cat = 0; cat < nCategories(); cat++)
+      result.add(new PoissonAuxiliarySample(endPointSamplers.get(cat).maxDepartureRate));
+    
+    for (Pair<TreeNode,TreeNode> edge : tree.getRootedEdges(root))
+    {
+      final TreeNode 
+        topNode = edge.getLeft(),
+        botNode = edge.getRight();
+      final double branchLength = tree.getBranchLength(topNode, botNode);
+      for (int s = 0; s < nSites; s++)
+      {
+        final int 
+          topState = internalSample.getInternalState(topNode, s),
+          botState = internalSample.getInternalState(botNode, s);
+        int category = internalSample.categoryIndicators[s];
+        int nTransitions = endPointSamplers.get(category).sampleNTransitions(rand, topState, botState, branchLength);
+        result.get(category).incrementCount(topNode, botNode, nTransitions);
+      }
+    }
+    
+    return result;
+  }
 
+  public static class PoissonAuxiliarySample
+  {
+    public final double rate;
+    private final Counter<UnorderedPair<TreeNode, TreeNode>> 
+      transitionCounts = new Counter<UnorderedPair<TreeNode, TreeNode>>(),
+      sampleCounts = new Counter<UnorderedPair<TreeNode, TreeNode>>();
+    private PoissonAuxiliarySample(double rate)
+    {
+      this.rate = rate;
+    }
+    public void incrementCount(TreeNode topNode, TreeNode botNode, int increment)
+    {
+      transitionCounts.incrementCount(UnorderedPair.of(topNode, botNode), increment);
+      sampleCounts.incrementCount(UnorderedPair.of(topNode, botNode), 1.0);
+    }
+    public int getTransitionCount(TreeNode topNode, TreeNode botNode)
+    {
+      return BriefMath.getAndCheckInt(transitionCounts.getCount(UnorderedPair.of(topNode, botNode)));
+    }
+    public int getSampleCount(TreeNode topNode, TreeNode botNode)
+    {
+      return BriefMath.getAndCheckInt(sampleCounts.getCount(UnorderedPair.of(topNode, botNode)));
+    }
+  }
+  
   private List<EndPointSampler> endPointSamplers()
   {
     List<EndPointSampler> processes = Lists.newArrayList();

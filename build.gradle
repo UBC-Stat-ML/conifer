@@ -5,9 +5,9 @@ apply plugin: 'eclipse'
 uploadArchives {
   repositories.mavenDeployer {
     repository(url: "file:///Users/bouchard/Documents/web/public_html/maven/")
-    pom.version = " 1.0.2"
+    pom.version = " 1.1.0"
     pom.artifactId = "conifer"
-    pom.groupId = "com.conifer"
+    pom.groupId = "ca.ubc.stat"
   }
 }
 
@@ -27,7 +27,7 @@ repositories {
     url "http://www.stat.ubc.ca/~bouchard/maven/"
   }
   maven {
-  	url "http://www.biojava.org/download/maven/"
+    url "http://www.biojava.org/download/maven/"
   }
 }
 
@@ -35,10 +35,11 @@ dependencies {
   compile group: 'com.google.guava', name: 'guava', version: '16.0.1'
   testCompile group: 'junit', name: 'junit', version: '4.11'
   compile group: 'junit', name: 'junit', version: '4.11'
-  compile group: 'com.3rdf', name: 'tutorialj', version: '2.0.0'
-  compile group: 'com.3rdf', name: 'binc', version: '1.1'
-  compile group: 'com.3rdf', name: 'briefj', version: '2.0.2'
-  compile group: 'com.3rdf', name: 'bayonet', version: '2.0.3'
+  compile group: 'ca.ubc.stat', name: 'tutorialj', version: '2.0.2'
+  compile group: 'ca.ubc.stat', name: 'binc', version: '1.1.2'
+  compile group: 'ca.ubc.stat', name: 'briefj', version: '2.1.0'
+  compile group: 'ca.ubc.stat', name: 'bayonet', version: '2.1.0'
+  compile group: 'ca.ubc', name: 'ahmc-java', version: '1.0.0'
   compile group: 'org.jgrapht', name: 'jgrapht-dist', version: '0.9.0'
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.3'
   compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24'
