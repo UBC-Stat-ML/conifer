@@ -16,7 +16,15 @@ import briefj.collections.Counter;
 import briefj.tomove.Results;
 
 
-
+/**
+ * Store and plot samples from the exponential family-based representation of
+ * rate matrices.
+ * 
+ * 
+ * 
+ * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+ *
+ */
 public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
 {
   private ExpFamParameters parameters;

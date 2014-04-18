@@ -1,16 +1,18 @@
 package conifer.processors;
 
-import java.util.List;
-
-import conifer.TopologyUtils;
-import conifer.TreeNode;
-import conifer.UnrootedTree;
 import blang.processing.NodeProcessor;
 import blang.processing.ProcessorContext;
 import blang.variables.RealValued;
+import conifer.UnrootedTree;
 
 
-
+/**
+ * The tree diameter is the max distance between two leaves of a tree.
+ * Used for testing.
+ * 
+ * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+ *
+ */
 public class TreeDiameterProcessor implements NodeProcessor<UnrootedTree>, RealValued
 {
   private UnrootedTree tree;

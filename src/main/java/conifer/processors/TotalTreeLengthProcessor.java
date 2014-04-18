@@ -6,7 +6,13 @@ import blang.processing.ProcessorContext;
 import blang.variables.RealValued;
 
 
-
+/**
+ * Computes the sum of the branch lengths of a tree.
+ * Used for testing.
+ * 
+ * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+ *
+ */
 public class TotalTreeLengthProcessor implements NodeProcessor<UnrootedTree>, RealValued
 {
   private UnrootedTree tree;
