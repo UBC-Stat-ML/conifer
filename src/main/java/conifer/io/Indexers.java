@@ -10,4 +10,11 @@ public class Indexers
   {
     return PhylogeneticObservationFactory.nucleotidesFactory().getIndexer();
   }
-}
+  public static Indexer<String> proteinIndexer()
+  {
+    return PhylogeneticObservationFactory.proteinFactory().getIndexer();
+  }
+    
+  }
+  
+
