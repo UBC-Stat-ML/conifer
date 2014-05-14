@@ -1,0 +1,11 @@
+{
+  "caseSensitive" : false,
+  "orderedSymbols" : ["A", "R", "N", "D", "C", "Q", "E", "G", "H", "L", "I", "K", "M", "F", "P", "S", "T", "W", "Y", "V"],
+  "ambiguousSymbols": {
+    "B" : [               "N", "D"                                                                                                                ],
+    "Z" : [                                     "Q", "E"                                                                                          ],
+    "X" : ["A", "R", "N", "D", "C", "Q", "E", "G", "H", "L", "I", "K", "M", "F", "P", "S", "T", "W", "Y", "V"],
+    "-"  :  ["A", "R", "N", "D", "C", "Q", "E", "G", "H", "L", "I", "K", "M", "F", "P", "S", "T", "W", "Y", "V"]
+    
+  }
+}

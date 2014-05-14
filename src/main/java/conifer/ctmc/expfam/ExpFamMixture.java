@@ -37,6 +37,16 @@ public class ExpFamMixture implements RateMatrixMixture
     return result;
   }
   
+  public static Indexer<CTMCState> simpleProteinStateIndexer(int nCategories)
+  {
+    Indexer<String> indexer = Indexers.proteinIndexer();
+    Indexer<CTMCState> result = new Indexer<CTMCState>();
+    for (int cat = 0; cat < nCategories; cat++)
+      for (int i = 0; i < indexer.size(); i++)
+        result.addToIndex(new CTMCState(cat, indexer.i2o(i), null));
+    return result;
+  }
+  
   public static ExpFamMixture fromSerialized(SerializedExpFamMixture serialized, Indexer<String> observationIndexer)
   {
     CTMCExpFam<CTMCState> globalExponentialFamily = new CTMCExpFam<CTMCState>(serialized.getSupport(), serialized.getCTMCStateIndexer(), true);
@@ -69,6 +79,20 @@ public class ExpFamMixture implements RateMatrixMixture
     RateMatrixToEmissionModel emissionModel = null;
     Indexer<String> dnaIndexer = Indexers.dnaIndexer();
     CTMCStateSpace stateSpace = new CTMCStateSpace(dnaIndexer, dnaIndexer, nCat);
+    ExpFamParameters params = new ExpFamParameters(globalExponentialFamily, stateSpace);
+    ExpFamMixture mixture = new ExpFamMixture(params, emissionModel, stateSpace);
+    return mixture;
+  }
+  
+  public static ExpFamMixture proteinGTR()
+  {
+    final int nCat = 1;
+    CTMCExpFam<CTMCState> globalExponentialFamily = CTMCExpFam.createModelWithFullSupport(simpleProteinStateIndexer(nCat), true);
+    globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singleton(new IdentityBivariate<CTMCState>()));
+    globalExponentialFamily.extractUnivariateFeatures(Collections.singleton(new IdentityUnivariate<CTMCState>()));
+    RateMatrixToEmissionModel emissionModel = null;
+    Indexer<String> proteinIndexer = Indexers.proteinIndexer();
+    CTMCStateSpace stateSpace = new CTMCStateSpace(proteinIndexer,proteinIndexer, nCat);
     ExpFamParameters params = new ExpFamParameters(globalExponentialFamily, stateSpace);
     ExpFamMixture mixture = new ExpFamMixture(params, emissionModel, stateSpace);
     return mixture;

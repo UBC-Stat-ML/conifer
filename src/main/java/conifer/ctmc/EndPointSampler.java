@@ -16,6 +16,10 @@ import com.google.common.collect.Lists;
  * WARNING: Not thread-safe.
  * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+ * The objective of this code is to sample the full path given the initial states and the final states.
+ * The number of transitions and sojourn time is unkown and needs to be sampled.
+ * The theory behind this code can be found at 
+ * http://www.stat.ubc.ca/~bouchard/courses/stat547-sp2013-14/lecture/2014/02/05/lecture10.html
  *
  */
 public class EndPointSampler
@@ -64,7 +68,12 @@ public class EndPointSampler
   {
     return cache.size();
   }
-
+/**
+ * This unifomizedTransition is used to create matrix "B" in the Alex's lecture notes 
+ * @param rateMatrix
+ * @param mu  can be understood as the omega in the lecture notes
+ * @return
+ */
   private static double[][] uniformizedTransition(double [][] rateMatrix, double mu)
   {
     int nStates = rateMatrix.length;
@@ -74,6 +83,12 @@ public class EndPointSampler
         result[i][j] = (i == j ? 1.0 : 0.0) + rateMatrix[i][j] / mu;
     return result;
   }
+  
+  /**
+   * This code will return the biggest diagonal element in the rate matrix 
+   * @param rateMatrix
+   * @return
+   */
   
   private static double maxDepartureRate(double [][] rateMatrix)
   {
@@ -86,6 +101,20 @@ public class EndPointSampler
     }
     return max;
   }
+  
+  /**
+   * The objective of this code is to generate the number of transitions between different states
+   *  http://www.stat.ubc.ca/~bouchard/courses/stat547-sp2013-14/lecture/2014/02/05/lecture10.html is a good reference
+   *  To understand this code, check Equation 17-20 in lecture 10
+   *  To get the marginal distribution, we marginalize the product of the poission part and the factor graph part
+   *  In the code below, we separate the terms related to "n"- number of transition steps and those not so that we have logConstant and logMuT, not 
+   *  related to "n"
+   * @param rand
+   * @param startPoint
+   * @param endPoint
+   * @param T
+   * @return
+   */
   
   public int sampleNTransitions(Random rand, int startPoint, int endPoint, double T)
   {

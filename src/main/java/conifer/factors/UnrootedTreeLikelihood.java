@@ -111,6 +111,20 @@ public class UnrootedTreeLikelihood
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, observations);
   }
   
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> fromFastaProteinFile(File fastaFile)
+  {
+    Random rand = new Random();
+    Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
+    UnrootedTree tree = defaultTree(data.keySet());
+    SimpleRateMatrix baseRateMatrix = RateMatrices.randomGTR(rand, 20);
+    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0.1), RealVariable.real(1.0), baseRateMatrix, 0);
+    PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.proteinFactory();
+    TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).length());
+    MultiCategorySubstitutionModel.loadObservations(observations, data, factory); 
+    MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, observations.nSites());
+    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, observations);
+  }
+  
   /**
    * Chained method to change the evolutionary model into an exponential family mixture, keeping the other aspects (tree and
    * observations) unchanged.

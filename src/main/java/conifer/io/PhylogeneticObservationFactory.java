@@ -49,6 +49,13 @@ public class PhylogeneticObservationFactory
     return _nucleotideFactory;
   }
   
+  public static PhylogeneticObservationFactory proteinFactory()
+  {
+    if(_proteinFactory == null)
+      _proteinFactory = fromResource("/conifer/io/protein-iupac-encoding.txt");
+    return _proteinFactory;
+   }
+  
   /**
    * Reads the specifications of a PhylogeneticObservationFactory from a JSON file.
    * 
@@ -64,7 +71,7 @@ public class PhylogeneticObservationFactory
   }
   
   /**
-   * 
+   *
    * @param sequence To be chunked and indexed.
    * @return An array with rows indexing sites and columns indexing actual symbols, filled with one
    *         if the actual symbol is permitted at that site or zero otherwise.
@@ -194,4 +201,5 @@ public class PhylogeneticObservationFactory
   }
   
   private static PhylogeneticObservationFactory _nucleotideFactory = null;
+  private static PhylogeneticObservationFactory _proteinFactory = null;
 }
