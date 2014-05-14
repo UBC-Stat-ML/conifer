@@ -16,6 +16,7 @@ import briefj.collections.UnorderedPair;
 
 import com.google.common.collect.Maps;
 
+import conifer.moves.AllBranchesScaling;
 import conifer.moves.SingleBranchScaling;
 import conifer.moves.SingleNNI;
 import conifer.processors.TotalTreeLengthProcessor;
@@ -30,7 +31,8 @@ import conifer.processors.TreeDiameterProcessor;
  */
 @Samplers({
   SingleNNI.class, 
-  SingleBranchScaling.class
+  SingleBranchScaling.class,
+  AllBranchesScaling.class
 })
 @Processors({
   TotalTreeLengthProcessor.class,

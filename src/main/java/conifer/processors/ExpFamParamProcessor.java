@@ -20,7 +20,8 @@ import briefj.tomove.Results;
  * Store and plot samples from the exponential family-based representation of
  * rate matrices.
  * 
- * 
+ * Two types of statistics are stored: the weights (natural parameterization) 
+ * used in the exponential family, and the values of the rates in the rate matrix.
  * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  *
@@ -41,6 +42,7 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
     
     // TODO: split into different folders
     // TODO: better viz (remove dep on coda at same time)
+    // TODO: add stationary distribution estimates
     
     // print weights
     Counter<String> weights = model.getWeights();

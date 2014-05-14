@@ -22,7 +22,7 @@ public class RealVectorMHProposal implements MHProposalDistribution
   @Override
   public Proposal propose(Random rand)
   {
-    System.out.println("Computing RealVectorHMProposal");
+//    System.out.println("Computing RealVectorHMProposal");
     if (savedValue != null)
       throw new RuntimeException();
     double [] variableArray = variable.getVector();

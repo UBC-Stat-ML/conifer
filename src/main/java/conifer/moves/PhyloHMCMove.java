@@ -70,7 +70,7 @@ public class PhyloHMCMove extends NodeMove
       for (int i = 0; i < 1000; i++)
       {
         hmcResult = HMC.doIter(rand, L, epsilon, i == 0 ? new DoubleMatrix(initialPoint) : hmcResult.next_q, objective, objective);
-        System.out.println(hmcResult.energy + "\t" + Arrays.toString(hmcResult.next_q.data));
+//        System.out.println(hmcResult.energy + "\t" + Arrays.toString(hmcResult.next_q.data));
       }
       newPoint = hmcResult.next_q.data;
     }

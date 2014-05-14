@@ -134,6 +134,12 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
   }
   
   public List<PoissonAuxiliarySample> samplePoissonAuxiliaryVariables(Random rand, TreeObservations observations,
+      UnrootedTree tree)
+  {
+    return samplePoissonAuxiliaryVariables(rand, observations, tree, TopologyUtils.arbitraryNode(tree));
+  }
+  
+  public List<PoissonAuxiliarySample> samplePoissonAuxiliaryVariables(Random rand, TreeObservations observations,
       UnrootedTree tree, 
       TreeNode root)
   {
@@ -167,6 +173,12 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
     return result;
   }
 
+  /**
+   * Each instance of PoissonAuxiliarySample holds the sufficient
+   * statistics for one category for performing global branch resampling.
+   * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+   *
+   */
   public static class PoissonAuxiliarySample
   {
     public final double rate;
@@ -182,10 +194,21 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
       transitionCounts.incrementCount(UnorderedPair.of(topNode, botNode), increment);
       sampleCounts.incrementCount(UnorderedPair.of(topNode, botNode), 1.0);
     }
+    /**
+     * 
+     * @param topNode
+     * @param botNode
+     * @return The number of Poisson events for this category.
+     */
     public int getTransitionCount(TreeNode topNode, TreeNode botNode)
     {
       return BriefMath.getAndCheckInt(transitionCounts.getCount(UnorderedPair.of(topNode, botNode)));
     }
+    /**
+     * @param topNode
+     * @param botNode
+     * @return The number of times this category was used (should be the same for all nodes)
+     */
     public int getSampleCount(TreeNode topNode, TreeNode botNode)
     {
       return BriefMath.getAndCheckInt(sampleCounts.getCount(UnorderedPair.of(topNode, botNode)));

@@ -1,36 +1,21 @@
 package conifer.moves;
 
-import hmc.AHMC;
-import hmc.DataStruct;
-import hmc.HMC;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import org.jblas.DoubleMatrix;
-
-import com.google.common.collect.Lists;
-
-import conifer.UnrootedTree;
-import conifer.ctmc.PathStatistics;
-import conifer.ctmc.expfam.CTMCExpFam;
-import conifer.ctmc.expfam.CTMCState;
-import conifer.ctmc.expfam.CTMCStateSpace;
-import conifer.ctmc.expfam.ExpFamMixture;
-import conifer.ctmc.expfam.ExpFamParameters;
-import conifer.ctmc.expfam.ExpectedStatistics;
-import conifer.factors.NonClockTreePrior;
-import conifer.factors.UnrootedTreeLikelihood;
-import conifer.models.MultiCategorySubstitutionModel;
-
+import bayonet.distributions.Exponential;
 import bayonet.distributions.Gamma;
-import bayonet.distributions.Normal.MeanVarianceParameterization;
-import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.NodeMove;
 import blang.mcmc.SampledVariable;
-import briefj.Indexer;
+import briefj.collections.UnorderedPair;
+import conifer.TreeNode;
+import conifer.UnrootedTree;
+import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.factors.NonClockTreePrior;
+import conifer.factors.UnrootedTreeLikelihood;
+import conifer.models.MultiCategorySubstitutionModel;
+import conifer.models.MultiCategorySubstitutionModel.PoissonAuxiliarySample;
 
 
 
@@ -39,7 +24,7 @@ public class AllBranchesScaling extends NodeMove
   @SampledVariable UnrootedTree tree;
   
   @ConnectedFactor UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
-  @ConnectedFactor NonClockTreePrior<Gamma.Parameters> prior;
+  @ConnectedFactor NonClockTreePrior<Exponential.Parameters> prior;
   
 
   @Override
@@ -49,19 +34,26 @@ public class AllBranchesScaling extends NodeMove
     if (rand.nextInt(10) != 0)
       return;
     
-    throw new RuntimeException();
+    List<PoissonAuxiliarySample> auxVars = likelihood.evolutionaryModel.samplePoissonAuxiliaryVariables(rand, likelihood.observations, likelihood.tree);
+
+    final double alpha = 1.0;
+    final double beta = prior.branchDistributionParameters.getRate();
     
-//    if (prior.marginalDistributionParameters.mean.getValue() != 0.0)
-//      throw new RuntimeException();
-//    final double variance = prior.marginalDistributionParameters.variance.getValue();
-//    
-//    List<PathStatistics> pathStatistics = likelihood.evolutionaryModel.samplePosteriorPaths(rand, likelihood.observations, likelihood.tree);
-//    
-//    ExpectedStatistics<CTMCState> convertedStat = convert(pathStatistics); 
-//    CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective objective = parameters.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0/variance, convertedStat);
-//    
-//    double [] initialPoint = parameters.getVector();
-//    double [] newPoint;
+    // loop over edges
+    for (UnorderedPair<TreeNode, TreeNode> edge : likelihood.tree.getTopology().edgeSet())
+    {
+      double updatedShape = alpha;
+      double updatedRate = beta;
+      for (PoissonAuxiliarySample aux : auxVars)
+      {
+        updatedShape += aux.getTransitionCount(edge.getFirst(), edge.getSecond());
+        updatedRate += aux.rate * aux.getSampleCount(edge.getFirst(), edge.getSecond());
+      }
+      // sample new branch length
+      final double newBranchLengths = Gamma.generate(rand, updatedRate, updatedShape);
+      tree.updateBranchLength(edge, newBranchLengths);
+    }
+    
 //    
 //    if (hyperParametersInitialized())
 //    {
