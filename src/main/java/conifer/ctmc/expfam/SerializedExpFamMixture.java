@@ -220,6 +220,10 @@ public class SerializedExpFamMixture
     return fromResource("/conifer/ctmc/expfam/kimura1980-expfam.txt");
   }
 
+  public static SerializedExpFamMixture accordance45()
+  {
+    return fromResource("/conifer/ctmc/expfam/accordance-expfam.txt");
+  }
 
 
 }

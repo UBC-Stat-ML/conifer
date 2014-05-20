@@ -69,6 +69,11 @@ public class ExpFamMixture implements RateMatrixMixture
     return fromSerialized(SerializedExpFamMixture.kimura1980(), Indexers.dnaIndexer());
   }
   
+  public static ExpFamMixture Accordance45()
+  {
+    return fromSerialized(SerializedExpFamMixture.accordance45(), Indexers.proteinIndexer());
+  }
+  
   public static ExpFamMixture dnaGTR()
   {
     final int nCat = 1;
