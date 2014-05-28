@@ -11,7 +11,7 @@ import blang.annotations.DefineFactor;
 import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.processing.ProcessorContext;
 import briefj.BriefIO;
-import briefj.tomove.Results;
+import briefj.run.Results;
 import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;

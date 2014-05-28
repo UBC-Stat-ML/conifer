@@ -13,7 +13,7 @@ import blang.processing.NodeProcessor;
 import blang.processing.ProcessorContext;
 import briefj.OutputManager;
 import briefj.collections.Counter;
-import briefj.tomove.Results;
+import briefj.run.Results;
 
 
 /**
