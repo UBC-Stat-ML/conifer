@@ -56,6 +56,13 @@ public class PhylogeneticObservationFactory
     return _proteinFactory;
    }
   
+  public static PhylogeneticObservationFactory proteinPairFactory()
+  {
+    if(_proteinPairFactory == null)
+      _proteinPairFactory = fromResource("/conifer/io/proteinPair-iupac-encoding.txt");
+    return _proteinPairFactory;
+   }
+  
   /**
    * Reads the specifications of a PhylogeneticObservationFactory from a JSON file.
    * 
@@ -202,4 +209,5 @@ public class PhylogeneticObservationFactory
   
   private static PhylogeneticObservationFactory _nucleotideFactory = null;
   private static PhylogeneticObservationFactory _proteinFactory = null;
+  private static PhylogeneticObservationFactory _proteinPairFactory=null;
 }

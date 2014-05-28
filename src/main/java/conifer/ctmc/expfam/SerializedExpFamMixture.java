@@ -44,7 +44,13 @@ public class SerializedExpFamMixture
     System.out.println(s1.getSupport());
   }
   
-  
+ /*public int getFeatureNum()
+ {
+   int i = unaryFeatures.size();
+   int j= binaryFeatures.size();
+   return  (i+j);
+ }
+ */
 
   public BivariateFeatureExtractor<CTMCState> getBivariateFeatureExtractor()
   {
@@ -228,6 +234,12 @@ public class SerializedExpFamMixture
   {
     return fromResource("/conifer/ctmc/expfam/accordance-expfam.txt");
   }
+  
+  public static SerializedExpFamMixture pair()
+  {
+    return fromResource("/conifer/ctmc/expfam/pair-expfam.txt");
+  }
+  
 
 
 }
