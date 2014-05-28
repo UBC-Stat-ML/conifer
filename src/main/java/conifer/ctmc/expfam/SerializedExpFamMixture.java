@@ -35,12 +35,22 @@ public class SerializedExpFamMixture
   public static void main(String [] args)
   {
     SerializedExpFamMixture s = fromResource("/conifer/ctmc/expfam/kimura1980-expfam.txt");
+    SerializedExpFamMixture s1 = fromResource("/conifer/ctmc/expfam/accordance-expfam.txt");
     System.out.println(s);
     System.out.println(s.getCTMCStateIndexer());
     System.out.println(s.getSupport());
+    System.out.println(s1);
+    System.out.println(s1.getCTMCStateIndexer());
+    System.out.println(s1.getSupport());
   }
   
-  
+ /*public int getFeatureNum()
+ {
+   int i = unaryFeatures.size();
+   int j= binaryFeatures.size();
+   return  (i+j);
+ }
+ */
 
   public BivariateFeatureExtractor<CTMCState> getBivariateFeatureExtractor()
   {
@@ -220,6 +230,16 @@ public class SerializedExpFamMixture
     return fromResource("/conifer/ctmc/expfam/kimura1980-expfam.txt");
   }
 
+  public static SerializedExpFamMixture accordance()
+  {
+    return fromResource("/conifer/ctmc/expfam/accordance-expfam.txt");
+  }
+  
+  public static SerializedExpFamMixture pair()
+  {
+    return fromResource("/conifer/ctmc/expfam/pair-expfam.txt");
+  }
+  
 
 
 }

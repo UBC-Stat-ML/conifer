@@ -27,6 +27,9 @@ public class ExpFamMixture implements RateMatrixMixture
   
   public final CTMCStateSpace stateSpace;
   
+  public static int nFeatures;
+  public int nFeatures() { return nFeatures; }
+  
   public static Indexer<CTMCState> simpleDNAStateIndexer(int nCategories)
   {
     Indexer<String> indexer = Indexers.dnaIndexer();
@@ -47,12 +50,22 @@ public class ExpFamMixture implements RateMatrixMixture
     return result;
   }
   
+  public static Indexer<CTMCState> simpleProteinPairStateIndexer(int nCategories)
+  {
+    Indexer<String> indexer = Indexers.proteinPairIndexer();
+    Indexer<CTMCState> result = new Indexer<CTMCState>();
+    for (int cat = 0; cat < nCategories; cat++)
+      for (int i = 0; i < indexer.size(); i++)
+        result.addToIndex(new CTMCState(cat, indexer.i2o(i), null));
+    return result;
+  }
+  
   public static ExpFamMixture fromSerialized(SerializedExpFamMixture serialized, Indexer<String> observationIndexer)
   {
     CTMCExpFam<CTMCState> globalExponentialFamily = new CTMCExpFam<CTMCState>(serialized.getSupport(), serialized.getCTMCStateIndexer(), true);
     globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singletonList(serialized.getBivariateFeatureExtractor()));
     globalExponentialFamily.extractUnivariateFeatures(Collections.singletonList(serialized.getUnivariateFeatureExtractor()));
-    
+    nFeatures = globalExponentialFamily.nFeatures();
     RateMatrixToEmissionModel emissionModel = serialized.getEmissionModel();
     Indexer<String> latentIndexer = serialized.getLatentIndexer();
     if (emissionModel == null)
@@ -67,6 +80,16 @@ public class ExpFamMixture implements RateMatrixMixture
   public static ExpFamMixture kimura1980()
   {
     return fromSerialized(SerializedExpFamMixture.kimura1980(), Indexers.dnaIndexer());
+  }
+  
+  public static ExpFamMixture accordance()
+  {
+    return fromSerialized(SerializedExpFamMixture.accordance(), Indexers.proteinIndexer());
+  }
+  
+  public static ExpFamMixture pair()
+  {
+    return fromSerialized(SerializedExpFamMixture.pair(), Indexers.proteinPairIndexer());
   }
   
   public static ExpFamMixture dnaGTR()

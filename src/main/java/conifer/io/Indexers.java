@@ -14,7 +14,12 @@ public class Indexers
   {
     return PhylogeneticObservationFactory.proteinFactory().getIndexer();
   }
-    
+   
+  public static Indexer<String> proteinPairIndexer()
+  {
+    return PhylogeneticObservationFactory.proteinPairFactory().getIndexer();
+  }
+  
   }
   
 
