@@ -1,24 +1,17 @@
 package conifer;
 
 import java.io.File;
-import java.io.PrintWriter;
 import java.util.Random;
 
-//import bayonet.distributions.Exponential;
-//import bayonet.distributions.Exponential.RateParameterization;
 import bayonet.distributions.Normal.MeanVarianceParameterization;
 import blang.ForwardSampler;
 import blang.MCMCRunner;
 import blang.ProbabilityModel;
 import blang.annotations.DefineFactor;
 import blang.factors.IIDRealVectorGenerativeFactor;
-import blang.processing.ProcessorContext;
-import briefj.BriefIO;
 import briefj.opt.Option;
 import briefj.opt.OptionsParser;
-import briefj.tomove.Results;
 import conifer.ctmc.expfam.ExpFamMixture;
-//import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
 

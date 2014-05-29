@@ -125,4 +125,10 @@ public class ExpFamParameters implements RealVectorInterface
     for (int i = 0; i < values.length; i++)
       weights.setCount(fIndexer.i2o(i), values[i]);
   }
+
+  @Override
+  public int getDim()
+  {
+    return globalExponentialFamily.nFeatures();
+  }
 }
