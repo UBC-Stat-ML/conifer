@@ -7,3 +7,5 @@ bin/conifer
 bin/conifer/Main.class
 results
 build
+pairContact.txt
+tree.nwk.txt
