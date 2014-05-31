@@ -18,7 +18,7 @@ import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
 
 
-public class pairProteinModel extends MCMCRunner
+public class PairProteinModel extends MCMCRunner
 {
   File inputFile 
     = new File("pairContact.txt");
@@ -50,7 +50,7 @@ public class pairProteinModel extends MCMCRunner
   
   public static void main(String [] args)
   {
-    pairProteinModel runner = new pairProteinModel();
+    PairProteinModel runner = new PairProteinModel();
     runner.factory.mcmcOptions.nMCMCSweeps = 200;
     runner.run();
     
