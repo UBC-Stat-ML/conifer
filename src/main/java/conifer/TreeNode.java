@@ -23,8 +23,13 @@ public final class TreeNode
   {
     synchronized (INTERNAL_PREFIX)
     {
-      return withLabel(INTERNAL_PREFIX + (nextId++));
+      return unlabelled(nextId++);
     }
+  }
+  
+  public static TreeNode unlabelled(int index)
+  {
+    return withLabel(INTERNAL_PREFIX + index);
   }
   
   @Override

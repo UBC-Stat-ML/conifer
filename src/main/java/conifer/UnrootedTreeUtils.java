@@ -5,7 +5,9 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graphs;
 
 import com.google.common.collect.Lists;
@@ -15,9 +17,11 @@ import conifer.io.newick.NewickParser;
 import conifer.io.newick.ParseException;
 
 import bayonet.distributions.Exponential;
+import bayonet.graphs.GraphUtils;
 import blang.variables.RealVariable;
 import briefj.BriefCollections;
 import briefj.BriefIO;
+import briefj.BriefLists;
 import briefj.Indexer;
 import briefj.collections.Counter;
 import briefj.collections.Tree;
@@ -29,7 +33,11 @@ public class UnrootedTreeUtils
 {
   public static UnrootedTree fromNewick(File f)
   {
-    NewickParser parser = new NewickParser(BriefIO.fileToString(f));
+    return fromNewickString(BriefIO.fileToString(f));
+  }
+  public static UnrootedTree fromNewickString(String newickString)
+  {
+    NewickParser parser = new NewickParser(newickString); 
     try
     {
       Tree<TreeNode> topo = parser.parse();
@@ -202,18 +210,74 @@ public class UnrootedTreeUtils
     }
   }
   
-  public static void main(String [] args)
+  /**
+   * Remove nodes that have exactly two neighbors, changing branch lengths appropriately 
+   * @param t
+   */
+  public static void simplify(UnrootedTree t)
   {
-    Random rand = new Random(1);
-    for (int i = 0; i < 3; i++)
-    {
-      List<TreeNode> leaves = Lists.newArrayList();
-      leaves.add(TreeNode.withLabel("A"));
-      leaves.add(TreeNode.withLabel("B"));
-      leaves.add(TreeNode.withLabel("C"));
-      leaves.add(TreeNode.withLabel("D"));
-      UnrootedTree randomTree = NonClockTreePrior.generate(rand, Exponential.on(RealVariable.real()), leaves);
-      System.out.println(toNewick(randomTree));
-    }
+    simplify(t, t.leaves().get(0), null);
   }
+  
+  /**
+   * 
+   * @param t
+   * @param parent
+   * @param current
+   * @param accumulatedBranchLength
+   * @return
+   */
+  private static void simplify(UnrootedTree t, TreeNode goodNode, TreeNode parent)
+  {
+    outerLoop : for (UnorderedPair<TreeNode,TreeNode> neighborEdge : Lists.newArrayList(t.getTopology().edgesOf(goodNode)))
+    {
+      TreeNode neighborNode = GraphUtils.pickOther(neighborEdge, goodNode);
+      if (neighborNode == parent)
+        continue outerLoop;
+      
+      // follow down until we get to a good node,
+      TreeNode previous = goodNode;
+      TreeNode current = neighborNode;
+      double totalBranchLength = 0.0;
+      List<Pair<TreeNode,TreeNode>> path = Lists.newArrayList();
+      do
+      {
+        totalBranchLength += t.getBranchLength(previous, current);
+        path.add(Pair.of(previous, current));
+        TreeNode next = findNext(t.getTopology().edgesOf(current), current, previous);
+        previous = current;
+        current = next;
+      } while (previous != null && t.getTopology().edgesOf(previous).size() == 2);
+      
+      // if there were more than one hop to a good node, do simplifications
+      TreeNode last = BriefLists.last(path).getRight();
+      if (path.size() > 1)
+      {
+        for (int i = 0; i < path.size(); i++)
+        {
+          Pair<TreeNode,TreeNode> currentEdge = path.get(i);
+          t.removeEdge(currentEdge.getLeft(), currentEdge.getRight());
+          if (i != 0)
+            t.getTopology().removeVertex(currentEdge.getLeft());
+        }
+        t.addEdge(goodNode, last, totalBranchLength);
+      }
+      
+      simplify(t, last, goodNode);
+    }
+
+  }
+  private static TreeNode findNext(
+      Set<UnorderedPair<TreeNode, TreeNode>> edges, TreeNode center, TreeNode previous)
+  {
+    for (UnorderedPair<TreeNode, TreeNode> edge : edges)
+    {
+      TreeNode node = GraphUtils.pickOther(edge, center);
+      if (node != previous)
+        return node;
+    }
+    return null;
+  }
+  
+
 }

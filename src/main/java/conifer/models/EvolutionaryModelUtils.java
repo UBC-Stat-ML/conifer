@@ -19,14 +19,32 @@ import conifer.io.TreeObservations;
 
 public class EvolutionaryModelUtils
 {
+  /**
+   * Build a factor graph for the given tree according to a model and observation.
+   * 
+   * @param evolutionaryModel
+   * @param tree
+   * @param root
+   * @param observations
+   * @return
+   */
   public static List<FactorGraph<TreeNode>> buildFactorGraphs( 
       EvolutionaryModel evolutionaryModel,
       UnrootedTree tree,
       TreeNode root,
       TreeObservations observations)
   {
+    return buildFactorGraphs(evolutionaryModel, tree, root, observations, true);
+  }
+  public static List<FactorGraph<TreeNode>> buildFactorGraphs( 
+      EvolutionaryModel evolutionaryModel,
+      UnrootedTree tree,
+      TreeNode root,
+      TreeObservations observations,
+      boolean useInitialDistribution)
+  {
     List<FactorGraph<TreeNode>> result = Lists.newArrayList();
-    List<Pair<TreeNode,TreeNode>> orientedEdges = tree.getRootedEdges(root); //EdgeSorter.newEdgeSorter(tree.getTopology(), root).backwardMessages();
+    List<Pair<TreeNode,TreeNode>> orientedEdges = tree.getRootedEdges(root); 
     
     for (int i = 0; i < evolutionaryModel.nFactorGraphs(); i++)
     {
@@ -36,10 +54,12 @@ public class EvolutionaryModelUtils
       // add observations
       if (observations != null)
         for (TreeNode observedNode : observations.getObservedTreeNodes())
-          evolutionaryModel.buildObservation(observedNode, context);
+          if (tree.getTopology().vertexSet().contains(observedNode)) // this check is useful when the data contains nodes not in the tree (see for example SRPMove for a use case)
+            evolutionaryModel.buildObservation(observedNode, context);
         
       // initial distribution
-      evolutionaryModel.buildInitialDistribution(root, context);
+      if (useInitialDistribution)
+        evolutionaryModel.buildInitialDistribution(root, context);
       
       // add transitions
       for (Pair<TreeNode,TreeNode> edge : orientedEdges)
@@ -51,12 +71,17 @@ public class EvolutionaryModelUtils
     return result;
   }
   
-  public static List<UnaryFactor<TreeNode>> getRootMarginalsFromFactorGraphs(List<FactorGraph<TreeNode>> factorGraphs, TreeNode arbitraryRoot)
+  public static List<SumProduct<TreeNode>> getSumProductsFromFactorGraphs(List<FactorGraph<TreeNode>> factorGraphs, TreeNode arbitraryRoot)
   {
     List<SumProduct<TreeNode>> sumProds = Lists.newArrayList();
     for (FactorGraph<TreeNode> factorGraph : factorGraphs)
       sumProds.add(new SumProduct<TreeNode>(factorGraph));
-    return getRootMarginals(sumProds, arbitraryRoot);
+    return sumProds;
+  }
+  
+  public static List<UnaryFactor<TreeNode>> getRootMarginalsFromFactorGraphs(List<FactorGraph<TreeNode>> factorGraphs, TreeNode arbitraryRoot)
+  {
+    return getRootMarginals(getSumProductsFromFactorGraphs(factorGraphs, arbitraryRoot), arbitraryRoot);
   }
   public static List<UnaryFactor<TreeNode>> getRootMarginals(List<SumProduct<TreeNode>> sumProds, TreeNode arbitraryRoot)
   {
@@ -65,4 +90,5 @@ public class EvolutionaryModelUtils
       result.add(sumProd.computeMarginal(arbitraryRoot));
     return result;
   }
+  
 }

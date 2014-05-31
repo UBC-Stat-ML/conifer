@@ -14,9 +14,11 @@ import blang.annotations.Samplers;
 import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import conifer.moves.AllBranchesScaling;
+import conifer.moves.SPRMove;
 import conifer.moves.SingleBranchScaling;
 import conifer.moves.SingleNNI;
 import conifer.processors.TotalTreeLengthProcessor;
@@ -32,7 +34,8 @@ import conifer.processors.TreeDiameterProcessor;
 @Samplers({
   SingleNNI.class, 
   SingleBranchScaling.class,
-  AllBranchesScaling.class
+  AllBranchesScaling.class,
+  SPRMove.class
 })
 @Processors({
   TotalTreeLengthProcessor.class,
@@ -65,6 +68,12 @@ public class UnrootedTree
   {
     this.topology.addEdge(node1, node2);
     branchLengths.put(new UnorderedPair<TreeNode, TreeNode>(node1, node2), length);
+  }
+  
+  public void removeEdge(TreeNode n1, TreeNode n2)
+  {
+    topology.removeEdge(n1, n2);
+    branchLengths.remove(UnorderedPair.of(n1, n2));
   }
   
   /**
@@ -142,13 +151,11 @@ public class UnrootedTree
       TreeNode moved, 
       TreeNode newFixed)
   {
-    topology.removeEdge(oldFixed, moved);
-    topology.addEdge(moved, newFixed);
     double branchLength = getBranchLength(oldFixed, moved);
-    branchLengths.remove(new UnorderedPair<TreeNode, TreeNode>(oldFixed, moved));
-    branchLengths.put(new UnorderedPair<TreeNode,TreeNode>(moved, newFixed), branchLength);
+    removeEdge(oldFixed, moved);
+    addEdge(moved, newFixed, branchLength);
   }
-
+  
   /**
    * Set the value of the topology and branch length of this tree to those of the provided
    * tree (no copy performed, just two references set)
@@ -183,6 +190,11 @@ public class UnrootedTree
     return UnrootedTreeUtils.fromNewick(f);
   }
   
+  public static UnrootedTree fromNewickString(String string)
+  {
+    return UnrootedTreeUtils.fromNewickString(string);
+  }
+  
   public String toNewick()
   {
     return UnrootedTreeUtils.toNewick(this);
@@ -193,4 +205,139 @@ public class UnrootedTree
   {
     return toNewick();
   }
+
+  /**
+   * Iterate the edge (oriented with the provided root) and add a dummy internal node on 
+   * each edge. This node is placed at give fraction from the bottom node of each edge,
+   * ratioFromBot. This modifies the tree in place.
+   * @param fixedRatioFromBot
+   * @param newRoot
+   * @return The list of dummy TreeNode hence created
+   */
+  public List<TreeNode> addAuxiliaryInternalNodes(double ratioFromBot,
+      TreeNode root)
+  {
+    List<TreeNode> result = Lists.newArrayList();
+    
+    for (Pair<TreeNode,TreeNode> edge : getRootedEdges(root))
+    {
+      double originalBL = getBranchLength(edge.getLeft(), edge.getRight());
+      double 
+        topBL = (1.0 - ratioFromBot) * originalBL,
+        botBL = ratioFromBot * originalBL;
+      removeEdge(edge.getLeft(), edge.getRight());
+      TreeNode currentDummyNode = TreeNode.nextUnlabelled();
+      addNode(currentDummyNode);
+      addEdge(edge.getLeft(), currentDummyNode, topBL);
+      addEdge(currentDummyNode, edge.getRight(), botBL);
+      result.add(currentDummyNode);
+    }
+    
+    return result;
+  }
+
+  /**
+   * This assumes that removedRoot has exactly 2 neighbors, n1 and n2 (hence they form a chain ..n1--removedRoot--n2..
+   * 
+   * Simplify the tree in place into ..n1--n2.. with the new branch length equal to the
+   * sum of the two removed edges.
+   * 
+   * @param n1
+   * @param removedRoot
+   * @param n2
+   */
+  public void simplify(TreeNode n1, TreeNode removedRoot, TreeNode n2)
+  {
+    if (topology.edgesOf(removedRoot).size() != 2)
+      throw new RuntimeException("Simplify assumes that the node to be removed has exactly 2 neighbors.");
+    double branchSum = getBranchLength(n1, removedRoot) + getBranchLength(removedRoot, n2);
+    removeEdge(n1, removedRoot);
+    removeEdge(removedRoot, n2);
+    topology.removeVertex(removedRoot);
+    addEdge(n1, n2, branchSum);
+  }
+
+  /**
+   * This splits the tree into two parts relative to the edge e=(removedRoot, detached).
+   * 
+   * This will return a subtree containing e and the subtree on the side of the node detached
+   * relative to e. 
+   * 
+   * This instance will be modified in place to remove all the edges and nodes in the returned
+   * tree, except for the node removedRoot.
+   * 
+   * @param removedRoot
+   * @param detached
+   * @return
+   */
+  public UnrootedTree prune(TreeNode removedRoot, TreeNode detachedNode)
+  {
+    double branchLen = getBranchLength(removedRoot, detachedNode);
+    removeEdge(removedRoot, detachedNode);
+    
+    UnrootedTree result = new UnrootedTree();
+
+    result.addNode(detachedNode);
+    
+    for (Pair<TreeNode,TreeNode> orientedEdge : getRootedEdges(detachedNode))
+    {
+      result.addNode(orientedEdge.getRight());
+      result.addEdge(orientedEdge.getLeft(), orientedEdge.getRight(), getBranchLength(orientedEdge.getLeft(), orientedEdge.getRight()));
+      this.removeEdge(orientedEdge.getLeft(), orientedEdge.getRight());
+      this.topology.removeVertex(orientedEdge.getRight());
+    }
+    
+    this.topology.removeVertex(detachedNode);
+    result.addNode(removedRoot);
+    result.addEdge(detachedNode, removedRoot, branchLen);
+    
+    return result;
+  }
+
+  public void regraft(UnrootedTree prunedSubtree, TreeNode prunedSubtreeRoot,
+      TreeNode attachment)
+  {
+    for (Pair<TreeNode,TreeNode> orientedEdge : prunedSubtree.getRootedEdges(prunedSubtreeRoot))
+    {
+      TreeNode 
+        topNode = orientedEdge.getLeft(),
+        botNode = orientedEdge.getRight();
+      double branchLength = prunedSubtree.getBranchLength(topNode, botNode);
+      if (topNode.equals(prunedSubtreeRoot))
+        topNode = attachment;
+      this.addNode(botNode);
+      this.addEdge(topNode, botNode, branchLength);
+    }
+  }
+
+  public void simplify()
+  {
+    UnrootedTreeUtils.simplify(this);
+  }
+  
+  public static void main(String [] args)
+  {
+//    String ns = "((A:1.0,Z:2.0):3.0,(B:4.0,C:5.0):6.0,X:100);";
+//    UnrootedTree t = UnrootedTree.fromNewickString(ns);
+//    System.out.println(t.topology);
+//    System.out.println("Before: " + t);
+//    UnrootedTree pruned = t.prune(TreeNode.unlabelled(2), TreeNode.unlabelled(0));
+//    System.out.println("After: " + t);
+//    System.out.println("Pruned:" + pruned);
+//    UnrootedTreeUtils.simplify(t);
+//    System.out.println("After(simplified):" +t);
+//    System.out.println(t.getTopology());
+    
+    String ns = "(((A:1.0, B:10.0):100):1000);";
+    UnrootedTree t = UnrootedTree.fromNewickString(ns);
+    System.out.println(t.getTopology());
+    System.out.println(t);
+    t.simplify();
+    System.out.println(t);
+    System.out.println(t.getTopology());
+    System.out.println(t.branchLengths);
+    
+//    t.regraft(pruned, TreeNode.unlabelled(2), TreeNode.unlabelled(2));
+//    System.out.println("Regraft:" + t);
+  } 
 }
