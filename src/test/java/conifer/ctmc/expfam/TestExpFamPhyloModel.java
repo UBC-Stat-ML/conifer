@@ -1,5 +1,6 @@
 package conifer.ctmc.expfam;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import bayonet.distributions.Exponential.RateParameterization;
@@ -36,14 +37,19 @@ public class TestExpFamPhyloModel extends MCMCRunner
 
   public static void main(String [] args)
   {
+    shouldUsePlots = true;
     new TestExpFamPhyloModel().checkStationarity();
   }
+  
+  public static boolean shouldUsePlots = false;
+
   
   @Test
   public void checkStationarity()
   {
     this.factory.setCheckAllNodesCoveredByMCMCMoves(false);
     MCMCAlgorithm algo = buildMCMCAlgorithm();
+    algo.options.CODA = shouldUsePlots;
 
     System.out.println(algo);
     
