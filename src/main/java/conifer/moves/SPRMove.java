@@ -27,7 +27,16 @@ import blang.mcmc.SampledVariable;
 import briefj.collections.UnorderedPair;
 
 
-
+/**
+ * A subtree prune regraft move.
+ * 
+ * See comments in execute for detailed instruction.
+ * 
+ * Assumes arity of 3 for internal nodes. 
+ * 
+ * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
+ *
+ */
 public class SPRMove extends NodeMove
 {
   @SampledVariable UnrootedTree tree;
@@ -61,12 +70,14 @@ public class SPRMove extends NodeMove
     // disconnect the tree
     UnrootedTree prunedSubtree = tree.prune(removedRoot, detached);
     
-    // calculate the branch ratio, sample another at random
+    // calculate the branch ratio
+    // TODO: sample another at random
     double referenceLengthFromBot = tree.getBranchLength(removedRoot, third);
     double joinedLength = referenceLengthFromBot + tree.getBranchLength(removedRoot, newRoot);
     double fixedRatioFromBot = referenceLengthFromBot / joinedLength;
     
     // compute the factor graphs (one per potentical category) for the subtree, and run the sum product on these
+    // TODO: consider more than one stem lengths
     EvolutionaryModel evolutionaryModel = treeLikelihood.evolutionaryModel;
     List<UnaryFactor<TreeNode>> prunedSubtreeMarginals = EvolutionaryModelUtils.getRootMarginalsFromFactorGraphs(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, prunedSubtree, removedRoot, treeLikelihood.observations), removedRoot);
     

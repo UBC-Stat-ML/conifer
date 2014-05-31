@@ -31,10 +31,21 @@ import briefj.collections.UnorderedPair;
 
 public class UnrootedTreeUtils
 {
+  /**
+   * See comments in UnrootedTree
+   * @param f
+   * @return
+   */
   public static UnrootedTree fromNewick(File f)
   {
     return fromNewickString(BriefIO.fileToString(f));
   }
+  
+  /**
+   * See comments in UnrootedTree
+   * @param f
+   * @return
+   */
   public static UnrootedTree fromNewickString(String newickString)
   {
     NewickParser parser = new NewickParser(newickString); 
@@ -220,6 +231,7 @@ public class UnrootedTreeUtils
   }
   
   /**
+   * See comments in unrooted
    * 
    * @param t
    * @param parent

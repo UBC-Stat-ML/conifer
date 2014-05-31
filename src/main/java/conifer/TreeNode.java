@@ -3,13 +3,20 @@ package conifer;
 
 /**
  * The name of a node on a tree. Can be an informative string for the leaves of the 
- * tree, or some id for the internal nodes.
+ * tree, or some id for the internal nodes. We call the former case labelled,
+ * and the latter case, unlabelled.
  * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  *
  */
 public final class TreeNode
 {
+  /**
+   * Create a labelled node with the given name.
+   * Usually for the leaves only.
+   * @param name
+   * @return
+   */
   public static TreeNode withLabel(String name)
   {
     return new TreeNode(name);
@@ -27,6 +34,11 @@ public final class TreeNode
     }
   }
   
+  /**
+   * Re-create an internal node with the given index
+   * @param index
+   * @return
+   */
   public static TreeNode unlabelled(int index)
   {
     return withLabel(INTERNAL_PREFIX + index);

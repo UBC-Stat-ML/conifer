@@ -185,11 +185,23 @@ public class UnrootedTree
     return UnrootedTreeUtils.allTotalBranchLengthDistances(this);
   }
   
+  /**
+   * Reads the contents of the given file and parse it as a newick string.
+   * @param f
+   * @return
+   */
   public static UnrootedTree fromNewick(File f)
   {
     return UnrootedTreeUtils.fromNewick(f);
   }
   
+  /**
+   * Parse a tree from a string containing a newick specification.
+   * 
+   * For example: UnrootedTree.fromNewickString("((A:1.0,Z:2.0):3.0,(B:4.0,C:5.0):6.0,X:100);");
+   * @param string
+   * @return
+   */
   public static UnrootedTree fromNewickString(String string)
   {
     return UnrootedTreeUtils.fromNewickString(string);
@@ -294,6 +306,14 @@ public class UnrootedTree
     return result;
   }
 
+  /**
+   * Take the subtree prunedSubtree rooted at prunedSubtreeRoot,
+   * and add it in place, essentially merging node specified by variable attachment with node
+   * specified by prunedSubtreeRoot (keeping the name in variable attachment)
+   * @param prunedSubtree
+   * @param prunedSubtreeRoot
+   * @param attachment
+   */
   public void regraft(UnrootedTree prunedSubtree, TreeNode prunedSubtreeRoot,
       TreeNode attachment)
   {
@@ -310,34 +330,14 @@ public class UnrootedTree
     }
   }
 
+  /**
+   * Remove all internal nodes with exactly two neighbors, changing edges and 
+   * branch lengths accordingly to keep the same interpretation of the tree
+   * (under reversible models)
+   */
   public void simplify()
   {
     UnrootedTreeUtils.simplify(this);
   }
-  
-  public static void main(String [] args)
-  {
-//    String ns = "((A:1.0,Z:2.0):3.0,(B:4.0,C:5.0):6.0,X:100);";
-//    UnrootedTree t = UnrootedTree.fromNewickString(ns);
-//    System.out.println(t.topology);
-//    System.out.println("Before: " + t);
-//    UnrootedTree pruned = t.prune(TreeNode.unlabelled(2), TreeNode.unlabelled(0));
-//    System.out.println("After: " + t);
-//    System.out.println("Pruned:" + pruned);
-//    UnrootedTreeUtils.simplify(t);
-//    System.out.println("After(simplified):" +t);
-//    System.out.println(t.getTopology());
-    
-    String ns = "(((A:1.0, B:10.0):100):1000);";
-    UnrootedTree t = UnrootedTree.fromNewickString(ns);
-    System.out.println(t.getTopology());
-    System.out.println(t);
-    t.simplify();
-    System.out.println(t);
-    System.out.println(t.getTopology());
-    System.out.println(t.branchLengths);
-    
-//    t.regraft(pruned, TreeNode.unlabelled(2), TreeNode.unlabelled(2));
-//    System.out.println("Regraft:" + t);
-  } 
+ 
 }
