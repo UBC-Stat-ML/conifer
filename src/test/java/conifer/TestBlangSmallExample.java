@@ -68,6 +68,7 @@ public class TestBlangSmallExample extends MCMCRunner
     
     // The number of MCMC sweeps to perform at each iteration of the test (more info below)
     algo.options.nMCMCSweeps = 10;
+    algo.options.CODA = false; 
     
     // Actual code for setting up the test itself
     CheckStationarity check = new CheckStationarity();
