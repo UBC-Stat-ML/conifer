@@ -33,6 +33,13 @@ task downloadFile(type: Download) {
 
 task fetchDataFiles(type: Download) {
   src([
+    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/UTY.ape.4.nwk',
+    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/UTY_4.fasta',
+    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/UTY_4.g.fasta',
+    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES_8.g.fasta',
+    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES_8.fasta',
+    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES_4.g.fasta',
+    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES.ape.8.nwk',
     'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES_4.fasta',
     'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES.ape.4.nwk'
   ])
