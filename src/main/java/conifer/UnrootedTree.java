@@ -219,14 +219,11 @@ public class UnrootedTree
   }
 
   /**
-   * Iterate the edge (oriented with the provided root) and add a dummy internal node on 
-   * each edge. This node is placed at give fraction from the bottom node of each edge,
-   * ratioFromBot. This modifies the tree in place.
-   * @param fixedRatioFromBot
-   * @param newRoot
-   * @return The list of dummy TreeNode hence created
+   * Iterate the edge (oriented with the provided root) and add two dummy internal nodes on 
+   * each edge. The nodes are placed at the given fractions from the bottom node of each edge. 
+   * This modifies the tree in place.
    */
-  public List<TreeNode> addAuxiliaryInternalNodes(double ratioFromBot,
+  public List<TreeNode> addAuxiliaryInternalNodes(double smallRatio, double largerRatio, 
       TreeNode root)
   {
     List<TreeNode> result = Lists.newArrayList();
@@ -234,15 +231,23 @@ public class UnrootedTree
     for (Pair<TreeNode,TreeNode> edge : getRootedEdges(root))
     {
       double originalBL = getBranchLength(edge.getLeft(), edge.getRight());
-      double 
-        topBL = (1.0 - ratioFromBot) * originalBL,
-        botBL = ratioFromBot * originalBL;
+      double
+        bottomBL = smallRatio * originalBL,
+        middleBL = (largerRatio - smallRatio) * originalBL,
+        top_BL = (1.0 - largerRatio) * originalBL;
+
       removeEdge(edge.getLeft(), edge.getRight());
-      TreeNode currentDummyNode = TreeNode.nextUnlabelled();
-      addNode(currentDummyNode);
-      addEdge(edge.getLeft(), currentDummyNode, topBL);
-      addEdge(currentDummyNode, edge.getRight(), botBL);
-      result.add(currentDummyNode);
+      TreeNode 
+        lowerDummyNode = TreeNode.nextUnlabelled(),
+        upperDummyNode = TreeNode.nextUnlabelled();
+      addNode(lowerDummyNode);
+      addNode(upperDummyNode);
+      // left = complete top
+      addEdge(edge.getLeft(), upperDummyNode, top_BL);
+      addEdge(upperDummyNode, lowerDummyNode, middleBL);
+      addEdge(lowerDummyNode, edge.getRight(), bottomBL);
+      result.add(lowerDummyNode);
+      result.add(upperDummyNode);
     }
     
     return result;

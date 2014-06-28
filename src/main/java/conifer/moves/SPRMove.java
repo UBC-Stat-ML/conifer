@@ -96,7 +96,10 @@ public class SPRMove extends NodeMove
     tree.simplify(third, removedRoot, newRoot);
     
     // create intermediate nodes in the main tree
-    List<TreeNode> attachmentPoints = tree.addAuxiliaryInternalNodes(fixedRatioFromBot, newRoot);
+    double additionalRatio = rand.nextDouble();
+    double smallRatio = Math.min(additionalRatio, fixedRatioFromBot);
+    double largerRatio= Math.max(additionalRatio, fixedRatioFromBot);
+    List<TreeNode> attachmentPoints = tree.addAuxiliaryInternalNodes(smallRatio, largerRatio, newRoot);
     
     // run the sum product on the main tree
     List<SumProduct<TreeNode>> mainTreeSumProducts = EvolutionaryModelUtils.getSumProductsFromFactorGraphs(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, tree, newRoot, treeLikelihood.observations, false), newRoot);
