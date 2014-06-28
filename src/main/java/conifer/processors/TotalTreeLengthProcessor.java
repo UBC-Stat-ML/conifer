@@ -1,6 +1,7 @@
 package conifer.processors;
 
 import conifer.UnrootedTree;
+import conifer.UnrootedTreeUtils;
 import blang.processing.NodeProcessor;
 import blang.processing.ProcessorContext;
 import blang.variables.RealValued;
@@ -21,10 +22,7 @@ public class TotalTreeLengthProcessor implements NodeProcessor<UnrootedTree>, Re
   @Override
   public void process(ProcessorContext context)
   {
-    double sum = 0.0;
-    for (double branchLength : tree.getBranchLengths().values())
-      sum += branchLength;
-    this.currentValue = sum;
+    currentValue = UnrootedTreeUtils.totalTreeLength(tree);
   }
 
   @Override

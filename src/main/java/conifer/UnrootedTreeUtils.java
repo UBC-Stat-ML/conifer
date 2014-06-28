@@ -290,6 +290,14 @@ public class UnrootedTreeUtils
     }
     return null;
   }
+
+  public static double totalTreeLength(UnrootedTree tree)
+  {
+    double sum = 0.0;
+    for (double branchLength : tree.getBranchLengths().values())
+      sum += branchLength;
+    return sum;
+  }
   
 
 }

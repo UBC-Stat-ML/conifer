@@ -35,6 +35,7 @@ public class SingleBranchScaling implements MHProposalDistribution
     double u = rand.nextDouble();
     final double m = Math.exp(lambda * (u - 0.5));
     final double newValue = m * oldValue;
+    
     tree.updateBranchLength(edge, newValue);
     return new Proposal() {
       

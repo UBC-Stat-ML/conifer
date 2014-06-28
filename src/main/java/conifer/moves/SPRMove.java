@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
+import conifer.UnrootedTreeUtils;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.EvolutionaryModel;
@@ -70,11 +71,21 @@ public class SPRMove extends NodeMove
     // disconnect the tree
     UnrootedTree prunedSubtree = tree.prune(removedRoot, detached);
     
+    final double 
+      remRootThirdLen = tree.getBranchLength(removedRoot, third),
+      newRootRemRootLen=tree.getBranchLength(removedRoot, newRoot);
+      
+    if (remRootThirdLen == 0.0 || newRootRemRootLen == 0.0)
+      throw new RuntimeException("SPR does not support zero branch lengths.");
+    
     // calculate the branch ratio
     // TODO: sample another at random
-    double referenceLengthFromBot = tree.getBranchLength(removedRoot, third);
-    double joinedLength = referenceLengthFromBot + tree.getBranchLength(removedRoot, newRoot);
+    double referenceLengthFromBot = remRootThirdLen;
+    double joinedLength = referenceLengthFromBot + newRootRemRootLen;
     double fixedRatioFromBot = referenceLengthFromBot / joinedLength;
+    
+    if (fixedRatioFromBot == 1.0) // rounding problem: can cause branches of len zero
+      fixedRatioFromBot = 1.0 - 1e-15; // note that double are less precise around 1.0 than around 0.0
     
     // compute the factor graphs (one per potentical category) for the subtree, and run the sum product on these
     // TODO: consider more than one stem lengths
