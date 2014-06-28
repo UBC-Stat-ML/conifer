@@ -4,21 +4,12 @@ package conifer;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graphs;
 
-import com.google.common.collect.Lists;
-
-import conifer.factors.NonClockTreePrior;
-import conifer.io.newick.NewickParser;
-import conifer.io.newick.ParseException;
-
-import bayonet.distributions.Exponential;
 import bayonet.graphs.GraphUtils;
-import blang.variables.RealVariable;
 import briefj.BriefCollections;
 import briefj.BriefIO;
 import briefj.BriefLists;
@@ -26,6 +17,11 @@ import briefj.Indexer;
 import briefj.collections.Counter;
 import briefj.collections.Tree;
 import briefj.collections.UnorderedPair;
+
+import com.google.common.collect.Lists;
+
+import conifer.io.newick.NewickParser;
+import conifer.io.newick.ParseException;
 
 
 
