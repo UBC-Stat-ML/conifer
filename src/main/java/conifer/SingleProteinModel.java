@@ -28,19 +28,20 @@ public class SingleProteinModel extends MCMCRunner
 {
   
  // private String myPath;
-  public static class ProteinOptions
+public static class ProteinOptions
   {
    @Option(gloss="File of provided alignment")
    public static File inputFile;
    @Option(gloss="File of the tree topology")
    public static File treeFile;
-  //File inputFile = new File("/Users/crystal/Dropbox/protein/data/titin/alignmentContact.txt");
+//  //File inputFile = new File("/Users/crystal/Dropbox/protein/data/titin/alignmentContact.txt");
   }
+  
   @DefineFactor(onObservations = true)
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood1 = 
     UnrootedTreeLikelihood
     .fromFastaProteinFile(ProteinOptions.inputFile)
-    .withExpFamMixture(ExpFamMixture.proteinGTR())
+    .withExpFamMixture(ExpFamMixture.accordance())
     .withTree(ProteinOptions.treeFile);
    // .withTree(new File("/Users/crystal/Dropbox/protein/data/titin/tree.nwk.txt"));
   
@@ -75,10 +76,10 @@ public class SingleProteinModel extends MCMCRunner
     
     SingleProteinModel runner = new SingleProteinModel();
     
-    ProbabilityModel model = ProbabilityModel.parse(runner);
-    ForwardSampler sampler = new ForwardSampler(model);
-    Random rand = new Random(1);
-    sampler.simulate(rand);
+ //   ProbabilityModel model = ProbabilityModel.parse(runner);
+  //  ForwardSampler sampler = new ForwardSampler(model);
+   // Random rand = new Random(1);
+   // sampler.simulate(rand);
     
     
     //runner.setMyPath("");

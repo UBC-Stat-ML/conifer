@@ -113,10 +113,17 @@ public class PhylogeneticObservationFactory
     return orderedSymbols.size();
   }
   
+  private int getChunkLength()
+  {
+     return orderedSymbols.get(0).length();
+  }
+  
+  
   /**
    * 
    * @return
    */
+  
   public Indexer<String> getIndexer()
   {
     if (_indexer == null) 
@@ -153,7 +160,7 @@ public class PhylogeneticObservationFactory
     }
     return _indicators;
   }
-  
+ 
   private final List<String> orderedSymbols;
   private final Map<String, Set<String>> ambiguousSymbols;
   private final boolean caseSensitive;
@@ -210,4 +217,10 @@ public class PhylogeneticObservationFactory
   private static PhylogeneticObservationFactory _nucleotideFactory = null;
   private static PhylogeneticObservationFactory _proteinFactory = null;
   private static PhylogeneticObservationFactory _proteinPairFactory=null;
+
+  public int nSites()
+  {
+    return BriefCollections.pick(getIndicators().values()).length;
+    //return BriefCollections.pick(getIndicators().values()).length()/factory.getChunkLength());
+  }
 }

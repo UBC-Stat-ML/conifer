@@ -48,6 +48,12 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
     Counter<String> weights = model.getWeights();
     for (String key : weights.keySet())
       output.write(key, "mcmcIter", context.getMcmcIteration(), key, weights.getCount(key));
+       
+
+    Counter<CTMCState> stationary = model.getStationaryDistribution();
+    for (CTMCState state0 : stationary.keySet())
+      output.write("stationary("+state0.toString()+")", "mcmcIter", context.getMcmcIteration(), state0, stationary.getCount(state0));
+       
     
     List<CTMCState> states = parameters.globalExponentialFamily.stateIndexer.objectsList();
     for (CTMCState state0 : states)

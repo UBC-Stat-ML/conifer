@@ -13,6 +13,11 @@ public class RateMatrices
     return SimpleRateMatrix.fromResource("/conifer/ctmc/kimura1980.txt");
   }
   
+  public static SimpleRateMatrix accordance()
+  {
+    return SimpleRateMatrix.fromResource("/conifer/ctmc/accordance.txt");
+  }
+  
   /**
    * Generate uniform pi and thetas, normalize the pi, and create a 
    * GTR from this. 

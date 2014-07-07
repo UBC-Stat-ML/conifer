@@ -23,14 +23,14 @@ public class SimplePhyloModel extends MCMCRunner
 {
   File inputFile 
 //    = new File("primates.fasta");
-    = new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta");
+    = new File("/Users/crystal/Documents/ExpRepEM/ForSohrab/alignsimutree.txt");
   
   @DefineFactor(onObservations = true)
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
     UnrootedTreeLikelihood
     .fromFastaFile(inputFile)
-    .withExpFamMixture(ExpFamMixture.kimura1980())
-    .withTree(new File("/Users/bouchard/Documents/data/utcs/23S.E.raxml.nwk"));
+    .withExpFamMixture(ExpFamMixture.dnaGTR())
+    .withTree(new File("/Users/crystal/Documents/ExpRepEM/ForSohrab/tree.nwk.simutree.txt"));
   
   @DefineFactor
   NonClockTreePrior<RateParameterization> treePrior = 
@@ -53,7 +53,7 @@ public class SimplePhyloModel extends MCMCRunner
   public static void main(String [] args)
   {
     SimplePhyloModel runner = new SimplePhyloModel();
-    runner.factory.mcmcOptions.nMCMCSweeps = 10000000;
+    runner.factory.mcmcOptions.nMCMCSweeps = 200;
     runner.run();
     
   }

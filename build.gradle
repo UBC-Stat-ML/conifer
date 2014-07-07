@@ -45,6 +45,8 @@ dependencies {
   compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24'
   compile 'com.google.code.gson:gson:2.2.4'
   compile 'org.jblas:jblas:1.2.3'
+  compile 'gov.nist.math.jama:gov.nist.math.jama:1.1.1'
+
 }
 
 task(tutorialj, dependsOn: ['build','testClasses'], type: JavaExec) {
