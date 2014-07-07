@@ -43,7 +43,7 @@ public class SingleNNI implements MHProposalDistribution
   @Override
   public Proposal propose(Random rand)
   {
-//    System.out.println("Computing sNNI move.");
+    System.out.println("Computing sNNI move.");
     List<UnorderedPair<TreeNode, TreeNode>> nonTerminalEdges = TopologyUtils.nonTerminalEdges(tree.getTopology());
     if (nonTerminalEdges.isEmpty())
       return null; // If its just a pair of sequence, we do not need to propose anything.
