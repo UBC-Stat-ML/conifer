@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -57,6 +58,8 @@ public class SimplePhyloModel extends MCMCRunner
 	private final PrintWriter treeWriter = BriefIO.output(Results.getFileInResultFolder("FES.trees.newick"));
 
 	private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
+	
+	
 
 	public static void main(String [] args) throws ClassNotFoundException, IOException
 	{
@@ -73,14 +76,18 @@ public class SimplePhyloModel extends MCMCRunner
 		//		
 		//		6. exclude {{SPR, AllBranch}}
 		@SuppressWarnings("unchecked")
-		List<List<String>> experiments = Arrays.asList(Arrays.asList("SingleNNI"), 
-				Arrays.asList("SingleBranchScaling"), 
-				Arrays.asList("SPRMove"),
-				Arrays.asList("SingleNNI", "SingleBranchScaling"),
-				Arrays.asList("SingleNNI", "SPRMove"),
-				Arrays.asList("SingleBranchScaling", "SPRMove"),
-				Arrays.asList("SingleNNI", "SingleBranchScaling", "SPRMove"),
-				Arrays.asList("SPRMove", "AllBranchesScaling")
+		List<List<String>> experiments = Arrays.asList(
+		    Arrays.asList("AllBranchesScaling")
+//		    Arrays.asList("SingleBranchScaling")
+		    
+//		    Arrays.asList("SingleNNI"), 
+//				Arrays.asList("SingleBranchScaling"), 
+//				Arrays.asList("SPRMove"),
+//				Arrays.asList("SingleNNI", "SingleBranchScaling"),
+//				Arrays.asList("SingleNNI", "SPRMove"),
+//				Arrays.asList("SingleBranchScaling", "SPRMove"),
+//				Arrays.asList("SingleNNI", "SingleBranchScaling", "SPRMove"),
+//				Arrays.asList("SPRMove", "AllBranchesScaling")
 				);
 		int index = 0;
 		for (List<String> experiment : experiments) {
@@ -89,7 +96,7 @@ public class SimplePhyloModel extends MCMCRunner
 			
 			SimplePhyloModel runner = new SimplePhyloModel();
 			runner.factory.mcmcOptions.nMCMCSweeps = 1000;
-			runner.factory.mcmcOptions.burnIn = (int) Math.round(.1 * runner.factory.mcmcOptions.nMCMCSweeps);
+//			runner.factory.mcmcOptions.burnIn = (int) Math.round(.1 * runner.factory.mcmcOptions.nMCMCSweeps);
 
 			String excluding = "Excluding " + experiment.toString();
 			for (String moveClassName : experiment) {
@@ -128,9 +135,21 @@ public class SimplePhyloModel extends MCMCRunner
 			FileUtils.copyDirectory(Results.getResultFolder(), newDirectory);
 		}
 	}
+	
+	double sumOfMin = 0.0;
+	double n = 0.0;
 
 	protected void process(ProcessorContext context)
 	{
+	  {
+	    // find the min branch length
+	    double minBranch = Collections.min(likelihood.tree.getBranchLengths().values());
+	    sumOfMin += minBranch;
+	    n++;
+	    
+//	    if (n % 100 == 0)
+	      System.out.println("Avg min branch length = " + (sumOfMin/n));
+	  }
 		treeWriter.println(likelihood.tree.toNewick());
 		treeWriter.flush();
 	}
