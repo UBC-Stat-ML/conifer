@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.jgrapht.UndirectedGraph;
 
+import bayonet.graphs.GraphUtils;
 import briefj.BriefCollections;
 import briefj.collections.UnorderedPair;
 
@@ -29,56 +30,15 @@ public class TopologyUtils
     List<UnorderedPair<N, N>> result = Lists.newArrayList();
     
     for (UnorderedPair<N, N> edge : topology.edgeSet())
-      if (!isTip(edge, topology))
+      if (!GraphUtils.isTip(edge, topology))
         result.add(edge);
     
     return result;
   }
   
-  /**
-   * @param <N>
-   * @param edge
-   * @param topology
-   * @return The edges connected to leaves.
-   */
-  public static <N> boolean isTip(UnorderedPair<N, N> edge, UndirectedGraph<N,UnorderedPair<N, N>> topology)
-  {
-    return topology.degreeOf(edge.getFirst()) == 1 || topology.degreeOf(edge.getSecond()) == 1;
-  }
-  
   public static TreeNode arbitraryNode(UnrootedTree tree)
   {
     return BriefCollections.pick(tree.getTopology().vertexSet());
-  }
-  
-  /**
-   * 
-   * @param <N>
-   * @param topology
-   * @return The nodes that have strictly more than one neighbors.
-   */
-  public static <N> List<N> internalNodes(UndirectedGraph<N,UnorderedPair<N, N>> topology)
-  {
-    List<N> result = Lists.newArrayList();
-    for (N vertex : topology.vertexSet())
-      if (topology.degreeOf(vertex) > 1)
-        result.add(vertex);
-    return result;
-  }
-  
-  /**
-   * 
-   * @param <N>
-   * @param topology
-   * @return The nodes that have one or zero neighbors.
-   */
-  public static <N> List<N> leaves(UndirectedGraph<N,UnorderedPair<N, N>> topology)
-  {
-    List<N> result = Lists.newArrayList();
-    for (N vertex : topology.vertexSet())
-      if (topology.degreeOf(vertex) <= 1)
-        result.add(vertex);
-    return result;
   }
   
   public static List<TreeNode> syntheticTaxaList(int n)

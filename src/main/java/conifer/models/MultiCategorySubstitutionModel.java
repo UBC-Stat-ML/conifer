@@ -12,6 +12,7 @@ import org.jgrapht.UndirectedGraph;
 
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Multinomial;
+import bayonet.graphs.GraphUtils;
 import bayonet.marginal.DiscreteFactorGraph;
 import bayonet.marginal.FactorGraph;
 import bayonet.marginal.Sampler;
@@ -333,7 +334,7 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
       UnrootedTree tree, TreeNode root)
   {
     MultiCategoryInternalNodeSample reconstructions = samplePriorInternalNodes(rand, tree, root);
-    for (TreeNode leaf : TopologyUtils.leaves(tree.getTopology()))
+    for (TreeNode leaf : GraphUtils.leaves(tree.getTopology()))
       destination.set(leaf, reconstructions.internalIndicators.get(leaf));
   }
   

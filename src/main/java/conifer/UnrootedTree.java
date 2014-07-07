@@ -173,7 +173,7 @@ public class UnrootedTree
    */
   public List<TreeNode> leaves()
   {
-    return TopologyUtils.leaves(getTopology());
+    return GraphUtils.leaves(getTopology());
   }
   
   /**

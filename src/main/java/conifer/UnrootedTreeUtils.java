@@ -75,7 +75,7 @@ public class UnrootedTreeUtils
     StringBuilder result = new StringBuilder();
     TreeNode pseudoRoot = null;
     // root the tree at an internal node if possible
-    List<TreeNode> internalNodes = TopologyUtils.internalNodes(tree.getTopology());
+    List<TreeNode> internalNodes = GraphUtils.internalNodes(tree.getTopology());
     if (!internalNodes.isEmpty())
       pseudoRoot = BriefCollections.pick(internalNodes);
     else if (!tree.getTopology().vertexSet().isEmpty()) // otherwise, do it arbitrarily

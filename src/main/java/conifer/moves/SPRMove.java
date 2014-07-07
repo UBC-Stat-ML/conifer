@@ -7,7 +7,6 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 
-import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.UnrootedTreeUtils;
@@ -51,7 +50,7 @@ public class SPRMove extends NodeMove
   public void execute(Random rand)
   {
     // nothing interesting to do if tree is only a single branch
-    List<TreeNode> internalNodes = TopologyUtils.internalNodes(tree.getTopology());
+    List<TreeNode> internalNodes = GraphUtils.internalNodes(tree.getTopology());
     if (internalNodes.isEmpty())
       return;
     

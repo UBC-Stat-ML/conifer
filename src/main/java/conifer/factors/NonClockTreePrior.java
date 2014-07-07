@@ -11,13 +11,13 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.google.common.collect.Lists;
 
 
-import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
 import bayonet.distributions.UnivariateRealDistribution;
+import bayonet.graphs.GraphUtils;
 import blang.annotations.FactorArgument;
 import blang.annotations.FactorComponent;
 import blang.factors.GenerativeFactor;
@@ -152,7 +152,7 @@ public class NonClockTreePrior<P> implements GenerativeFactor
   @Override
   public void generate(Random random)
   {
-    List<TreeNode> leaves = TopologyUtils.leaves(tree.getTopology());
+    List<TreeNode> leaves = GraphUtils.leaves(tree.getTopology());
     UnrootedTree sampled = generate(random, branchDistribution, leaves);
     this.tree.setTo(sampled);
   }
