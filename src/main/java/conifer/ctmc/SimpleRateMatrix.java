@@ -3,9 +3,14 @@ package conifer.ctmc;
 import java.io.File;
 import java.util.Arrays;
 
+import org.ejml.simple.SimpleMatrix;
+
 import com.google.gson.Gson;
 
+import conifer.ctmc.expfam.SerializedExpFamMixture;
 
+
+import bayonet.math.EJMLUtils;
 import briefj.BriefIO;
 
 
@@ -65,5 +70,12 @@ public class SimpleRateMatrix implements CTMCParameters
         + ", emissionModel=" + emissionModel + "]";
   }
 
+  public static void main(String [] args)
+  {
+    SimpleRateMatrix baseMatrix = RateMatrices.accordance();
+    baseMatrix.getProcess();
+  }
 
 }
+  
+  

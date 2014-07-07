@@ -11,24 +11,27 @@ import blang.annotations.DefineFactor;
 import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.processing.ProcessorContext;
 import briefj.BriefIO;
-import briefj.run.Results;
+import briefj.tomove.Results;
 import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
 
 
+
 public class PairProteinModel extends MCMCRunner
 {
   File inputFile 
-    = new File("pairContact.txt");
+    = new File("/Users/crystal/Dropbox/protein/data/titin/pairContact.txt");
   
   @DefineFactor(onObservations = true)
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
     UnrootedTreeLikelihood
-    .fromFastaFile(inputFile)
+    .fromFastaProteinPairFile(inputFile)
     .withExpFamMixture(ExpFamMixture.pair())
-    .withTree(new File("tree.nwk.txt"));
+    .withTree(new File("/Users/crystal/Dropbox/protein/data/titin/tree.nwk.txt"));
+  
+
   
   @DefineFactor
   NonClockTreePrior<RateParameterization> treePrior = 

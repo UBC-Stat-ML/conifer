@@ -113,17 +113,32 @@ public class UnrootedTreeLikelihood
   
   public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> fromFastaProteinFile(File fastaFile)
   {
-    Random rand = new Random();
     Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
     UnrootedTree tree = defaultTree(data.keySet());
-    SimpleRateMatrix baseRateMatrix = RateMatrices.randomGTR(rand, 20);
-    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0.1), RealVariable.real(1.0), baseRateMatrix, 0);
+    SimpleRateMatrix baseRateMatrix = RateMatrices.accordance();
+    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0), RealVariable.real(1.0), baseRateMatrix, 1);
     PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.proteinFactory();
     TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).length());
     MultiCategorySubstitutionModel.loadObservations(observations, data, factory); 
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, observations.nSites());
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, observations);
   }
+  
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> fromFastaProteinPairFile(File fastaFile)
+  {
+    Random rand = new Random();
+    Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
+    UnrootedTree tree = defaultTree(data.keySet());
+    SimpleRateMatrix baseRateMatrix = RateMatrices.randomGTR(rand, 400);
+    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0), RealVariable.real(1.0), baseRateMatrix, 1);
+    PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.proteinPairFactory();
+    TreeObservations observations = new FixedTreeObservations(factory.nSites()); //;
+    //System.out.println(BriefCollections.pick(data.values()).length()/factory.getChunkLength());
+    MultiCategorySubstitutionModel.loadObservations(observations, data, factory); 
+    MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, factory.nSites()); //observations.nSites()/factory.getChunkLength());
+    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, observations);
+  }
+  
   
   /**
    * Chained method to change the evolutionary model into an exponential family mixture, keeping the other aspects (tree and
