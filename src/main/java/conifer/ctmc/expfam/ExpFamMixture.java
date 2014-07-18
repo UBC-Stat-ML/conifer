@@ -30,30 +30,13 @@ public class ExpFamMixture implements RateMatrixMixture
   public static int nFeatures;
   public int nFeatures() { return nFeatures; }
   
-  public static Indexer<CTMCState> simpleDNAStateIndexer(int nCategories)
-  {
-    Indexer<String> indexer = Indexers.dnaIndexer();
-    Indexer<CTMCState> result = new Indexer<CTMCState>();
-    for (int cat = 0; cat < nCategories; cat++)
-      for (int i = 0; i < indexer.size(); i++)
-        result.addToIndex(new CTMCState(cat, indexer.i2o(i), null));
-    return result;
-  }
   
-  public static Indexer<CTMCState> simpleProteinStateIndexer(int nCategories)
-  {
-    Indexer<String> indexer = Indexers.proteinIndexer();
-    Indexer<CTMCState> result = new Indexer<CTMCState>();
-    for (int cat = 0; cat < nCategories; cat++)
-      for (int i = 0; i < indexer.size(); i++)
-        result.addToIndex(new CTMCState(cat, indexer.i2o(i), null));
-    return result;
-  }
   
-  public static Indexer<CTMCState> simpleProteinPairStateIndexer(int nCategories)
+  public static Indexer<CTMCState> simpleDNAStateIndexer(int nCategories, String model)
   {
-    Indexer<String> indexer = Indexers.proteinPairIndexer();
+    Indexer<String> indexer= Indexers.modelIndexer(model);
     Indexer<CTMCState> result = new Indexer<CTMCState>();
+    
     for (int cat = 0; cat < nCategories; cat++)
       for (int i = 0; i < indexer.size(); i++)
         result.addToIndex(new CTMCState(cat, indexer.i2o(i), null));
@@ -77,50 +60,28 @@ public class ExpFamMixture implements RateMatrixMixture
     return mixture;
   }
   
-  public static ExpFamMixture kimura1980()
+  public static ExpFamMixture rateMtxModel(String selectedRateMtx)
   {
-    return fromSerialized(SerializedExpFamMixture.kimura1980(), Indexers.dnaIndexer());
-  }
+   return fromSerialized(SerializedExpFamMixture.rateMtxModel(selectedRateMtx), Indexers.modelIndexer(selectedRateMtx));
+     }
   
-  public static ExpFamMixture accordance()
-  {
-    return fromSerialized(SerializedExpFamMixture.accordance(), Indexers.proteinIndexer());
-  }
-  
-  public static ExpFamMixture pair()
-  {
-    return fromSerialized(SerializedExpFamMixture.pair(), Indexers.proteinPairIndexer());
-  }
-  
-  public static ExpFamMixture dnaGTR()
+
+  public static ExpFamMixture randomGTR(String selectedRateMtx)
   {
     final int nCat = 1;
-    CTMCExpFam<CTMCState> globalExponentialFamily = CTMCExpFam.createModelWithFullSupport(simpleDNAStateIndexer(nCat), true);
+    CTMCExpFam<CTMCState> globalExponentialFamily = CTMCExpFam.createModelWithFullSupport(simpleDNAStateIndexer(nCat,selectedRateMtx), true);
     globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singleton(new IdentityBivariate<CTMCState>()));
     globalExponentialFamily.extractUnivariateFeatures(Collections.singleton(new IdentityUnivariate<CTMCState>()));
     
     RateMatrixToEmissionModel emissionModel = null;
-    Indexer<String> dnaIndexer = Indexers.dnaIndexer();
+    Indexer<String> dnaIndexer = Indexers.modelIndexer(selectedRateMtx);
     CTMCStateSpace stateSpace = new CTMCStateSpace(dnaIndexer, dnaIndexer, nCat);
     ExpFamParameters params = new ExpFamParameters(globalExponentialFamily, stateSpace);
     ExpFamMixture mixture = new ExpFamMixture(params, emissionModel, stateSpace);
     return mixture;
   }
   
-  public static ExpFamMixture proteinGTR()
-  {
-    final int nCat = 1;
-    CTMCExpFam<CTMCState> globalExponentialFamily = CTMCExpFam.createModelWithFullSupport(simpleProteinStateIndexer(nCat), true);
-    globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singleton(new IdentityBivariate<CTMCState>()));
-    globalExponentialFamily.extractUnivariateFeatures(Collections.singleton(new IdentityUnivariate<CTMCState>()));
-    RateMatrixToEmissionModel emissionModel = null;
-    Indexer<String> proteinIndexer = Indexers.proteinIndexer();
-    CTMCStateSpace stateSpace = new CTMCStateSpace(proteinIndexer,proteinIndexer, nCat);
-    ExpFamParameters params = new ExpFamParameters(globalExponentialFamily, stateSpace);
-    ExpFamMixture mixture = new ExpFamMixture(params, emissionModel, stateSpace);
-    return mixture;
-  }
-  
+
   public ExpFamMixture(
       ExpFamParameters parameters,
       RateMatrixToEmissionModel emissionModel, 

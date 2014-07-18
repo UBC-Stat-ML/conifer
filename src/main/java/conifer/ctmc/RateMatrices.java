@@ -2,6 +2,9 @@ package conifer.ctmc;
 
 import java.util.Random;
 
+import conifer.ctmc.expfam.RateMtxNames;
+import conifer.ctmc.expfam.SerializedExpFamMixture;
+
 import bayonet.distributions.Multinomial;
 
 
@@ -16,6 +19,56 @@ public class RateMatrices
   public static SimpleRateMatrix accordance()
   {
     return SimpleRateMatrix.fromResource("/conifer/ctmc/accordance.txt");
+  }
+  
+  public static SimpleRateMatrix polarity()
+  {
+    return SimpleRateMatrix.fromResource("/conifer/ctmc/polarity.txt");
+  }
+
+  public static SimpleRateMatrix polaritySize()
+  {
+    return SimpleRateMatrix.fromResource("/conifer/ctmc/polaritySize.txt");
+  }
+
+  public static SimpleRateMatrix rateMtxModel(String selectedRateMtx)
+  {
+    SimpleRateMatrix rateMtx;
+    RateMatrices result = new RateMatrices();
+    rateMtx=null;
+    
+    if (selectedRateMtx == null) {
+      throw new IllegalArgumentException("selectedRateMtx is null!");
+  }
+
+  final RateMtxNames something = RateMtxNames.fromString(selectedRateMtx);
+
+  if (something == null) {
+     return result.kimura1980();
+  }
+
+  switch(something) {
+      case KIMURA1980:
+          return result.kimura1980();
+      case ACCORDANCE:
+          return result.accordance();
+      case PAIR:
+         // return result.pair()
+      case POLARITY:
+          return result.polarity();
+      case POLARITYSIZE:
+          return result.polaritySize();
+      
+      default:
+          return result.kimura1980();  
+  }
+    
+//    {
+//      Random rand = new Random();
+//      int size =400;
+//      rateMtx=result.randomGTR(rand, size);
+//    }
+     
   }
   
   /**

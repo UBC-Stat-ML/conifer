@@ -3,6 +3,7 @@ package conifer.ctmc.expfam;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.lang.reflect.*;
 
 import org.jgrapht.UndirectedGraph;
 
@@ -222,8 +223,39 @@ public class SerializedExpFamMixture
         + ", binaryFeatures=" + binaryFeatures + ", fullSupport=" + fullSupport
         + "]";
   }
+  
 
+public static SerializedExpFamMixture rateMtxModel(final String selectedRateMtx) {
+   if (selectedRateMtx == null) {
+       throw new IllegalArgumentException("model is null!");
+   }
 
+   final RateMtxNames something = RateMtxNames.fromString(selectedRateMtx);
+
+   if (something == null) {
+      return null;
+   }
+
+   switch(something) {
+       case KIMURA1980:
+           return SerializedExpFamMixture.kimura1980();
+       case ACCORDANCE:
+           return SerializedExpFamMixture.accordance();
+       case PAIR:
+           return SerializedExpFamMixture.pair();
+       case POLARITY:
+           return SerializedExpFamMixture.polarity();
+       case POLARITYSIZE:
+           return SerializedExpFamMixture.polaritySize();
+       
+       default:
+           return SerializedExpFamMixture.kimura1980();    
+   }   
+}  
+ 
+
+  
+  
 
   public static SerializedExpFamMixture kimura1980()
   {
@@ -239,6 +271,17 @@ public class SerializedExpFamMixture
   {
     return fromResource("/conifer/ctmc/expfam/pair-expfam.txt");
   }
+  
+  public static SerializedExpFamMixture polarity()
+  {
+    return fromResource("/conifer/ctmc/expfam/polarity-expfam.txt");
+  }
+  
+  public static SerializedExpFamMixture polaritySize()
+  {
+    return fromResource("/conifer/ctmc/expfam/polaritySize-expfam.txt");
+  }
+  
   
 
 

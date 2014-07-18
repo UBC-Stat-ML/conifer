@@ -13,6 +13,10 @@ import briefj.Indexer;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
+import conifer.ctmc.RateMatrices;
+import conifer.ctmc.SimpleRateMatrix;
+import conifer.ctmc.expfam.RateMtxNames;
+
 
 /**
  * A PhylogeneticObservationFactory contains the information required to 
@@ -61,6 +65,38 @@ public class PhylogeneticObservationFactory
     if(_proteinPairFactory == null)
       _proteinPairFactory = fromResource("/conifer/io/proteinPair-iupac-encoding.txt");
     return _proteinPairFactory;
+   }
+  
+  public static PhylogeneticObservationFactory selectedFactory(final String selectedRateMtx)
+  {
+    PhylogeneticObservationFactory result = null;
+    if (selectedRateMtx == null) {
+      throw new IllegalArgumentException("model is null!");
+    }
+
+    final RateMtxNames something = RateMtxNames.fromString(selectedRateMtx);
+
+    if (something == null) {
+      return result.nucleotidesFactory();
+    }
+
+    switch(something) {
+    case KIMURA1980:
+      return result.nucleotidesFactory();
+    case ACCORDANCE:
+      return result.proteinFactory();
+    case PAIR:
+      return result._proteinPairFactory;
+    case POLARITY:
+      return result.proteinFactory();
+    case POLARITYSIZE:
+      return result.proteinFactory();
+
+    default:
+      return result.nucleotidesFactory();    
+    }   
+   
+    
    }
   
   /**
@@ -169,6 +205,7 @@ public class PhylogeneticObservationFactory
   private transient Indexer<String> _indexer;
   private transient Map<String,double[]> _indicators;
   private transient double[] _unknownIndicator;
+  public int nChunks;
   
   private double[] getUnknownIndicator()
   {
@@ -217,10 +254,15 @@ public class PhylogeneticObservationFactory
   private static PhylogeneticObservationFactory _nucleotideFactory = null;
   private static PhylogeneticObservationFactory _proteinFactory = null;
   private static PhylogeneticObservationFactory _proteinPairFactory=null;
-
+  
   public int nSites()
   {
-    return BriefCollections.pick(getIndicators().values()).length;
-    //return BriefCollections.pick(getIndicators().values()).length()/factory.getChunkLength());
+      return nChunks;
   }
+
+//  public int nSites()
+//  {
+//    return BriefCollections.pick(getIndicators().values()).length;
+//    //return BriefCollections.pick(getIndicators().values()).length()/factory.getChunkLength());
+//  }
 }

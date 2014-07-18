@@ -11,6 +11,7 @@ import blang.annotations.DefineFactor;
 import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.processing.ProcessorContext;
 import briefj.BriefIO;
+import briefj.opt.Option;
 import briefj.run.Results;
 import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.factors.NonClockTreePrior;
@@ -27,16 +28,19 @@ public class HierarchicalPhyloModel extends MCMCRunner {
 	File inputFileFES
 	= new File(
 			"src/main/resources/conifer/sampleInput/FES_4.fasta");
+	
+	@Option()
+  public static String selectedRateMtx="kimura1980()";
 
 	@DefineFactor(onObservations = true)
 	public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihoodUTY = UnrootedTreeLikelihood
-	.fromFastaFile(inputFileUTY)
-	.withExpFamMixture(ExpFamMixture.kimura1980())
+	.fromFastaFile(inputFileUTY, selectedRateMtx)
+	.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx))
 	.withTree(new File("src/main/resources/conifer/sampleInput/UTY.ape.4.nwk"));
 
 	@DefineFactor(onObservations = true)
 	public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihoodFES = UnrootedTreeLikelihood
-	.fromFastaFile(inputFileFES)
+	.fromFastaFile(inputFileFES, selectedRateMtx)
 	.withExpFamMixture(likelihoodUTY.evolutionaryModel.rateMatrixMixture)
 	.withTree(new File("src/main/resources/conifer/sampleInput/FES.ape.4.nwk"));
 
