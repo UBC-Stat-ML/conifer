@@ -105,6 +105,12 @@ public class UnrootedTree
     return branchLengths.get(new UnorderedPair<TreeNode, TreeNode>(node1, node2));
   }
   
+  public double getBranchLength(UnorderedPair<TreeNode, TreeNode> edge)
+  {
+    return branchLengths.get(edge);
+  }
+ 
+  
   /**
    * Modifies in place the length of a branch.
    * @param edge
@@ -344,5 +350,6 @@ public class UnrootedTree
   {
     UnrootedTreeUtils.simplify(this);
   }
- 
+
+
 }
