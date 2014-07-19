@@ -76,6 +76,11 @@ public class UnrootedTree
     branchLengths.remove(UnorderedPair.of(n1, n2));
   }
   
+  public void removeEdge(UnorderedPair<TreeNode, TreeNode> edge)
+  {
+    removeEdge(edge.getFirst(), edge.getSecond());
+  }
+  
   /**
    * 
    * @return
@@ -350,6 +355,8 @@ public class UnrootedTree
   {
     UnrootedTreeUtils.simplify(this);
   }
+
+
 
 
 }

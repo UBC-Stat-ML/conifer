@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -18,10 +19,12 @@ import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
 import bayonet.distributions.UnivariateRealDistribution;
 import bayonet.graphs.GraphUtils;
+import bayonet.math.SamplingUtils;
 import blang.annotations.FactorArgument;
 import blang.annotations.FactorComponent;
 import blang.factors.GenerativeFactor;
 import blang.variables.RealVariable;
+import briefj.collections.UnorderedPair;
 
 
 
@@ -72,27 +75,39 @@ public class NonClockTreePrior<P> implements GenerativeFactor
       Collection<TreeNode> leaves)
   {
     UnrootedTree result = new UnrootedTree();
-    for (TreeNode leaf : leaves)
-      result.addNode(leaf);
-    List<TreeNode> roots = Lists.newArrayList(leaves);
-    loop:while (roots.size() > 1)
+    
+    Queue<TreeNode> queue = Lists.newLinkedList(leaves);
+    
+    if (queue.isEmpty())
+      return result;
+    
+    TreeNode leaf1 = queue.poll();
+    result.addNode(leaf1);
+    
+    if (queue.isEmpty())
+      return result;
+    
+    TreeNode leaf2 = queue.poll();
+    result.addNode(leaf2);
+    result.addEdge(leaf1, leaf2, Double.NaN);
+    
+    while (!queue.isEmpty())
     {
-      
-      if (roots.size() == 2)
-      {
-        result.addEdge(roots.get(0), roots.get(1), sample(branchDistribution, random));
-        break loop;
-      }
-      else
-      {
-        Pair<TreeNode,TreeNode> pair = popRandomPair(random, roots);
-        TreeNode newInternal = TreeNode.nextUnlabelled();
-        result.addNode(newInternal);
-        result.addEdge(pair.getLeft(), newInternal, sample(branchDistribution, random));
-        result.addEdge(pair.getRight(), newInternal, sample(branchDistribution, random));
-        roots.add(newInternal);
-      }
+      // pick a random edge
+      UnorderedPair<TreeNode, TreeNode> edge = SamplingUtils.uniformFromCollection(random, result.getTopology().edgeSet());
+      TreeNode internal = TreeNode.nextUnlabelled();
+      TreeNode newLeaf = queue.poll();
+      result.removeEdge(edge);
+      result.addNode(newLeaf);
+      result.addNode(internal);
+      result.addEdge(newLeaf, internal, Double.NaN);
+      result.addEdge(internal, edge.getFirst(), Double.NaN);
+      result.addEdge(internal, edge.getSecond(), Double.NaN);
     }
+    
+    for (UnorderedPair<TreeNode, TreeNode> edge : result.getTopology().edgeSet())
+      result.updateBranchLength(edge, sample(branchDistribution, random));
+    
     return result;
   }
   
