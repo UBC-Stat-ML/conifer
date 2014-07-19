@@ -48,7 +48,7 @@ public class TestSimplePhyloModel extends MCMCRunner
     
     // Here: 1000 is the number of test iterations (different than MCMC sweeps, see below)
     //       0.05 is a p-value threshold
-    check.check(algo, 1000, 0.05);
+    check.check(algo, 10000, 0.05);
     
   }
 }
