@@ -8,12 +8,16 @@ import java.util.Queue;
 import java.util.Random;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.analysis.function.Exp;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import com.google.common.collect.Lists;
 
 
+import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
+import conifer.UnrootedTreeUtils;
 
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
@@ -63,12 +67,69 @@ public class NonClockTreePrior<P> implements GenerativeFactor
     return result;
   }
   
-  private double branchLengthLogDensity(double length)
+  public double branchLengthLogDensity(double length)
   {
     branchDistribution.getRealization().setValue(length);
     return branchDistribution.logDensity();
   }
   
+  public static void main(String [] args)
+  {
+    Random rand = new Random(1);
+    for (int j= 0; j < 100; j++)
+    {
+      SummaryStatistics old = new SummaryStatistics(), newOne = new SummaryStatistics();
+      
+      Exponential<RateParameterization> exp = Exponential.newExponential();
+      List<TreeNode> leaves = TopologyUtils.syntheticTaxaList(4);
+      for (int i = 0; i < 10000; i++)
+      {
+        old.   addValue(UnrootedTreeUtils.totalTreeLength(_old_generate(rand, exp,  leaves)));
+        newOne.addValue(UnrootedTreeUtils.totalTreeLength(generate(rand, exp, leaves)));
+      }
+      System.out.println("new:" + newOne.getMean());
+      System.out.println("old:" + old.getMean());
+    }
+  }
+  
+  public static UnrootedTree _old_generate(
+      Random random, 
+      UnivariateRealDistribution branchDistribution,
+      Collection<TreeNode> leaves)
+  {
+    UnrootedTree result = new UnrootedTree();
+    for (TreeNode leaf : leaves)
+      result.addNode(leaf);
+    List<TreeNode> roots = Lists.newArrayList(leaves);
+    loop:while (roots.size() > 1)
+    {
+      
+      if (roots.size() == 2)
+      {
+        result.addEdge(roots.get(0), roots.get(1), sample(branchDistribution, random));
+        break loop;
+      }
+      else
+      {
+        Pair<TreeNode,TreeNode> pair = popRandomPair(random, roots);
+        TreeNode newInternal = TreeNode.nextUnlabelled();
+        result.addNode(newInternal);
+        result.addEdge(pair.getLeft(), newInternal, sample(branchDistribution, random));
+        result.addEdge(pair.getRight(), newInternal, sample(branchDistribution, random));
+        roots.add(newInternal);
+      }
+    }
+    return result;
+  }
+  
+  /**
+   * Generate a tree with a topology uniformly distributed
+   * over bifurcating unrooted tree, using:
+   * 
+   *   The generation of random, binary unordered trees
+   *   George W. Furnas
+   *     see 2.1.2 (p.204)
+   */
   public static UnrootedTree generate(
       Random random, 
       UnivariateRealDistribution branchDistribution,
@@ -76,7 +137,9 @@ public class NonClockTreePrior<P> implements GenerativeFactor
   {
     UnrootedTree result = new UnrootedTree();
     
-    Queue<TreeNode> queue = Lists.newLinkedList(leaves);
+    List<TreeNode> shuffled = Lists.newArrayList(leaves);
+    Collections.shuffle(shuffled);
+    Queue<TreeNode> queue = Lists.newLinkedList(shuffled);
     
     if (queue.isEmpty())
       return result;
@@ -109,6 +172,11 @@ public class NonClockTreePrior<P> implements GenerativeFactor
       result.updateBranchLength(edge, sample(branchDistribution, random));
     
     return result;
+  }
+  
+  public static UnrootedTree generateWithExponentialDistributedBranchLengths(Random random, int nLeaves)
+  {
+    return generate(random, Exponential.newExponential(), TopologyUtils.syntheticTaxaList(nLeaves));
   }
   
   private static double sample(UnivariateRealDistribution distribution, Random rand)
@@ -171,5 +239,7 @@ public class NonClockTreePrior<P> implements GenerativeFactor
     UnrootedTree sampled = generate(random, branchDistribution, leaves);
     this.tree.setTo(sampled);
   }
+
+
   
 }

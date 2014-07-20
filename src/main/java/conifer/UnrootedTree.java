@@ -3,6 +3,7 @@ package conifer;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.UndirectedGraph;
@@ -46,8 +47,23 @@ public class UnrootedTree
   /**
    * Note if other fields are added, setTo() should be modified as well.
    */
-  private UndirectedGraph<TreeNode, UnorderedPair<TreeNode, TreeNode>> topology = GraphUtils.newUndirectedGraph();
-  private Map<UnorderedPair<TreeNode, TreeNode>,Double> branchLengths = Maps.newLinkedHashMap();
+  private UndirectedGraph<TreeNode, UnorderedPair<TreeNode, TreeNode>> topology;
+  private Map<UnorderedPair<TreeNode, TreeNode>,Double> branchLengths;
+  
+  public UnrootedTree(UnrootedTree model)
+  {
+    this.topology = GraphUtils.newUndirectedGraph(model.topology);
+    this.branchLengths = Maps.newLinkedHashMap(model.branchLengths);
+  }
+  
+  /**
+   * Create an empty tree.
+   */
+  public UnrootedTree()
+  {
+    topology = GraphUtils.newUndirectedGraph();
+    branchLengths = Maps.newLinkedHashMap();
+  }
   
   /**
    * Add a node (species)
@@ -259,6 +275,31 @@ public class UnrootedTree
       addEdge(lowerDummyNode, edge.getRight(), bottomBL);
       result.add(lowerDummyNode);
       result.add(upperDummyNode);
+    }
+    
+    return result;
+  }
+  
+  public List<TreeNode> addAuxiliaryInternalNodes(Random rand, double orig, Pair<TreeNode,TreeNode> oriEdge, TreeNode root)
+  {
+    List<TreeNode> result = Lists.newArrayList();
+    
+    for (Pair<TreeNode,TreeNode> edge : getRootedEdges(root))
+    {
+      double ratio = edge.equals(oriEdge) ? orig : rand.nextDouble();
+      double originalBL = getBranchLength(edge.getLeft(), edge.getRight());
+      double
+        bottomBL = ratio * originalBL,
+        top_BL = (1.0 - ratio) * originalBL;
+
+      removeEdge(edge.getLeft(), edge.getRight());
+      TreeNode 
+        dummyNode = TreeNode.nextUnlabelled();
+      addNode(dummyNode);
+      // left = complete top
+      addEdge(edge.getLeft(), dummyNode, top_BL);
+      addEdge(dummyNode, edge.getRight(), bottomBL);
+      result.add(dummyNode);
     }
     
     return result;
