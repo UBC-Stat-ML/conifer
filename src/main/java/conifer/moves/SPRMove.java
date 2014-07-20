@@ -189,9 +189,10 @@ public class SPRMove extends NodeMove
 //    System.out.println("----");
 //    System.out.println(UnrootedTreeUtils.totalTreeLength(tree));
 //    System.out.println("original LL = " + treeLikelihood.logDensity());
-    BriefLog.warnOnce("remove hacks in SPRMove");
-    double oriLL = treeLikelihood.logDensity();
-    int initIndex = -1;
+    
+//    BriefLog.warnOnce("remove hacks in SPRMove");
+//    double oriLL = treeLikelihood.logDensity();
+//    int initIndex = -1;
     
     // nothing interesting to do if tree is only a single branch
     List<TreeNode> internalNodes = GraphUtils.internalNodes(tree.getTopology());
@@ -215,19 +216,19 @@ public class SPRMove extends NodeMove
     UnrootedTree prunedSubtree = tree.prune(removedRoot, detached);
     
     final double 
-      remRootThirdLen = tree.getBranchLength(removedRoot, third),
-      newRootRemRootLen=tree.getBranchLength(removedRoot, newRoot);
+      remRootThirdLen  =  tree.getBranchLength(removedRoot, third),
+      newRootRemRootLen = tree.getBranchLength(removedRoot, newRoot);
       
     if (remRootThirdLen == 0.0 || newRootRemRootLen == 0.0)
       throw new RuntimeException("SPR does not support zero branch lengths.");
     
     // calculate the branch ratio
-    double referenceLengthFromBot = remRootThirdLen;
-    double joinedLength = referenceLengthFromBot + newRootRemRootLen;
-    double fixedRatioFromBot = referenceLengthFromBot / joinedLength;
+//    double referenceLengthFromBot = remRootThirdLen;
+    double joinedLength = remRootThirdLen + newRootRemRootLen;
+//    double fixedRatioFromBot = referenceLengthFromBot / joinedLength;
     
-    if (fixedRatioFromBot == 1.0) // rounding problem: can cause branches of len zero
-      fixedRatioFromBot = 1.0 - 1e-15; // note that double are less precise around 1.0 than around 0.0
+//    if (fixedRatioFromBot == 1.0) // rounding problem: can cause branches of len zero
+//      fixedRatioFromBot = 1.0 - 1e-15; // note that double are less precise around 1.0 than around 0.0
     
     // compute the factor graphs (one per potentical category) for the subtree, and run the sum product on these
     // TODO: consider more than one stem lengths
@@ -235,16 +236,16 @@ public class SPRMove extends NodeMove
     List<UnaryFactor<TreeNode>> prunedSubtreeMarginals = EvolutionaryModelUtils.getRootMarginalsFromFactorGraphs(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, prunedSubtree, removedRoot, treeLikelihood.observations), removedRoot);
     
     // form an edge joining the two edge connected to a node of arity two caused by the disconnect
-    tree.simplify(third, removedRoot, newRoot);
+//    tree.simplify(third, removedRoot, newRoot);
     
     // create intermediate nodes in the main tree
     
     
-    double additionalRatio = fixedRatioFromBot; BriefLog.warnOnce("ANother thing in SPRMove to remove/fix");
-      //rand.nextDouble();
-    double smallRatio = Math.min(additionalRatio, fixedRatioFromBot);
-    double largerRatio= Math.max(additionalRatio, fixedRatioFromBot);
-    List<TreeNode> attachmentPoints = tree.addAuxiliaryInternalNodes(rand, fixedRatioFromBot, Pair.of(newRoot, third), newRoot);//smallRatio, largerRatio, newRoot);
+//    double additionalRatio = fixedRatioFromBot; BriefLog.warnOnce("ANother thing in SPRMove to remove/fix");
+//      //rand.nextDouble();
+//    double smallRatio = Math.min(additionalRatio, fixedRatioFromBot);
+//    double largerRatio= Math.max(additionalRatio, fixedRatioFromBot);
+    List<TreeNode> attachmentPoints = tree.addAuxiliaryInternalNodes(rand, removedRoot);//smallRatio, largerRatio, newRoot);
     
     // run the sum product on the main tree
     List<SumProduct<TreeNode>> mainTreeSumProducts = EvolutionaryModelUtils.getSumProductsFromFactorGraphs(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, tree, newRoot, treeLikelihood.observations, false), newRoot);
@@ -264,21 +265,21 @@ public class SPRMove extends NodeMove
         currentFullUnaries.add(currentMainTreeSumProduct.getFactorGraph().factorOperations().pointwiseProduct(Arrays.asList(prunedSubtreeMarginal, currentMainTreeMarginal)));
       }
       
-      double priorFactor = 0.0;
-      BriefLog.warnOnce("non exp currently not in SPR");
+//      double priorFactor = 0.0;
+//      BriefLog.warnOnce("non exp currently not in SPR");
 //      Pair<Double,Double> proposedBranches = findBranches(attachmentPoint, tree);
-//      final double 
-//        b1 = proposedBranches.getLeft(),
-//        b2 = proposedBranches.getRight();
-//      
-////      System.out.println(b1 + "\t" + b2);
-////      System.out.println(treePrior.branchLengthLogDensity(b1) + "\t" + treePrior.branchLengthLogDensity(b2) 
-////          + "\t" + treePrior.branchLengthLogDensity(b1 + b2));
-//
-//      
-//      double priorFactor = 
-//        + treePrior.branchLengthLogDensity(b1) + treePrior.branchLengthLogDensity(b2) 
-//        - treePrior.branchLengthLogDensity(b1 + b2);
+      Pair<Double,Double> neighborBLs = neighborBranchLengths(attachmentPoint, tree);
+      final double 
+        b1 = neighborBLs.getLeft(), //proposedBranches.getLeft(),
+        b2 = neighborBLs.getRight();//proposedBranches.getRight();
+      
+//      System.out.println(b1 + "\t" + b2);
+//      System.out.println(treePrior.branchLengthLogDensity(b1) + "\t" + treePrior.branchLengthLogDensity(b2) 
+//          + "\t" + treePrior.branchLengthLogDensity(b1 + b2));
+      
+      double priorFactor = 
+        + treePrior.branchLengthLogDensity(b1) + treePrior.branchLengthLogDensity(b2) 
+        - treePrior.branchLengthLogDensity(b1 + b2);
       
 //      System.out.println(priorFactor);
       
@@ -286,12 +287,12 @@ public class SPRMove extends NodeMove
       final double likelihood = evolutionaryModel.computeLogLikelihood(context);
 //      System.out.println(likelihood);
       
-      BriefLog.warnOnce("yet another thing to rem");
-      if (NumericalUtils.isClose(likelihood, oriLL, 1e-10))
-      {
-//        System.out.println("*");
-        initIndex = i;
-      } 
+//      BriefLog.warnOnce("yet another thing to rem");
+//      if (NumericalUtils.isClose(likelihood, oriLL, 1e-10))
+//      {
+////        System.out.println("*");
+//        initIndex = i;
+//      } 
       
       samplingArray[i] = priorFactor + likelihood;
     }
@@ -301,17 +302,19 @@ public class SPRMove extends NodeMove
     int sampledIndex = Multinomial.sampleMultinomial(rand, samplingArray);
     
     
-    BriefLog.warnOnce("yet another SPR");
+//    BriefLog.warnOnce("yet another SPR");
     double 
-      proposedBranches = findBranches2(attachmentPoints.get(sampledIndex), tree),
-      oriBranches = findBranches2(attachmentPoints.get(initIndex), tree);
+      proposedBranches = sum(neighborBranchLengths(attachmentPoints.get(sampledIndex), tree)),
+      oriBranches      = sum(neighborBranchLengths(removedRoot, tree));
     double ratio = (proposedBranches) / (oriBranches);
+    
+    
 //    System.out.println(ratio);
-    if (rand.nextDouble() > ratio)   
-      sampledIndex  = initIndex;
+//    if (rand.nextDouble() > ratio)   
+//      sampledIndex  = initIndex; // reject
     // end bad block
     
-    TreeNode sampledAttachment = attachmentPoints.get(sampledIndex);
+    TreeNode sampledAttachment = rand.nextDouble() < ratio ? attachmentPoints.get(sampledIndex) : removedRoot;
     
     // do the re-attachment
     tree.regraft(prunedSubtree, removedRoot, sampledAttachment);
@@ -323,41 +326,57 @@ public class SPRMove extends NodeMove
 //    System.out.println("---");
   }
 
-  private static double findBranches2(TreeNode treeNode, UnrootedTree tree2)
+//  private static double findBranches2(TreeNode treeNode, UnrootedTree tree2)
+//  {
+//    double sum = 0.0;
+//    for (TreeNode neighbor : Graphs.neighborListOf(tree2.getTopology(), treeNode))
+//      sum += tree2.getBranchLength(neighbor, treeNode);
+//    return sum;
+//  }
+  
+  private static double sum(Pair<Double,Double> pair)
   {
-    double sum = 0.0;
-    for (TreeNode neighbor : Graphs.neighborListOf(tree2.getTopology(), treeNode))
-      sum += tree2.getBranchLength(neighbor, treeNode);
-    return sum;
-  }
-
-  private static Pair<Double, Double> findBranches(TreeNode attachmentPoint,
-      UnrootedTree tree)
-  {
-    TreeNode endPoint1 = findNeighborOfGivenDegree(attachmentPoint, tree, false);
-    TreeNode attach2 = findNeighborOfGivenDegree(attachmentPoint, tree, true);
-    TreeNode endPoint2 = findNeighborOfGivenDegree(attach2, tree, false);
-    
-    return Pair.of(tree.getBranchLength(endPoint1, attachmentPoint), tree.getBranchLength(attachmentPoint, attach2) + tree.getBranchLength(attach2, endPoint2));
+    return pair.getLeft() + pair.getRight();
   }
   
-  private static TreeNode findNeighborOfGivenDegree(TreeNode node,
-      UnrootedTree tree, boolean isDegree2)
+  private static Pair<Double,Double> neighborBranchLengths(TreeNode treeNode, UnrootedTree tree)
   {
-    TreeNode result = null;
-    for (TreeNode neighbor : Graphs.neighborListOf(tree.getTopology(), node))
-    {
-      int currentDegree = Graphs.neighborListOf(tree.getTopology(), neighbor).size();
-      boolean degreeMatch = isDegree2 ? (currentDegree == 2) : (currentDegree == 1 || currentDegree == 3);
-      if (degreeMatch)
-      {
-        if (result != null)
-          throw new RuntimeException();
-        result = neighbor;
-      }
-    }
-    if (result == null)
+    List<TreeNode> attachmentNeighbors = Graphs.neighborListOf(tree.getTopology(), treeNode);
+    if (attachmentNeighbors.size() != 2)
       throw new RuntimeException();
-    return result;
+    double
+      b1 = tree.getBranchLength(attachmentNeighbors.get(0), treeNode), 
+      b2 = tree.getBranchLength(attachmentNeighbors.get(1), treeNode);
+    return Pair.of(b1, b2);
   }
+
+//  private static Pair<Double, Double> findBranches(TreeNode attachmentPoint,
+//      UnrootedTree tree)
+//  {
+//    TreeNode endPoint1 = findNeighborOfGivenDegree(attachmentPoint, tree, false);
+//    TreeNode attach2 = findNeighborOfGivenDegree(attachmentPoint, tree, true);
+//    TreeNode endPoint2 = findNeighborOfGivenDegree(attach2, tree, false);
+//    
+//    return Pair.of(tree.getBranchLength(endPoint1, attachmentPoint), tree.getBranchLength(attachmentPoint, attach2) + tree.getBranchLength(attach2, endPoint2));
+//  }
+  
+//  private static TreeNode findNeighborOfGivenDegree(TreeNode node,
+//      UnrootedTree tree, boolean isDegree2)
+//  {
+//    TreeNode result = null;
+//    for (TreeNode neighbor : Graphs.neighborListOf(tree.getTopology(), node))
+//    {
+//      int currentDegree = Graphs.neighborListOf(tree.getTopology(), neighbor).size();
+//      boolean degreeMatch = isDegree2 ? (currentDegree == 2) : (currentDegree == 1 || currentDegree == 3);
+//      if (degreeMatch)
+//      {
+//        if (result != null)
+//          throw new RuntimeException();
+//        result = neighbor;
+//      }
+//    }
+//    if (result == null)
+//      throw new RuntimeException();
+//    return result;
+//  }
 }

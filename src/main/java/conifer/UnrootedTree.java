@@ -280,26 +280,31 @@ public class UnrootedTree
     return result;
   }
   
-  public List<TreeNode> addAuxiliaryInternalNodes(Random rand, double orig, Pair<TreeNode,TreeNode> oriEdge, TreeNode root)
+  public List<TreeNode> addAuxiliaryInternalNodes(Random rand, TreeNode current)
   {
     List<TreeNode> result = Lists.newArrayList();
     
-    for (Pair<TreeNode,TreeNode> edge : getRootedEdges(root))
+    for (Pair<TreeNode,TreeNode> edge : getRootedEdges(current))
     {
-      double ratio = edge.equals(oriEdge) ? orig : rand.nextDouble();
-      double originalBL = getBranchLength(edge.getLeft(), edge.getRight());
-      double
-        bottomBL = ratio * originalBL,
-        top_BL = (1.0 - ratio) * originalBL;
-
-      removeEdge(edge.getLeft(), edge.getRight());
-      TreeNode 
-        dummyNode = TreeNode.nextUnlabelled();
-      addNode(dummyNode);
-      // left = complete top
-      addEdge(edge.getLeft(), dummyNode, top_BL);
-      addEdge(dummyNode, edge.getRight(), bottomBL);
-      result.add(dummyNode);
+      if (edge.getLeft().equals(current) || edge.getRight().equals(current))
+        result.add(current);
+      else
+      {
+        double ratio = rand.nextDouble();
+        double originalBL = getBranchLength(edge.getLeft(), edge.getRight());
+        double
+          bottomBL = ratio * originalBL,
+          top_BL = (1.0 - ratio) * originalBL;
+  
+        removeEdge(edge.getLeft(), edge.getRight());
+        TreeNode 
+          dummyNode = TreeNode.nextUnlabelled();
+        addNode(dummyNode);
+        // left = complete top
+        addEdge(edge.getLeft(), dummyNode, top_BL);
+        addEdge(dummyNode, edge.getRight(), bottomBL);
+        result.add(dummyNode);
+      }
     }
     
     return result;
