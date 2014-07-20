@@ -246,40 +246,12 @@ public class UnrootedTree
   }
 
   /**
-   * Iterate the edge (oriented with the provided root) and add two dummy internal nodes on 
-   * each edge. The nodes are placed at the given fractions from the bottom node of each edge. 
+   * Iterate the edge (oriented with the provided root) and add a dummy internal node on 
+   * each edge, except for edges connected to current. 
+   * 
+   * The nodes are placed at a uniform fractions from the bottom node of each edge. 
    * This modifies the tree in place.
    */
-  public List<TreeNode> addAuxiliaryInternalNodes(double smallRatio, double largerRatio, 
-      TreeNode root)
-  {
-    List<TreeNode> result = Lists.newArrayList();
-    
-    for (Pair<TreeNode,TreeNode> edge : getRootedEdges(root))
-    {
-      double originalBL = getBranchLength(edge.getLeft(), edge.getRight());
-      double
-        bottomBL = smallRatio * originalBL,
-        middleBL = (largerRatio - smallRatio) * originalBL,
-        top_BL = (1.0 - largerRatio) * originalBL;
-
-      removeEdge(edge.getLeft(), edge.getRight());
-      TreeNode 
-        lowerDummyNode = TreeNode.nextUnlabelled(),
-        upperDummyNode = TreeNode.nextUnlabelled();
-      addNode(lowerDummyNode);
-      addNode(upperDummyNode);
-      // left = complete top
-      addEdge(edge.getLeft(), upperDummyNode, top_BL);
-      addEdge(upperDummyNode, lowerDummyNode, middleBL);
-      addEdge(lowerDummyNode, edge.getRight(), bottomBL);
-      result.add(lowerDummyNode);
-      result.add(upperDummyNode);
-    }
-    
-    return result;
-  }
-  
   public List<TreeNode> addAuxiliaryInternalNodes(Random rand, TreeNode current)
   {
     List<TreeNode> result = Lists.newArrayList();

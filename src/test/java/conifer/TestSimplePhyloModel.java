@@ -8,15 +8,12 @@ import bayonet.distributions.Exponential.RateParameterization;
 import blang.MCMCAlgorithm;
 import blang.MCMCRunner;
 import blang.annotations.DefineFactor;
-import blang.mcmc.MHMove;
 import blang.validation.CheckStationarity;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.DiscreteGammaMixture;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.moves.AllBranchesScaling;
-import conifer.moves.SPRMove;
-import conifer.moves.SingleBranchScaling;
 
 
 /**
@@ -32,8 +29,6 @@ public class TestSimplePhyloModel extends MCMCRunner
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> likelihood = 
     UnrootedTreeLikelihood.createEmpty(1, TopologyUtils.syntheticTaxaList(4));
   
-//  UnrootedTree tree = NonClockTreePrior.generateWithExponentialDistributedBranchLengths(new Random(1), 3);
-  
   @DefineFactor
   NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
 
@@ -43,7 +38,7 @@ public class TestSimplePhyloModel extends MCMCRunner
     this.factory.mcmcOptions.random = new Random(10001);
     this.factory.setCheckAllNodesCoveredByMCMCMoves(false);
     
-    this.factory.excludeNodeMove(AllBranchesScaling.class);
+//    this.factory.excludeNodeMove(AllBranchesScaling.class);
 //    this.factory.excludeNodeMove(SPRMove.class);
     
     MCMCAlgorithm algo = buildMCMCAlgorithm();
