@@ -225,32 +225,12 @@ public class SerializedExpFamMixture
   }
   
 
-public static SerializedExpFamMixture rateMtxModel(final String selectedRateMtx) {
+public static SerializedExpFamMixture rateMtxModel(final RateMtxNames selectedRateMtx) {
    if (selectedRateMtx == null) {
        throw new IllegalArgumentException("model is null!");
    }
 
-   final RateMtxNames something = RateMtxNames.fromString(selectedRateMtx);
-
-   if (something == null) {
-      return null;
-   }
-
-   switch(something) {
-       case KIMURA1980:
-           return SerializedExpFamMixture.kimura1980();
-       case ACCORDANCE:
-           return SerializedExpFamMixture.accordance();
-       case PAIR:
-           return SerializedExpFamMixture.pair();
-       case POLARITY:
-           return SerializedExpFamMixture.polarity();
-       case POLARITYSIZE:
-           return SerializedExpFamMixture.polaritySize();
-       
-       default:
-           return SerializedExpFamMixture.kimura1980();    
-   }   
+   return selectedRateMtx.getSerialized();
 }  
  
 

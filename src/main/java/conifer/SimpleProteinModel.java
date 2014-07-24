@@ -18,6 +18,7 @@ import briefj.run.Mains;
 import briefj.BriefIO;
 import briefj.OutputManager;
 import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
@@ -44,7 +45,7 @@ public class SimpleProteinModel implements Runnable, Processor
 
 
   @Option()
-  public static String selectedRateMtx="polaritySize()";
+  public static RateMtxNames selectedRateMtx=RateMtxNames.POLARITYSIZE;
 
   @OptionSet(name = "factory")
   public final MCMCFactory factory = new MCMCFactory();

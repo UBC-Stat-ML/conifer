@@ -7,6 +7,8 @@ import blang.MCMCAlgorithm;
 import blang.MCMCRunner;
 import blang.annotations.DefineFactor;
 import blang.validation.CheckStationarity;
+import briefj.opt.Option;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.DiscreteGammaMixture;
@@ -22,9 +24,12 @@ import conifer.models.MultiCategorySubstitutionModel;
 public class TestSimplePhyloModel extends MCMCRunner
 {
 
+  @Option()
+  public static RateMtxNames selectedRateMtx=RateMtxNames.KIMURA1980;
+  
   @DefineFactor
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> likelihood = 
-    UnrootedTreeLikelihood.createEmpty(1, TopologyUtils.syntheticTaxaList(4));
+    UnrootedTreeLikelihood.createEmpty(1, TopologyUtils.syntheticTaxaList(4), selectedRateMtx);
   
   
   @DefineFactor

@@ -13,6 +13,7 @@ import conifer.ctmc.expfam.features.IdentityBivariate;
 import conifer.ctmc.expfam.features.IdentityUnivariate;
 import conifer.io.Indexers;
 import conifer.models.RateMatrixMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 
 
 
@@ -32,9 +33,9 @@ public class ExpFamMixture implements RateMatrixMixture
   
   
   
-  public static Indexer<CTMCState> simpleDNAStateIndexer(int nCategories, String model)
+  public static Indexer<CTMCState> simpleDNAStateIndexer(int nCategories, final RateMtxNames selectedRateMtx)
   {
-    Indexer<String> indexer= Indexers.modelIndexer(model);
+    Indexer<String> indexer= Indexers.modelIndexer(selectedRateMtx);
     Indexer<CTMCState> result = new Indexer<CTMCState>();
     
     for (int cat = 0; cat < nCategories; cat++)
@@ -60,13 +61,13 @@ public class ExpFamMixture implements RateMatrixMixture
     return mixture;
   }
   
-  public static ExpFamMixture rateMtxModel(String selectedRateMtx)
+  public static ExpFamMixture rateMtxModel(RateMtxNames selectedRateMtx)
   {
    return fromSerialized(SerializedExpFamMixture.rateMtxModel(selectedRateMtx), Indexers.modelIndexer(selectedRateMtx));
      }
   
 
-  public static ExpFamMixture randomGTR(String selectedRateMtx)
+  public static ExpFamMixture randomGTR(RateMtxNames selectedRateMtx)
   {
     final int nCat = 1;
     CTMCExpFam<CTMCState> globalExponentialFamily = CTMCExpFam.createModelWithFullSupport(simpleDNAStateIndexer(nCat,selectedRateMtx), true);

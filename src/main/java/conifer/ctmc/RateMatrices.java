@@ -31,7 +31,7 @@ public class RateMatrices
     return SimpleRateMatrix.fromResource("/conifer/ctmc/polaritySize.txt");
   }
 
-  public static SimpleRateMatrix rateMtxModel(String selectedRateMtx)
+  public static SimpleRateMatrix rateMtxModel(final RateMtxNames selectedRateMtx)
   {
     SimpleRateMatrix rateMtx;
     RateMatrices result = new RateMatrices();
@@ -40,35 +40,7 @@ public class RateMatrices
     if (selectedRateMtx == null) {
       throw new IllegalArgumentException("selectedRateMtx is null!");
   }
-
-  final RateMtxNames something = RateMtxNames.fromString(selectedRateMtx);
-
-  if (something == null) {
-     return result.kimura1980();
-  }
-
-  switch(something) {
-      case KIMURA1980:
-          return result.kimura1980();
-      case ACCORDANCE:
-          return result.accordance();
-      case PAIR:
-         // return result.pair()
-      case POLARITY:
-          return result.polarity();
-      case POLARITYSIZE:
-          return result.polaritySize();
-      
-      default:
-          return result.kimura1980();  
-  }
-    
-//    {
-//      Random rand = new Random();
-//      int size =400;
-//      rateMtx=result.randomGTR(rand, size);
-//    }
-     
+    return selectedRateMtx.getRateMtx();     
   }
   
   /**

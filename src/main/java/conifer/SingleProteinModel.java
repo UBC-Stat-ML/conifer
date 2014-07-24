@@ -16,6 +16,7 @@ import briefj.opt.Option;
 import briefj.opt.OptionsParser;
 import briefj.opt.OptionSet;
 import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
 import briefj.run.Mains;
@@ -26,16 +27,14 @@ import briefj.OutputManager;
 
 public class SingleProteinModel implements Runnable, Processor
 {
-  
-
    @Option(gloss="File of provided alignment")
-   public static File inputFile;
+   public File inputFile;
 
    @Option(gloss="File of the tree topology")
-   public static File treeFile;
+   public File treeFile;
    
    @Option()
-   public static String selectedRateMtx="polaritySize()";
+   public static RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZE;
 
    @OptionSet(name = "factory")
    public final MCMCFactory factory = new MCMCFactory();
@@ -81,7 +80,6 @@ public class SingleProteinModel implements Runnable, Processor
     model = new Model();
     MCMCAlgorithm mcmc = factory.build(model, false);
     mcmc.options.nMCMCSweeps=10000; 
-    //System.out.println(mcmc.model);
     mcmc.run();
   }
 

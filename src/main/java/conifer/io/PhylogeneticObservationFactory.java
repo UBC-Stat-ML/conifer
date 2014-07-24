@@ -67,37 +67,16 @@ public class PhylogeneticObservationFactory
     return _proteinPairFactory;
    }
   
-  public static PhylogeneticObservationFactory selectedFactory(final String selectedRateMtx)
+  public static PhylogeneticObservationFactory selectedFactory(final RateMtxNames selectedRateMtx)
   {
     PhylogeneticObservationFactory result = null;
     if (selectedRateMtx == null) {
       throw new IllegalArgumentException("model is null!");
     }
-
-    final RateMtxNames something = RateMtxNames.fromString(selectedRateMtx);
-
-    if (something == null) {
-      return result.nucleotidesFactory();
-    }
-
-    switch(something) {
-    case KIMURA1980:
-      return result.nucleotidesFactory();
-    case ACCORDANCE:
-      return result.proteinFactory();
-    case PAIR:
-      return result._proteinPairFactory;
-    case POLARITY:
-      return result.proteinFactory();
-    case POLARITYSIZE:
-      return result.proteinFactory();
-
-    default:
-      return result.nucleotidesFactory();    
-    }   
-   
     
-   }
+    return selectedRateMtx.getFactory();
+    
+  }
   
   /**
    * Reads the specifications of a PhylogeneticObservationFactory from a JSON file.

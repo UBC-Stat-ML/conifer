@@ -9,6 +9,7 @@ import blang.MCMCRunner;
 import blang.annotations.DefineFactor;
 import blang.factors.IIDRealVectorGenerativeFactor;
 import briefj.BriefIO;
+import briefj.opt.Option;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
@@ -22,10 +23,12 @@ import conifer.models.MultiCategorySubstitutionModel;
  */
 public class TestRealData extends MCMCRunner
 {
-
+  @Option()
+  public static RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZE;
+  
   @DefineFactor(onObservations = true)
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
-    UnrootedTreeLikelihood.fromFastaFile(new File("primates.fasta")).withExpFamMixture(ExpFamMixture.dnaGTR());
+    UnrootedTreeLikelihood.fromFastaFile(new File("primates.fasta"), selectedRateMtx).withExpFamMixture(ExpFamMixture.randomGTR(selectedRateMtx));
   
   @DefineFactor
   public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> priorOnParams =

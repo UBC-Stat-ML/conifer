@@ -21,6 +21,7 @@ import briefj.BriefIO;
 import briefj.opt.Option;
 import briefj.run.Results;
 import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
@@ -33,7 +34,7 @@ public class SimplePhyloModel extends MCMCRunner
   = new File("src/main/resources/conifer/sampleInput/FES_4.fasta");
 
   @Option()
-  public static String selectedRateMtx = "kimura1980()";
+  public static RateMtxNames selectedRateMtx = RateMtxNames.KIMURA1980;
 
   @DefineFactor(onObservations = true)
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 

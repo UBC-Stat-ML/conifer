@@ -28,7 +28,7 @@ import conifer.models.EvolutionaryModel;
 import conifer.models.EvolutionaryModelUtils;
 import conifer.models.LikelihoodComputationContext;
 import conifer.models.MultiCategorySubstitutionModel;
-
+import conifer.ctmc.expfam.RateMtxNames;
 
 /**
  * Many phylogenetic likelihoods can be viewed as a factor that connects a 
@@ -82,7 +82,7 @@ public class UnrootedTreeLikelihood
    * no data. Used mostly for simulation-based testing.
    * @return
    */
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmpty(int nSites, List<TreeNode> leaves, String selectedRateMtx)
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmpty(int nSites, List<TreeNode> leaves, RateMtxNames selectedRateMtx)
   {
     UnrootedTree tree = defaultTree(leaves);
     SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
@@ -98,7 +98,7 @@ public class UnrootedTreeLikelihood
    * @param fastaFile
    * @return
    */
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> fromFastaFile(File fastaFile, String selectedRateMtx)
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> fromFastaFile(File fastaFile, final RateMtxNames selectedRateMtx)
   {
     Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
     UnrootedTree tree = defaultTree(data.keySet());
@@ -181,12 +181,13 @@ public class UnrootedTreeLikelihood
   
   public static void main(String [] args)
   {
-    UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> ll = fromFastaFile(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"), "kimura()");
+    RateMtxNames selectedRateMtx = RateMtxNames.KIMURA1980;
+    UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> ll = fromFastaFile(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"), selectedRateMtx);
     System.out.println("nSites=" + ll.observations.nSites());
     System.out.println("nNodes=" + ll.tree.getTopology().vertexSet().size());
     Random rand = new Random(1);
     ll.evolutionaryModel.samplePosteriorPaths(rand, ll.observations, ll.tree, BriefCollections.pick(ll.tree.getTopology().vertexSet()), null);
     System.out.println("done!");
-//    ll.
+//    
   }
 }
