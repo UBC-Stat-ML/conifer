@@ -3,7 +3,7 @@ apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: 'download-task'
 apply plugin:'application'
-mainClassName = "[mainClass].Main"
+mainClassName = "SingleProteinModel.Main"
 
 import de.undercouch.gradle.tasks.download.Download
 
