@@ -1,29 +1,22 @@
 package conifer.factors;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Assert;
 import org.junit.Test;
-
-import com.beust.jcommander.internal.Sets;
-import com.google.common.collect.Lists;
-
-import conifer.TopologyUtils;
-import conifer.TreeNode;
-import conifer.UnrootedTree;
-import conifer.UnrootedTreeUtils;
-import conifer.UnrootedTreeUtils.Clade;
 
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
 import briefj.Indexer;
 import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
+import conifer.TopologyUtils;
+import conifer.TreeNode;
+import conifer.UnrootedTree;
+import conifer.UnrootedTreeUtils;
+import conifer.UnrootedTreeUtils.Clade;
 
 
 
@@ -53,13 +46,7 @@ public class TestGenerateUnrooted
     double truth = 1.0/biparts.size();
     // TODO: clean with a stat test
     for (Set<UnorderedPair<Clade, Clade>> key : biparts)
-    {
-//      if (Math.abs(truth - biparts.getCount(key))/truth > 0.1)
-//        System.out.println("" + truth + " vs " + biparts.getCount(key));
-//      else
-//        System.out.print(".");
       Assert.assertTrue(Math.abs(truth - biparts.getCount(key))/truth < 0.1);
-    }
   }
 
 }
