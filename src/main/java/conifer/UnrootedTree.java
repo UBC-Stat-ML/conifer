@@ -214,6 +214,8 @@ public class UnrootedTree
   
   /**
    * Reads the contents of the given file and parse it as a newick string.
+   * 
+   * @see {@link #fromNewickString(String) fromNewickStrin(String)}
    * @param f
    * @return
    */
@@ -224,6 +226,12 @@ public class UnrootedTree
   
   /**
    * Parse a tree from a string containing a newick specification.
+   * 
+   * Limitations:
+   * - Names of taxa should have no space, start with ["a"-"z","A"-"Z","_"], and have character from ["a"-"z","A"-"Z","_","-","0"-"9","."] for the rest
+   * - Leaves should be named (not required for internal)
+   * - Leaf names should be distrinct
+   * - All edges should have a branch length attached to it
    * 
    * For example: UnrootedTree.fromNewickString("((A:1.0,Z:2.0):3.0,(B:4.0,C:5.0):6.0,X:100);");
    * @param string

@@ -41,7 +41,7 @@ import conifer.io.newick.ParseException;
 public class UnrootedTreeUtils
 {
   /**
-   * See comments in UnrootedTree
+   * {@link conifer.UnrootedTree#fromNewickString(String) UnrootedTree.fromNewick()}
    * @param f
    * @return
    */
@@ -51,7 +51,7 @@ public class UnrootedTreeUtils
   }
   
   /**
-   * See comments in UnrootedTree
+   *{@link conifer.UnrootedTree#fromNewickString(String) UnrootedTree.fromNewick()}
    * @param f
    * @return
    */
