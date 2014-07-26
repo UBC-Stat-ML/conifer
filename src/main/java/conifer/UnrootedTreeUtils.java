@@ -63,6 +63,7 @@ public class UnrootedTreeUtils
       Tree<TreeNode> topo = parser.parse();
       Map<TreeNode,Double> bls = parser.getBranchLengths();
       UnrootedTree result = new UnrootedTree();
+      checkLeavesUnique(topo);
       process(result, topo, bls, null);
       return result;
     } catch (ParseException e)
@@ -71,6 +72,17 @@ public class UnrootedTreeUtils
     }
   }
   
+  private static void checkLeavesUnique(Tree<TreeNode> tree)
+  {
+    Set<TreeNode> leavesSoFar = Sets.newHashSet();
+    for (TreeNode leaf : tree.getDescendents())
+    {
+      if (leavesSoFar.contains(leaf))
+        throw new RuntimeException("Duplicated leaf: " + leaf);
+      leavesSoFar.add(leaf);
+    }
+  }
+
   private static void process(
       UnrootedTree result, Tree<TreeNode> topo,
       Map<TreeNode, Double> bls, TreeNode ancestor)
@@ -78,7 +90,12 @@ public class UnrootedTreeUtils
     TreeNode current = topo.getLabel();
     result.addNode(current);
     if (ancestor != null)
-      result.addEdge(ancestor, current, bls.get(current));
+    {
+      Double branchLength = bls.get(current);
+      if (branchLength == null)
+        throw new RuntimeException("Missing branch length for edge (" + ancestor + ", " + current + ")");
+      result.addEdge(ancestor, current, branchLength);
+    }
     for (Tree<TreeNode> child : topo.getChildren())
       process(result, child, bls, current);
   }
