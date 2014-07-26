@@ -79,7 +79,7 @@ public class SingleProteinModel implements Runnable, Processor
     factory.addProcessor(this);
     model = new Model();
     MCMCAlgorithm mcmc = factory.build(model, false);
-    mcmc.options.nMCMCSweeps=10000; 
+    mcmc.options.nMCMCSweeps=200; 
     mcmc.run();
   }
 
