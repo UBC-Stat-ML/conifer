@@ -61,6 +61,8 @@ public final class TreeNode
   
   private TreeNode(String description)
   {
+    if (description == null)
+      throw new RuntimeException("TreeNode description should not be null. For unlabelled nodes, use nextUnlabelled().");
     this.description = description;
     this.isLabelled = !description.startsWith(INTERNAL_PREFIX);
   }
