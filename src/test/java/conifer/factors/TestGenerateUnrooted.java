@@ -49,10 +49,17 @@ public class TestGenerateUnrooted
       
     }
     biparts.normalize();
+    
     double truth = 1.0/biparts.size();
     // TODO: clean with a stat test
     for (Set<UnorderedPair<Clade, Clade>> key : biparts)
+    {
+//      if (Math.abs(truth - biparts.getCount(key))/truth > 0.1)
+//        System.out.println("" + truth + " vs " + biparts.getCount(key));
+//      else
+//        System.out.print(".");
       Assert.assertTrue(Math.abs(truth - biparts.getCount(key))/truth < 0.1);
+    }
   }
 
 }

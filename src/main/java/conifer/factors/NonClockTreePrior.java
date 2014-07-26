@@ -85,7 +85,7 @@ public class NonClockTreePrior<P> implements GenerativeFactor
     UnrootedTree result = new UnrootedTree();
     
     List<TreeNode> shuffled = Lists.newArrayList(leaves);
-    Collections.shuffle(shuffled);
+    Collections.shuffle(shuffled, random);
     Queue<TreeNode> queue = Lists.newLinkedList(shuffled);
     
     if (queue.isEmpty())
