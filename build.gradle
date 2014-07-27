@@ -20,6 +20,11 @@ eclipse {
   }
 }
 
+test {
+  testLogging {
+    exceptionFormat = 'full'
+  }
+}
 
 task fetchDataFiles(type: Download) {
   src([
