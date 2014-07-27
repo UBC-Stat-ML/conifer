@@ -68,16 +68,21 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
     output.flush();
     current++;
     if (current == interval)
-    {
-      interval = interval * 2;
-      current = 0;
-      File 
-        indexFile = new File(output.getOutputFolder(), "CODAindex.txt"),
-        chainFile = new File(output.getOutputFolder(), "CODAchain1.txt");
-      CodaParser.CSVToCoda(indexFile, chainFile, output.getOutputFolder());
-      SimpleCodaPlots codaPlots = new SimpleCodaPlots(chainFile, indexFile);
-      codaPlots.toPDF(new File(output.getOutputFolder(), "codaPlots.pdf"));
-    }
+      try
+      {
+        interval = interval * 2;
+        current = 0;
+        File 
+          indexFile = new File(output.getOutputFolder(), "CODAindex.txt"),
+          chainFile = new File(output.getOutputFolder(), "CODAchain1.txt");
+        CodaParser.CSVToCoda(indexFile, chainFile, output.getOutputFolder());
+        SimpleCodaPlots codaPlots = new SimpleCodaPlots(chainFile, indexFile);
+        codaPlots.toPDF(new File(output.getOutputFolder(), "codaPlots.pdf"));
+      }
+      catch (Exception e)
+      {
+        System.err.println("Warning: plot not working because R not found.");
+      }
   }
 
   private void ensureInitialized(ProcessorContext context)
