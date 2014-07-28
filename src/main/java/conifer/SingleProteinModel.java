@@ -34,7 +34,7 @@ public class SingleProteinModel implements Runnable, Processor
    public File treeFile;
    
    @Option()
-   public static RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZE;
+   public static RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZEGTR;
 
    @OptionSet(name = "factory")
    public final MCMCFactory factory = new MCMCFactory();
