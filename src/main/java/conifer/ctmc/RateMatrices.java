@@ -31,6 +31,11 @@ public class RateMatrices
     return SimpleRateMatrix.fromResource("/conifer/ctmc/polaritySize.txt");
   }
 
+  public static SimpleRateMatrix polaritySizeGTR()
+  {
+    return SimpleRateMatrix.fromResource("/conifer/ctmc/polaritySizeGTR.txt");
+  }
+  
   public static SimpleRateMatrix rateMtxModel(final RateMtxNames selectedRateMtx)
   {
     SimpleRateMatrix rateMtx;

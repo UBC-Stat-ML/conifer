@@ -129,6 +129,28 @@ public enum RateMtxNames
       {
         return RateMatrices.polaritySize();
       }
+    },
+    POLARITYSIZEGTR {
+      @Override
+      public SerializedExpFamMixture getSerialized()
+      {
+        return SerializedExpFamMixture.polaritySizeGTR();
+      }
+      
+      public Indexer<String> getIndexer()
+      {
+        return proteinIndexer();
+      }
+      
+      public PhylogeneticObservationFactory getFactory()
+      {
+        return proteinFactory();
+      }
+      
+      public SimpleRateMatrix getRateMtx()
+      {
+        return RateMatrices.polaritySizeGTR();
+      }
     };
     
     public abstract  SerializedExpFamMixture getSerialized();
