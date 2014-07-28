@@ -43,7 +43,7 @@ import org.jblas.Eigen;
 public class EigenCTMC implements CTMC
 {
   private static final double THRESHOLD = 1e-6;
-  private final SimpleEigenDecomposition eigenDecomp; 
+  private final RateMatrix rateMtx; 
   private final double [] stationaryDistribution;
   private final double [][] rates;
 
@@ -59,50 +59,37 @@ public class EigenCTMC implements CTMC
  public EigenCTMC(double [][] rates)
   {
     RateMatrixUtils.checkValidRateMatrix(rates);
-     this.eigenDecomp = SimpleEigenDecomposition(rates); 
+     this.rateMtx = RateMatrix(rates); 
      this.stationaryDistribution = computeStationary();
      this.rates = rates;
      }
  
- public static SimpleEigenDecomposition SimpleEigenDecomposition(double [][] rates)
+ 
+  
+
+ 
+ public static RateMatrix RateMatrix(double [][] rates)
  {
-   Matrix ratesMatrix = new Matrix(rates);
-   EigenvalueDecomposition ed = new EigenvalueDecomposition(ratesMatrix);
-   Matrix V = ed.getV();
-   Matrix D =ed.getD();
-   Matrix Vinverse = V.inverse();
-   Matrix resultMatrix = V.times(D).times(V.inverse());
-   //check if result and rates are close enough
-   SimpleMatrix trueMatrix = new SimpleMatrix(rates);
-   SimpleMatrix calculatedMatrix = new SimpleMatrix(resultMatrix.getArray()) ;
-   if(EJMLUtils.isClose(trueMatrix, calculatedMatrix, THRESHOLD))
-   {
-     return new SimpleEigenDecomposition(V, D, Vinverse);
-   }else{
-     throw new RuntimeException();
-     }
+   DoubleMatrix ratesMatrix = new DoubleMatrix(rates);
+   return new RateMatrix(rates);
+   
    
  }
-  
  
  
- 
- public static class SimpleEigenDecomposition
+ public static class RateMatrix
  {
-   public final Matrix V, D, Vinverse, calculatedRateMtx;
+   public final DoubleMatrix rateMtx;
 
-   public SimpleEigenDecomposition(Matrix v, Matrix d,
-       Matrix vinverse)
+   public RateMatrix(double [][] rates)
    {
-     V = v;
-     D = d;
-     Vinverse = vinverse;
-     calculatedRateMtx=V.times(D).times(V.inverse());
+     rateMtx = new DoubleMatrix(rates);
    }
    
  }
 
-  
+ 
+
   
   
   /**
@@ -153,9 +140,9 @@ public class EigenCTMC implements CTMC
   public double [][] marginalTransitionProbability(double branchLength)
   {
 
-    DoubleMatrix rateMtx = new DoubleMatrix(eigenDecomp.calculatedRateMtx.getArray());
-    rateMtx.muli(branchLength);
-    double [][] result = MatrixFunctions.expm(rateMtx).toArray2();
+    DoubleMatrix rateMtxTmp = new DoubleMatrix(rateMtx.rateMtx.toArray2());
+    rateMtxTmp.muli(branchLength);
+    double [][] result = MatrixFunctions.expm(rateMtxTmp).toArray2();
     NumericalUtils.checkIsTransitionMatrix(result);
    
     for (int row = 0; row < result.length; row++)
