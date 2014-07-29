@@ -75,7 +75,7 @@ public class UnrootedTreeUtils
   private static void checkLeavesUnique(Tree<TreeNode> tree)
   {
     Set<TreeNode> leavesSoFar = Sets.newHashSet();
-    for (TreeNode leaf : tree.getDescendents())
+    for (TreeNode leaf : tree.getLeaves())
     {
       if (leavesSoFar.contains(leaf))
         throw new RuntimeException("Duplicated leaf: " + leaf);

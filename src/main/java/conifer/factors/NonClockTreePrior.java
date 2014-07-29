@@ -170,8 +170,14 @@ public class NonClockTreePrior<P> implements GenerativeFactor
   
   public static NonClockTreePrior<RateParameterization> on(UnrootedTree tree)
   {
-    Exponential<RateParameterization> branchDist = Exponential.on(RealVariable.real());
+    Exponential<RateParameterization> branchDist = Exponential.newExponential(); //on(RealVariable.real());
     return new NonClockTreePrior<RateParameterization>(tree,branchDist.parameters, branchDist);
+  }
+  
+  public NonClockTreePrior<RateParameterization> withExponentialRate(double rate)
+  {
+    Exponential<RateParameterization> branchDist = Exponential.newExponential().withRate(rate);
+    return new NonClockTreePrior<RateParameterization>(tree, branchDist.parameters, branchDist);
   }
 
   /**
