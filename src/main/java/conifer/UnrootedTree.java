@@ -24,6 +24,7 @@ import conifer.moves.SingleBranchScaling;
 import conifer.moves.SingleNNI;
 import conifer.processors.TotalTreeLengthProcessor;
 import conifer.processors.TreeDiameterProcessor;
+import conifer.processors.TreeDistanceProcessor;
 
 
 /**
@@ -40,7 +41,8 @@ import conifer.processors.TreeDiameterProcessor;
 })
 @Processors({
   TotalTreeLengthProcessor.class,
-  TreeDiameterProcessor.class
+  TreeDiameterProcessor.class,
+  TreeDistanceProcessor.class
 })
 public class UnrootedTree
 {
