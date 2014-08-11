@@ -10,7 +10,7 @@ import conifer.TreeNode;
  * Observations can be simple discrete traits, but could also
  * be backed by an alignment to be resampled.
  * 
- * Continuous traits might be another later possibility later on.
+ * Continuous traits might be another later possibility.
  */
 public interface TreeObservations
 {
