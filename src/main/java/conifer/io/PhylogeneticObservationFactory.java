@@ -1,6 +1,7 @@
 package conifer.io;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +35,7 @@ import com.google.gson.Gson;
  * an ambiguous symbol.
  * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
- *
+ * @author Sohrab Salehi (sohrab.salehi@gmail.com)
  */
 public class PhylogeneticObservationFactory
 {
@@ -161,6 +162,24 @@ public class PhylogeneticObservationFactory
     return _indicators;
   }
  
+  /**
+   * 
+   * @return Inverse of getIndicators(), with string value of the indicator arrays as keys and the 
+   * string chunk as values.
+   *  
+   */
+  public Map<String,String> getIndicator2ChunkMap() 
+  {
+	  Map<String, String> a2s = Maps.newHashMap();
+	  // TODO: this will not include U, as it comes after T, what could be done for not 1-to-1 relations?
+	  for (Map.Entry<String, double[]> e : this.getIndicators().entrySet()) {
+		  if (e.getKey() != "U")
+			  a2s.put(Arrays.toString(e.getValue()), e.getKey());
+	  }
+	  
+	  return a2s;
+  }
+  
   private final List<String> orderedSymbols;
   private final Map<String, Set<String>> ambiguousSymbols;
   private final boolean caseSensitive;

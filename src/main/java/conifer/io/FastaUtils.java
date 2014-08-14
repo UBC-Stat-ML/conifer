@@ -1,8 +1,12 @@
 package conifer.io;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 
 import briefj.BriefIO;
 
@@ -49,34 +53,35 @@ public class FastaUtils
 			}
 		}
 
-
 		return map;
 	}
 
 	/**
 	 * Currently assumes that the alphabet order is ACGT 
 	 * @param observations
+	 * @throws IOException 
 	 */
-	public static void writeFasta(TreeObservations observations) {
+	public static String writeFasta(TreeObservations observations, File outFile) throws IOException 
+	{
+		// get the alphabet map
+		Map<String,String> a2s = PhylogeneticObservationFactory.nucleotidesFactory().getIndicator2ChunkMap();
+
 		StringBuilder result = new StringBuilder();
 		for (TreeNode node : observations.getObservedTreeNodes()) {
-			result.append(">" + node + System.lineSeparator());
+			result.append(">" + node + "\n");
 			double[][] s = (double[][]) observations.get(node);
-			// TODO: get the alphabet order from the model
-			char[] alphabet = {'A', 'C', 'G', 'T'};
 			char charAtSite = 'N';
 			for (int j = 0; j < s.length; j++) {
-				for (int k = 0; k < s[j].length; k++) {
-					if (s[j][k] != 0.0) {
-						charAtSite = alphabet[k];
-					}
-				}
+				charAtSite = a2s.get(Arrays.toString(s[j])).charAt(0);
 				result.append(charAtSite);
 			}
-			result.append(System.lineSeparator());
+			result.append("\n");
 		}
 		
-	System.out.println("-----------------");
-	System.out.println(result.toString());
+		FileUtils.writeStringToFile(outFile, result.toString());
+
+		return result.toString();
 	}
+
+
 }

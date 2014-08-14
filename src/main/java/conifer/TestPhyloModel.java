@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 
+import com.google.common.collect.BiMap;
 import com.google.common.collect.Maps;
 
 import bayonet.distributions.Exponential;
@@ -36,6 +39,7 @@ import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.io.FastaUtils;
+import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.moves.AllBranchesScaling;
@@ -62,7 +66,7 @@ public class TestPhyloModel implements Runnable, Processor
 	public int burnIn = (int) Math.round(.1 * nMCMCSweeps);
 
 	@Option
-	public int thinningPeriod = 10;
+	public int thinningPeriod = 20;
 
 	@Option
 	public String phyloModel = "GTR";
@@ -71,6 +75,9 @@ public class TestPhyloModel implements Runnable, Processor
 	public final MCMCFactory factory = new MCMCFactory();
 
 
+	@Option
+	public int nSites = 10;
+	
 	public class Model
 	{
 		List<TreeNode> leaves = Arrays.asList(
@@ -82,7 +89,7 @@ public class TestPhyloModel implements Runnable, Processor
 		@DefineFactor(onObservations = true)
 
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
-		UnrootedTreeLikelihood.createEmpty(5, leaves)
+		UnrootedTreeLikelihood.createEmpty(nSites, leaves)
 		//.fromFastaFile(new File(alignmentFilePath))
 		.withExpFamMixture(ExpFamMixture.kimura1980());
 		//	.withTree(new File(initialTreeFilePath));
@@ -179,6 +186,7 @@ public class TestPhyloModel implements Runnable, Processor
 
 	public MCMCAlgorithm initForwardSampling() {
 		factory.addProcessor(this);
+		//factory.mcmcOptions.random = new Random(2000);
 		factory.mcmcOptions.nMCMCSweeps = nMCMCSweeps;
 		factory.mcmcOptions.burnIn = burnIn;
 		factory.mcmcOptions.thinningPeriod = thinningPeriod;
@@ -229,33 +237,56 @@ public class TestPhyloModel implements Runnable, Processor
 		//		Mains.instrumentedRun(args, new TestPhyloModel());
 
 		// do forward sampling of this model
+		//System.out.println(results.toString());
+		makeSyntheticData();
+		
+	}
+	
+	public static void makeSyntheticData() {
 		List realizations = new ArrayList();
 		TestPhyloModel runner = new TestPhyloModel();
 		MCMCAlgorithm algo = runner.initForwardSampling();
 		ForwardSampler f = new ForwardSampler(algo.model);
 
-		// TODO: convert the output to a FASTA File
+		int nSteps = 1;
 		Map<Object,List<Double>> results = Maps.newHashMap();
 		System.out.println(runner.model.likelihood.observations.toString());
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < nSteps; i++) {
 			f.simulate(algo.options.random);
 			collectValues(algo, results);
 			realizations.add(runner.model.likelihood.observations.toString());
-			System.out.println(runner.model.likelihood.observations.toString());
-			FastaUtils.writeFasta(runner.model.likelihood.observations);
+			runner.writeTree(runner.model.likelihood.tree);
+			//System.out.println(runner.model.likelihood.observations.toString());
+			try {
+				FastaUtils.writeFasta(runner.model.likelihood.observations, 
+						Results.getFileInResultFolder("SimulatedData.fasta"));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		TreeObservations observations = runner.model.likelihood.observations;
 		// TODO: get the rest of the simulation parameters (total_branch_length?)
-		System.out.println("------------------------------");
-		System.out.println(results.toString());
+		System.out.println("Total BranchLength: " + UnrootedTreeUtils.totalTreeLength((runner.model.likelihood.tree)));
+		// TODO: get the tree topology
+		System.out.println(results);
 		
-		
-		
-
 	}
-
+	
+	public void writeTree(UnrootedTree tree) {
+		PrintWriter theWriter = BriefIO.output(Results.getFileInResultFolder("SimulatedDataTree.newick"));
+		theWriter.println(tree.toNewick());
+		theWriter.flush();
+	}
+	
 	public static void collectValues(MCMCAlgorithm mcmc, Map<Object,List<Double>> values) {
+		
+		for (Object var: mcmc.model.getLatentVariables()) {
+			System.out.println(var.toString());
+			System.out.println(mcmc.model.getName(var));
+		}
+		
 		for (RealValued realValuedVariable : mcmc.model.getLatentVariables(RealValued.class))
 			BriefMaps.getOrPutList(values, 
 					mcmc.model.getName(realValuedVariable)).add(realValuedVariable.getValue());
