@@ -44,6 +44,7 @@ import conifer.io.TreeObservations;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.moves.AllBranchesScaling;
 import conifer.moves.PhyloHMCMove;
+import conifer.moves.SPRMove;
 import conifer.moves.SingleBranchScaling;
 import conifer.moves.SingleNNI;
 
@@ -60,13 +61,13 @@ public class TestPhyloModel implements Runnable, Processor
 	public String alignmentFilePath = "";
 
 	@Option
-	public int nMCMCSweeps = 10000;
+	public int nMCMCSweeps = 100;
 
 	@Option
 	public int burnIn = (int) Math.round(.1 * nMCMCSweeps);
 
 	@Option
-	public int thinningPeriod = 20;
+	public int thinningPeriod = 10;
 
 	@Option
 	public String phyloModel = "GTR";
@@ -76,8 +77,8 @@ public class TestPhyloModel implements Runnable, Processor
 
 
 	@Option
-	public int nSites = 10;
-	
+	public int nSites = 500;
+
 	public class Model
 	{
 		List<TreeNode> leaves = Arrays.asList(
@@ -87,12 +88,11 @@ public class TestPhyloModel implements Runnable, Processor
 				TreeNode.withLabel("Orangutan"));
 
 		@DefineFactor(onObservations = true)
-
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
-		UnrootedTreeLikelihood.createEmpty(nSites, leaves)
-		//.fromFastaFile(new File(alignmentFilePath))
-		.withExpFamMixture(ExpFamMixture.kimura1980());
-		//	.withTree(new File(initialTreeFilePath));
+		UnrootedTreeLikelihood//.createEmpty(nSites, leaves)
+		.fromFastaFile(new File(alignmentFilePath))
+		.withExpFamMixture(ExpFamMixture.kimura1980())
+		.withTree(new File(initialTreeFilePath));
 
 		@DefineFactor
 		NonClockTreePrior<RateParameterization> treePrior = 
@@ -114,43 +114,51 @@ public class TestPhyloModel implements Runnable, Processor
 	// we can build different models here and instantiate them according to the input parameter
 	// in the run block.
 
-
 	// Note: only instantiate this in run to avoid problems with command line argument parsing
 	public Model model;
 
-	private final PrintWriter treeWriter = BriefIO.output(Results.getFileInResultFolder("FES.trees.newick"));
-
-	private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
+	private PrintWriter treeWriter;
+	private PrintWriter detailWriter;
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run()
 	{
 		System.out.println("Running the newest version...");
+		treeWriter = BriefIO.output(Results.getFileInResultFolder("FES.trees.newick"));
+		detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
 
+		
 		logToFile("Over AlignmentFile:" + getAlignmentFile());
-
+		
 		factory.addProcessor(this);
 		factory.mcmcOptions.nMCMCSweeps = nMCMCSweeps;
 		factory.mcmcOptions.burnIn = burnIn;
+		factory.mcmcOptions.CODA = true;
 		factory.mcmcOptions.thinningPeriod = thinningPeriod;
 
 		// reference bug http://stackoverflow.com/questions/4829576/javac-error-inconvertible-types-with-generics
-
+		
+		// Fixed topology, , latent branch length
+//		factory.excludeNodeMove((Class<? extends Move>) (Object)SingleNNI.class);
+//		factory.excludeNodeMove(SPRMove.class);
+		
+		// Fixed topology, fixed branch length
+		//factory.excludeNodeMove((Class<? extends Move>) (Object)SingleBranchScaling.class);
+		//factory.excludeNodeMove(AllBranchesScaling.class);
+		
 		//factory.excludeNodeMove((Class<? extends Move>) (Object)SingleBranchScaling.class);
 		//factory.excludeNodeMove(AllBranchesScaling.class);
 		//factory.excludeNodeMove(PhyloHMCMove.class);
 		//factory.excludeNodeMove((Class<? extends Move>) (Object)SingleNNI.class);
 		//factory.excludeNodeMove((Class<? extends Move>) (Object)RealVectorMHProposal.class);
-
+		
 		model = new Model();
 		MCMCAlgorithm mcmc = factory.build(model, false);
 		System.out.println(mcmc.model);
 
 		long startTime = System.currentTimeMillis();
 		String excluding = "GTR-Excluding all but SPR move";
-
-
 
 		// log experiment information
 		logToFile("Experiment Title:" + excluding);
@@ -190,7 +198,7 @@ public class TestPhyloModel implements Runnable, Processor
 		factory.mcmcOptions.nMCMCSweeps = nMCMCSweeps;
 		factory.mcmcOptions.burnIn = burnIn;
 		factory.mcmcOptions.thinningPeriod = thinningPeriod;
-
+		
 		// reference bug http://stackoverflow.com/questions/4829576/javac-error-inconvertible-types-with-generics
 
 		//factory.excludeNodeMove((Class<? extends Move>) (Object)SingleBranchScaling.class);
@@ -216,32 +224,30 @@ public class TestPhyloModel implements Runnable, Processor
 		//				new File("/Users/sohrab/project/conifer/results/all/2014-07-22-12-03-35-E0EbIo6x.exec/FESConsensusTree.Nexus"));
 		//		return;
 
-		//		System.out.println("Running the newest version...");
-		//		
-		//		args = new String[4];
-		//		args[0] = "-initialTreeFilePath";
-		//		args[1] = "/Users/sohrab//project/conifer/src/main/resources/conifer/sampleInput/FES.ape.4.nwk";
-		//		args[2] = "-alignmentFile";
-		//		args[3] = "/Users/sohrab/project/conifer/src/main/resources/conifer/sampleInput/FES_4.fasta";
-		//		
-		//		//args = new String[1];
-		//		//args[0] = "-help";
-		//		
-		//		// TODO: remove this
-		//		for (int i = 0; i < args.length; i++) {
-		//			System.out.println(args[i]);	
-		//		}
-		//		
-		//		System.out.println(args.length);
-		//		
-		//		Mains.instrumentedRun(args, new TestPhyloModel());
+		System.out.println("Running the newest version...");
 
-		// do forward sampling of this model
-		//System.out.println(results.toString());
-		makeSyntheticData();
+		args = new String[4];
+		args[0] = "-initialTreeFilePath";
+		args[1] = "/Users/sohrab/project/conifer/src/main/resources/conifer/sampleInput/FES.ape.4.nwk";
+		args[2] = "-alignmentFile";
+		args[3] = "/Users/sohrab/project/conifer/src/main/resources/conifer/sampleInput/FES_4.fasta";
+
+		//args = new String[1];
+		//args[0] = "-help";
+
+		// TODO: remove this
+		for (int i = 0; i < args.length; i++) {
+			System.out.println(args[i]);	
+		}
+
+		System.out.println(args.length);
+
+		Mains.instrumentedRun(args, new TestPhyloModel());
 		
+		// TODO: test if all topologies are the same
+		// TODO: test if all branch lengths are the same/different 
 	}
-	
+
 	public static void makeSyntheticData() {
 		List realizations = new ArrayList();
 		TestPhyloModel runner = new TestPhyloModel();
@@ -271,22 +277,22 @@ public class TestPhyloModel implements Runnable, Processor
 		System.out.println("Total BranchLength: " + UnrootedTreeUtils.totalTreeLength((runner.model.likelihood.tree)));
 		// TODO: get the tree topology
 		System.out.println(results);
-		
+
 	}
-	
+
 	public void writeTree(UnrootedTree tree) {
 		PrintWriter theWriter = BriefIO.output(Results.getFileInResultFolder("SimulatedDataTree.newick"));
 		theWriter.println(tree.toNewick());
 		theWriter.flush();
 	}
-	
+
 	public static void collectValues(MCMCAlgorithm mcmc, Map<Object,List<Double>> values) {
-		
+
 		for (Object var: mcmc.model.getLatentVariables()) {
 			System.out.println(var.toString());
 			System.out.println(mcmc.model.getName(var));
 		}
-		
+
 		for (RealValued realValuedVariable : mcmc.model.getLatentVariables(RealValued.class))
 			BriefMaps.getOrPutList(values, 
 					mcmc.model.getName(realValuedVariable)).add(realValuedVariable.getValue());
@@ -296,13 +302,13 @@ public class TestPhyloModel implements Runnable, Processor
 
 		for (RealValued realValuedProcessor : ReflexionUtils.sublistOfGivenType(mcmc.processors, RealValued.class))
 			BriefMaps.getOrPutList(values, realValuedProcessor).add(realValuedProcessor.getValue());
-			*/
-		
+		 */
 	}
 
 	@Override
 	public void process(ProcessorContext context)
 	{
+		System.out.println("Writing the tree...");
 		treeWriter.println(model.likelihood.tree.toNewick());
 		treeWriter.flush();
 	}

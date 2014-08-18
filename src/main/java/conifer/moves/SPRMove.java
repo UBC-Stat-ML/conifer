@@ -79,7 +79,7 @@ public class SPRMove extends NodeMove
     if (remRootThirdLen == 0.0 || newRootRemRootLen == 0.0)
       throw new RuntimeException("SPR does not support zero branch lengths.");
     
-    // compute the factor graphs (one per potentical category) for the subtree, and run the sum product on these
+    // compute the factor graphs (one per potential category) for the subtree, and run the sum product on these
     // TODO: consider more than one stem lengths
     EvolutionaryModel evolutionaryModel = treeLikelihood.evolutionaryModel;
     List<UnaryFactor<TreeNode>> prunedSubtreeMarginals = EvolutionaryModelUtils.getRootMarginalsFromFactorGraphs(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, prunedSubtree, removedRoot, treeLikelihood.observations), removedRoot);

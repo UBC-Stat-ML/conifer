@@ -34,10 +34,10 @@ import conifer.processors.TreeDistanceProcessor;
  *
  */
 @Samplers({
-  SingleNNI.class, 
-  SingleBranchScaling.class,
-  AllBranchesScaling.class,
-  SPRMove.class
+  SingleNNI.class, 				// only topology
+  SingleBranchScaling.class, // only branch length
+  AllBranchesScaling.class, // affect only branch length
+  SPRMove.class				// only topology
 })
 @Processors({
   TotalTreeLengthProcessor.class,

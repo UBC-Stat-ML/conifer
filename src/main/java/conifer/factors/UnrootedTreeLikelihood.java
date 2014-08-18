@@ -53,6 +53,7 @@ public class UnrootedTreeLikelihood
   /**
    * 
    */
+  // TODO: @Sohrab, is this the best way to supress sampling of the tree (fixed topology and branch lenght?)
   @FactorArgument
   public final UnrootedTree tree;
   

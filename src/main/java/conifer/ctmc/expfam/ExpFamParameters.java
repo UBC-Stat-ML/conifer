@@ -1,5 +1,6 @@
 package conifer.ctmc.expfam;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.Lists;
@@ -130,5 +131,21 @@ public class ExpFamParameters implements RealVectorInterface
   public int getDim()
   {
     return globalExponentialFamily.nFeatures();
+  }
+  
+  @Override
+  /**
+   * Row major traverse. ACGT
+   */
+  public String toString() {
+	  double[][] rateMatrix = this.getRateMatrix(0);
+	  
+//	  for (int i = 0; i < rateMatrix.length; i++) {
+//		  for (int j = 0; j < rateMatrix[i].length; j++) {
+//			  System.out.println(rateMatrix[i][j]);
+//		  }
+//	  }
+	  
+	  return "RateMatrix [rateMatrix=" + Arrays.deepToString(rateMatrix) + "]";
   }
 }

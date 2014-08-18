@@ -30,7 +30,7 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
 {
   private ExpFamParameters parameters;
   private OutputManager output = null;
-  private int interval = 2;
+  private int interval = 11;
   private int current = 0;
 
   @Override
