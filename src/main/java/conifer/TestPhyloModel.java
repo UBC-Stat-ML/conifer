@@ -5,14 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
-import org.apache.commons.io.FileUtils;
-
-import com.google.common.collect.BiMap;
 import com.google.common.collect.Maps;
 
 import bayonet.distributions.Exponential;
@@ -23,14 +18,11 @@ import blang.MCMCAlgorithm;
 import blang.MCMCFactory;
 import blang.annotations.DefineFactor;
 import blang.factors.IIDRealVectorGenerativeFactor;
-import blang.mcmc.Move;
-import blang.mcmc.RealVectorMHProposal;
 import blang.processing.Processor;
 import blang.processing.ProcessorContext;
 import blang.variables.RealValued;
 import briefj.BriefIO;
 import briefj.BriefMaps;
-import briefj.ReflexionUtils;
 import briefj.opt.Option;
 import briefj.opt.OptionSet;
 import briefj.run.Mains;
@@ -39,14 +31,8 @@ import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.io.FastaUtils;
-import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
 import conifer.models.MultiCategorySubstitutionModel;
-import conifer.moves.AllBranchesScaling;
-import conifer.moves.PhyloHMCMove;
-import conifer.moves.SPRMove;
-import conifer.moves.SingleBranchScaling;
-import conifer.moves.SingleNNI;
 
 
 
