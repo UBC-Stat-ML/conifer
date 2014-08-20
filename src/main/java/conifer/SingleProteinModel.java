@@ -3,6 +3,10 @@ package conifer;
 import java.io.File;
 import java.util.Random;
 
+import org.apache.commons.io.FileUtils;
+
+import com.sun.media.jai.codecimpl.util.ImagingException;
+
 import bayonet.distributions.Normal.MeanVarianceParameterization;
 import blang.ForwardSampler;
 import blang.MCMCAlgorithm;
@@ -19,9 +23,13 @@ import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
+import conifer.moves.PhyloHMCMove;
 import briefj.run.Mains;
+import briefj.run.Results;
 import blang.processing.ProcessorContext;
 import briefj.OutputManager;
+
+import java.io.IOException;
 
 
 
@@ -32,6 +40,12 @@ public class SingleProteinModel implements Runnable, Processor
 
    @Option(gloss="File of the tree topology")
    public File treeFile;
+   
+   @Option(gloss="Indicator of whether to exclude HMC move")
+   public boolean isExcluded;
+   
+   @Option(gloss="band width of weight in MCMC")
+   public int bandWidth;
    
    @Option()
    public static RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZEGTR;
@@ -77,13 +91,22 @@ public class SingleProteinModel implements Runnable, Processor
   public void run()
   {
     factory.addProcessor(this);
+    if(isExcluded)
+    {
+      factory.excludeNodeMove(PhyloHMCMove.class);
+    }
     model = new Model();
     MCMCAlgorithm mcmc = factory.build(model, false);
-    mcmc.options.nMCMCSweeps=100000; 
+    mcmc.options.nMCMCSweeps = 100000; 
+    mcmc.options.burnIn = (int) Math.round(.1 * factory.mcmcOptions.nMCMCSweeps);
     mcmc.run();
-  }
+    //File newDirectory = new File(Results.getResultFolder().getParent() + "isExcludedHMCMove" + isExcluded + Results.getResultFolder().getName() + "." + System.currentTimeMillis());
+    //newDirectory.mkdir();
+    //FileUtils.copyDirectory(Results.getResultFolder(), newDirectory);
+    
+     }
 
- public static void main(String [] args)
+ public static void main(String [] args) 
   {
     Mains.instrumentedRun(args, new SingleProteinModel());
   }

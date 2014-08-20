@@ -13,6 +13,8 @@ import blang.variables.RealVectorInterface;
 
 public class RealVectorMHProposal implements MHProposalDistribution
 {
+  public int bandWidth;
+  
   @SampledVariable RealVectorInterface variable;
   
   @ConnectedFactor List<Factor> connectedFactors;
@@ -29,7 +31,7 @@ public class RealVectorMHProposal implements MHProposalDistribution
     savedValue = variableArray.clone();
     
     for (int i = 0; i < variableArray.length; i++)
-      variableArray[i] += 0.01 * rand.nextGaussian();
+      variableArray[i] += bandWidth * rand.nextGaussian();
     variable.setVector(variableArray);
     
     return new ProposalRealization();
