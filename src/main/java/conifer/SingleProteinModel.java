@@ -45,7 +45,7 @@ public class SingleProteinModel implements Runnable, Processor
    public boolean isExcluded;
    
    @Option(gloss="band width of weight in MCMC")
-   public int bandWidth;
+   public double bandWidth;
    
    @Option()
    public static RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZEGTR;
@@ -97,12 +97,19 @@ public class SingleProteinModel implements Runnable, Processor
     }
     model = new Model();
     MCMCAlgorithm mcmc = factory.build(model, false);
-    mcmc.options.nMCMCSweeps = 100000; 
+    mcmc.options.nMCMCSweeps = 100; 
     mcmc.options.burnIn = (int) Math.round(.1 * factory.mcmcOptions.nMCMCSweeps);
     mcmc.run();
-    //File newDirectory = new File(Results.getResultFolder().getParent() + "isExcludedHMCMove" + isExcluded + Results.getResultFolder().getName() + "." + System.currentTimeMillis());
-    //newDirectory.mkdir();
-    //FileUtils.copyDirectory(Results.getResultFolder(), newDirectory);
+    File newDirectory = new File(Results.getResultFolder().getParent() + "isExcludedHMCMove" + isExcluded + bandWidth+selectedRateMtx+Results.getResultFolder().getName() + "." + System.currentTimeMillis());
+    newDirectory.mkdir();
+    try
+    {
+      FileUtils.copyDirectory(Results.getResultFolder(), newDirectory);
+    } catch (IOException e)
+    {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
     
      }
 
