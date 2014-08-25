@@ -97,7 +97,7 @@ public class SingleProteinModel implements Runnable, Processor
     }
     model = new Model();
     MCMCAlgorithm mcmc = factory.build(model, false);
-    mcmc.options.nMCMCSweeps = 100; 
+    mcmc.options.nMCMCSweeps = 100000; 
     mcmc.options.burnIn = (int) Math.round(.1 * factory.mcmcOptions.nMCMCSweeps);
     mcmc.run();
     File newDirectory = new File(Results.getResultFolder().getParent() + "isExcludedHMCMove" + isExcluded + bandWidth+selectedRateMtx+Results.getResultFolder().getName() + "." + System.currentTimeMillis());
