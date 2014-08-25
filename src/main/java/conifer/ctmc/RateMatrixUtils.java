@@ -1,6 +1,9 @@
 package conifer.ctmc;
 
+import org.ejml.simple.SimpleMatrix;
+
 import bayonet.distributions.Multinomial;
+import bayonet.math.EJMLUtils;
 import bayonet.math.NumericalUtils;
 
 
@@ -8,7 +11,7 @@ import bayonet.math.NumericalUtils;
  * Utilities for rate matrices.
  * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
- *
+ * @author Sean Jewell (jewellsean@gmail.com)
  */
 public class RateMatrixUtils
 {
@@ -105,4 +108,25 @@ public class RateMatrixUtils
     
     return result;
   }
+  
+  /**
+   * Normalize a rate matrix so that the expected number of transitions in 
+   * unit time is 1. 
+   * 
+   */
+  public static void normalize(double [][] rate)
+  {
+    double[] stationaryDistribution = (new EigenCTMC(rate)).stationaryDistribution();
+    double normConstant = 0; 
+    
+    for(int i = 0; i < rate[0].length; i++)
+    {
+      normConstant -= stationaryDistribution[i] * rate[i][i];
+    }
+    
+   rate = EJMLUtils.copyMatrixToArray(
+        (new SimpleMatrix(rate)).divide(normConstant)); 
+  }
+  
+   
 }
