@@ -1,6 +1,5 @@
 package conifer.models;
 
-import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
 
 // TODO: add checks on the valid value of copy numbers
 public class CNPair {

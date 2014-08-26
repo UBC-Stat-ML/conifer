@@ -59,7 +59,7 @@ public class SimplePhyloModel extends MCMCRunner
 	public static void main(String [] args) throws ClassNotFoundException, IOException
 	{
 		SimplePhyloModel runner = new SimplePhyloModel();
-		runner.factory.mcmcOptions.nMCMCSweeps = 1000;
+		runner.factory.mcmcOptions.nMCMCSweeps = 100;
 		runner.factory.mcmcOptions.burnIn = (int) Math.round(.1 * runner.factory.mcmcOptions.nMCMCSweeps);
 		
 		// run
