@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import briefj.BriefIO;
+import briefj.Indexer;
 import conifer.models.CNPair;
 
 import com.google.common.collect.Maps;
@@ -93,6 +94,8 @@ public class CNParser {
 			}
 		}
 		
-		
+		// example of an indexer
+		Indexer<CNPair> indexer = Indexers.CNPairIndexer();
+		System.out.println(indexer.i2o(5));
 	}
 }

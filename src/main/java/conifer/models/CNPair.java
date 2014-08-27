@@ -1,5 +1,7 @@
 package conifer.models;
 
+import conifer.io.CNObservationFactory;
+
 
 // TODO: add checks on the valid value of copy numbers
 public class CNPair {
@@ -13,6 +15,9 @@ public class CNPair {
 	public CNPair(int ra, int rA) {
 		
 		if (ra < 0 || rA < 0) throw new RuntimeException("Counts can't be negative.");
+		if (ra > CNObservationFactory.maximumNormalCopyNumber || rA > CNObservationFactory.maximumMutantCopyNumber) 
+			throw new RuntimeException("Counts can't be over " + CNObservationFactory.maximumMutantCopyNumber);
+		
 		
 		this.ra = ra;
 		this.rA = rA;
