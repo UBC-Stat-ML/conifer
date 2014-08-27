@@ -1,6 +1,7 @@
 package conifer;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
@@ -24,9 +25,11 @@ import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.moves.PhyloHMCMove;
+import conifer.moves.RealVectorMHProposal;
 import briefj.run.Mains;
 import briefj.run.Results;
 import blang.processing.ProcessorContext;
+import briefj.BriefIO;
 import briefj.OutputManager;
 
 import java.io.IOException;
@@ -44,8 +47,8 @@ public class SingleProteinModel implements Runnable, Processor
    @Option(gloss="Indicator of whether to exclude HMC move")
    public boolean isExcluded;
    
-   @Option(gloss="band width of weight in MCMC")
-   public double bandWidth;
+//   @Option(gloss="band width of weight in MCMC")
+//   public double bandWidth;
    
    @Option()
    public static RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZEGTR;
@@ -53,6 +56,8 @@ public class SingleProteinModel implements Runnable, Processor
    @OptionSet(name = "factory")
    public final MCMCFactory factory = new MCMCFactory();
   
+   @Option(gloss="Bandwidth of proposal for vectors in MCMC")
+   public double bandwidth = 0.01;
   
   public class Model
   {
@@ -69,7 +74,8 @@ public class SingleProteinModel implements Runnable, Processor
     .iidNormalOn(likelihood1.evolutionaryModel.rateMatrixMixture.parameters);
   }
   
-  
+  private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
+
 // The topology of the tree is fixed so that I don't put a prior on the tree topology
 // @DefineFactor
 // NonClockTreePrior<RateParameterization> treePrior1 = 
@@ -90,17 +96,20 @@ public class SingleProteinModel implements Runnable, Processor
 
   public void run()
   {
+    RealVectorMHProposal.bandWidth = bandwidth;
     factory.addProcessor(this);
+    model = new Model();
+    long startTime = System.currentTimeMillis();
     if(isExcluded)
     {
       factory.excludeNodeMove(PhyloHMCMove.class);
     }
-    model = new Model();
     MCMCAlgorithm mcmc = factory.build(model, false);
     mcmc.options.nMCMCSweeps = 100000; 
     mcmc.options.burnIn = (int) Math.round(.1 * factory.mcmcOptions.nMCMCSweeps);
     mcmc.run();
-    File newDirectory = new File(Results.getResultFolder().getParent() + "isExcludedHMCMove" + isExcluded + bandWidth+selectedRateMtx+Results.getResultFolder().getName() + "." + System.currentTimeMillis());
+    logToFile("Total time in minutes: " + ((System.currentTimeMillis() - startTime)/60000.0));
+    File newDirectory = new File(Results.getResultFolder().getParent() + "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+Results.getResultFolder().getName());
     newDirectory.mkdir();
     try
     {
@@ -123,5 +132,10 @@ public class SingleProteinModel implements Runnable, Processor
   {
     
   }
+  public void logToFile(String someline) {
+    this.detailWriter.println(someline);
+    this.detailWriter.flush();
+  }
+
 
 }
