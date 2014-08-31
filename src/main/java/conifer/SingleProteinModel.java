@@ -47,8 +47,11 @@ public class SingleProteinModel implements Runnable, Processor
    @Option(gloss="Indicator of whether to exclude HMC move")
    public boolean isExcluded;
    
-//   @Option(gloss="band width of weight in MCMC")
-//   public double bandWidth;
+   @Option(gloss="Number of MCMC iterations")
+   public int nMCMCIterations = 100000;
+   
+   @Option(gloss="ESS Experiment Number")
+   public int rep = 1;
    
    @Option()
    public static RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZEGTR;
@@ -105,11 +108,11 @@ public class SingleProteinModel implements Runnable, Processor
       factory.excludeNodeMove(PhyloHMCMove.class);
     }
     MCMCAlgorithm mcmc = factory.build(model, false);
-    mcmc.options.nMCMCSweeps = 100000; 
+    mcmc.options.nMCMCSweeps = nMCMCIterations; 
     mcmc.options.burnIn = (int) Math.round(.1 * factory.mcmcOptions.nMCMCSweeps);
     mcmc.run();
     logToFile("Total time in minutes: " + ((System.currentTimeMillis() - startTime)/60000.0));
-    File newDirectory = new File(Results.getResultFolder().getParent() + "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+Results.getResultFolder().getName());
+    File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+Results.getResultFolder().getName());
     newDirectory.mkdir();
     try
     {
