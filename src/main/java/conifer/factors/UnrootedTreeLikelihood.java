@@ -1,7 +1,9 @@
 package conifer.factors;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -19,11 +21,15 @@ import conifer.UnrootedTree;
 import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.RateMatrices;
 import conifer.ctmc.SimpleRateMatrix;
+import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.io.CNObservationFactory;
+import conifer.io.CNParser;
 import conifer.io.FastaUtils;
 import conifer.io.FixedTreeObservations;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
+import conifer.models.CNPair;
 import conifer.models.DiscreteGammaMixture;
 import conifer.models.EvolutionaryModel;
 import conifer.models.EvolutionaryModelUtils;
@@ -91,6 +97,29 @@ public class UnrootedTreeLikelihood
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
   }
+  
+  /** 
+   * Create a model from a CN file. 
+   * @throws IOException 
+   * @throws NumberFormatException 
+   * 
+   * 
+   */
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) throws NumberFormatException, IOException 
+  {
+    LinkedHashMap<TreeNode, List<CNPair>> data = CNParser.readCN(cnFile);
+    UnrootedTree tree = defaultTree(data.keySet());
+    tree.addNode(TreeNode.withLabel("root"));
+    // add custom rate matrix construction
+    // gammaMixture not supported
+    CNObservationFactory factory = CNObservationFactory.defaultFactory();
+    TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).size());
+//    MultiCategorySubstitutionModel.loadObservations(observations, data, factory);
+    
+    return null;
+    
+  }
+  
   
   /**
    * Create a model from a FASTA file. Currently assumes nucleotides data and uses kimura 1980 as a default matrix, and a

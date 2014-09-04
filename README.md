@@ -4,3 +4,27 @@
 
 Phylogenetics inference tools.
 
+### TODOs
+
+#### Both 
+
+- look at the implementation of emission model 
+- think about the identification issues
+
+#### Sean
+
+- create emission model for beta-binomial process
+- edit the log-likelihood by creating a new UnrootedTreeLikelihood for copy number states
+- add the custom rate matrix construction to unrootedtreelikelihood 
+
+
+
+#### Sohrab
+
+- look at casting into charsequence similarly to protein from Crystal? 
+- adding validity check to cn pair input 
+
+
+#### Notes: 
+
+- current assumes error model homogeneity across all sites 
