@@ -44,7 +44,7 @@ public class FastaUtils
 					map.put(currentTaxon, current);
 				}
 				else
-				{
+				{ 
 					line = line.replaceAll("\\s+", "");
 					if (current == null)
 						throw new RuntimeException("Error in the currenlty picky implementation of the fasta reader: the first line did not start with '>'");
