@@ -2,6 +2,7 @@ package conifer.factors;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,16 +106,36 @@ public class UnrootedTreeLikelihood
    * 
    * 
    */
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) throws NumberFormatException, IOException 
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) 
   {
-    LinkedHashMap<TreeNode, List<CNPair>> data = CNParser.readCN(cnFile);
+    LinkedHashMap<TreeNode, CharSequence> data = CNParser.readCN(cnFile);
     UnrootedTree tree = defaultTree(data.keySet());
     tree.addNode(TreeNode.withLabel("root"));
     // add custom rate matrix construction
     // gammaMixture not supported
-    CNObservationFactory factory = CNObservationFactory.defaultFactory();
-    TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).size());
-//    MultiCategorySubstitutionModel.loadObservations(observations, data, factory);
+    PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.copyNumberFactory();
+    TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).length()/factory.getChunkLength());
+    MultiCategorySubstitutionModel.loadObservations(observations, data, factory);
+    
+    
+    // testing
+    Map<String,String> a2s = PhylogeneticObservationFactory.copyNumberFactory().getIndicator2ChunkMap();
+ 
+	StringBuilder result = new StringBuilder();
+	for (TreeNode node : observations.getObservedTreeNodes()) {
+		result.append(">" + node + "\n");
+		double[][] s = (double[][]) observations.get(node);
+		String charAtSite = "S";
+		for (int j = 0; j < s.length; j++) {
+			charAtSite = a2s.get(Arrays.toString(s[j]));
+			result.append(charAtSite);
+		}
+		result.append("\n");
+	}
+	
+	System.out.println(result.toString());
+    
+    
     
     return null;
     
@@ -251,6 +272,11 @@ public class UnrootedTreeLikelihood
   
   public static void main(String [] args)
   {
+	File f = new File("src/main/resources/conifer/sampleInput/testCopyNumber.txt");
+	UnrootedTreeLikelihood.fromCNFile(f);
+	System.err.println("Finished reading CN!");
+	  
+	  
     UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> ll = fromFastaFile(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"));
     System.out.println("nSites=" + ll.observations.nSites());
     System.out.println("nNodes=" + ll.tree.getTopology().vertexSet().size());

@@ -39,4 +39,8 @@ public class CNPair {
 	public String toString() {
 		return "(" + ra + ", " + rA + ")";
 	}
+	
+	public String toRawString() {
+		return "" + ra + "," + rA;
+	}
 }

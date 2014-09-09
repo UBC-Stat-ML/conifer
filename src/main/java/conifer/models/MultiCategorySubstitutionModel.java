@@ -1,6 +1,7 @@
 package conifer.models;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -472,27 +473,27 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
   }
   
   
-  /**
-   * new load observations for cn
-   *  
-   *  TODO: potentially possible to cast into charsequence...look at protein  
-   *  
-   * @param observations
-   * @param rawStrings
-   * @param observationFactory
-   */
-  public static void loadCNObservations(
-      TreeObservations observations, 
-      Map<TreeNode, List<CNPair>> rawStrings, 
-      CNObservationFactory observationFactory)
-  {
-    for (TreeNode treeNode : rawStrings.keySet())
-    {
-      String rawString = rawStrings.get(treeNode).toString();
-      double [][] indicators = observationFactory.site2CharacterIndicators(rawString);
-      observations.set(treeNode, indicators);
-    }
-  }
+//  /**
+//   * new load observations for cn
+//   *  
+//   *  TODO: potentially possible to cast into charsequence...look at protein  
+//   *  
+//   * @param observations
+//   * @param rawStrings
+//   * @param observationFactory
+//   */
+//  public static void loadCNObservations(
+//      TreeObservations observations, 
+//      Map<TreeNode, List<CNPair>> rawStrings, 
+//      CNObservationFactory observationFactory)
+//  {
+//    for (TreeNode treeNode : rawStrings.keySet())
+//    {
+//      String rawString = rawStrings.get(treeNode).toString();
+//      double [][] indicators = observationFactory.site2CharacterIndicators(rawString);
+//      observations.set(treeNode, indicators);
+//    }
+//  }
   
   
   /**

@@ -18,7 +18,7 @@
       "WM", "WF", "WP", "WS", "WT", "WW", "WY", "WV", "YA", "YR", "YN", "YD", "YC", "YQ", "YE", "YG", "YH", "YL", "YI", "YK", "YM", "YF", "YP", "YS", "YT", 
       "YW", "YY", "YV", "VA", "VR", "VN", "VD", "VC", "VQ", "VE", "VG", "VH", "VL", "VI", "VK", "VM", "VF", "VP", "VS", "VT", "VW", "VY", "VV" ],
   "ambiguousSymbols": {
- "-A": [ "AA", "RA", "NA", "DA", "CA", "QA", "EA", "GA", "HA", "LA", "IA", "KA", "MA", "FA", "PA", "SA", "TA", "WA", "YA", "VA" ],
+"-A": [ "AA", "RA", "NA", "DA", "CA", "QA", "EA", "GA", "HA", "LA", "IA", "KA", "MA", "FA", "PA", "SA", "TA", "WA", "YA", "VA" ],
 "-R": [ "AR", "RR", "NR", "DR", "CR", "QR", "ER", "GR", "HR", "LR", "IR", "KR", "MR", "FR", "PR", "SR", "TR", "WR", "YR", "VR" ],
 "-N": [ "AN", "RN", "NN", "DN", "CN", "QN", "EN", "GN", "HN", "LN", "IN", "KN", "MN", "FN", "PN", "SN", "TN", "WN", "YN", "VN" ],
 "-D": [ "AD", "RD", "ND", "DD", "CD", "QD", "ED", "GD", "HD", "LD", "ID", "KD", "MD", "FD", "PD", "SD", "TD", "WD", "YD", "VD" ],

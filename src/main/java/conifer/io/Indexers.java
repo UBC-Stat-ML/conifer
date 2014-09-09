@@ -21,9 +21,22 @@ public class Indexers
 		return PhylogeneticObservationFactory.proteinPairFactory().getIndexer();
 	}
 
+	public static Indexer<String> copyNumberIndexer()
+	{
+		return PhylogeneticObservationFactory.copyNumberFactory().getIndexer();
+	}
+	
+	
 	public static Indexer<CNPair> CNPairIndexer()
 	{
 		return CNObservationFactory.defaultFactory().getIndexer();
+	}
+	
+	public static void main(String[] args) {
+		Indexer<String> i = Indexers.copyNumberIndexer();
+		for (Object j : i.objectsList()) {
+			System.out.println(j.toString());
+		}
 	}
 }
 
