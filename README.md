@@ -8,6 +8,8 @@ Phylogenetics inference tools.
 
 #### Both 
 
+- __write down the full theoretical model__
+- solve the problem with PIP
 - look at the implementation of emission model 
 - think about the identification issues
 
@@ -21,8 +23,8 @@ Phylogenetics inference tools.
 
 #### Sohrab
 
-- look at casting into charsequence similarly to protein from Crystal? 
-- adding validity check to cn pair input 
+- look at casting into charsequence similarly to protein from Crystal? [DONE]
+- adding validity check to cn pair input [DONE]
 
 
 #### Notes: 
