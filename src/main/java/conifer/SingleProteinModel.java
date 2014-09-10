@@ -108,6 +108,7 @@ public class SingleProteinModel implements Runnable, Processor
       factory.excludeNodeMove(PhyloHMCMove.class);
     }
     MCMCAlgorithm mcmc = factory.build(model, false);
+    mcmc.options.random = new Random(rep);
     mcmc.options.nMCMCSweeps = nMCMCIterations; 
     mcmc.options.burnIn = (int) Math.round(.1 * factory.mcmcOptions.nMCMCSweeps);
     mcmc.run();
