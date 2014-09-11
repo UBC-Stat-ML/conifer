@@ -45,7 +45,7 @@ public class SingleProteinModel implements Runnable, Processor
    public File treeFile;
    
    @Option(gloss="Indicator of whether to exclude HMC move")
-   public boolean isExcluded;
+   public boolean isExcluded=false;
    
    @Option(gloss="Number of MCMC iterations")
    public int nMCMCIterations = 100000;
@@ -53,8 +53,8 @@ public class SingleProteinModel implements Runnable, Processor
    @Option(gloss="ESS Experiment Number")
    public int rep = 1;
    
-   @Option()
-   public static RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZEGTR;
+   @Option(gloss="Rate Matrix Method")
+   public RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZEGTR;
 
    @OptionSet(name = "factory")
    public final MCMCFactory factory = new MCMCFactory();
