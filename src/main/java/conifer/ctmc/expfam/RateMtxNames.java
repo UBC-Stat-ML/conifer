@@ -151,6 +151,30 @@ public enum RateMtxNames
       {
         return RateMatrices.polaritySizeGTR();
       }
+    },
+    PROTEINSIMPLEGTR{
+      @Override
+      public SerializedExpFamMixture getSerialized()
+      {
+        return SerializedExpFamMixture.proteinSimpleGTR();
+      }
+      
+      public Indexer<String> getIndexer()
+      {
+        return proteinIndexer();
+      }
+      
+      public PhylogeneticObservationFactory getFactory()
+      {
+        return proteinFactory();
+      }
+      
+      public SimpleRateMatrix getRateMtx()
+      {
+        Random rand = new Random(1);
+        return RateMatrices.randomGTR(rand, 20);
+      }   
+      
     };
     
     public abstract  SerializedExpFamMixture getSerialized();

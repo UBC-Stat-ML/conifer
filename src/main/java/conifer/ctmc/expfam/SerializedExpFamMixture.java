@@ -267,6 +267,11 @@ public static SerializedExpFamMixture rateMtxModel(final RateMtxNames selectedRa
     return fromResource("/conifer/ctmc/expfam/polaritySizeGTR-expfam.txt");
   }
   
+  public static SerializedExpFamMixture proteinSimpleGTR(){
+    
+    return fromResource("/conifer/ctmc/expfam/proteinSimpleGTR-expfam.txt");
+  }
+  
   
 
 

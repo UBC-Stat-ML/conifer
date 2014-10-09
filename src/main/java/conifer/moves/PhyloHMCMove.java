@@ -4,6 +4,7 @@ import hmc.AHMC;
 import hmc.DataStruct;
 import hmc.HMC;
 
+import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -12,6 +13,7 @@ import org.jblas.DoubleMatrix;
 
 import com.google.common.collect.Lists;
 
+import conifer.SingleProteinModel;
 import conifer.ctmc.PathStatistics;
 import conifer.ctmc.expfam.CTMCExpFam;
 import conifer.ctmc.expfam.CTMCState;
@@ -21,13 +23,15 @@ import conifer.ctmc.expfam.ExpFamParameters;
 import conifer.ctmc.expfam.ExpectedStatistics;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
-
 import bayonet.distributions.Normal.MeanVarianceParameterization;
 import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.NodeMove;
 import blang.mcmc.SampledVariable;
+import briefj.BriefIO;
 import briefj.Indexer;
+import briefj.opt.Option;
+import briefj.run.Results;
 
 
 
@@ -38,9 +42,15 @@ public class PhyloHMCMove extends NodeMove
   @ConnectedFactor UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
   @ConnectedFactor IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior;
   
-  private Double epsilon = null;
-  private Integer L = null;
+  @Option(gloss="Epsilon provided ")
+  public static Double epsilon = null;
+  
+  @Option(gloss="L provided")
+  public static Integer L = null;
 
+  
+  private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("HMC.experiment.details.txt"));
+  
   @Override
   public void execute(Random rand)
   {
@@ -80,6 +90,8 @@ public class PhyloHMCMove extends NodeMove
       newPoint = ahmc.sample(rand).data;
       epsilon = ahmc.getEpsilon();
       L = ahmc.getL();
+      logToFile("optimal epsilon" +""+ epsilon);
+      logToFile("optimal L" + ""+ L);
     }
     
     parameters.setVector(newPoint);
@@ -134,4 +146,10 @@ public class PhyloHMCMove extends NodeMove
     
     return result;
   }
+  
+  public void logToFile(String someline) {
+    this.detailWriter.println(someline);
+    this.detailWriter.flush();
+  }
+
 }

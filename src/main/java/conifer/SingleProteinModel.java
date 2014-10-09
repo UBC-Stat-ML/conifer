@@ -26,6 +26,7 @@ import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.moves.PhyloHMCMove;
 import conifer.moves.RealVectorMHProposal;
+import conifer.processors.FileNameString;
 import briefj.run.Mains;
 import briefj.run.Results;
 import blang.processing.ProcessorContext;
@@ -40,6 +41,7 @@ public class SingleProteinModel implements Runnable, Processor
 {
    @Option(gloss="File of provided alignment")
    public File inputFile;
+   
 
    @Option(gloss="File of the tree topology")
    public File treeFile;
@@ -54,13 +56,19 @@ public class SingleProteinModel implements Runnable, Processor
    public int rep = 1;
    
    @Option(gloss="Rate Matrix Method")
-   public RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZEGTR;
+   public RateMtxNames selectedRateMtx = RateMtxNames.PAIR;
 
    @OptionSet(name = "factory")
    public final MCMCFactory factory = new MCMCFactory();
   
    @Option(gloss="Bandwidth of proposal for vectors in MCMC")
    public double bandwidth = 0.01;
+   
+   @Option(gloss="Epsilon provided ")
+   public static Double epsilon = null;
+   
+   @Option(gloss="L provided")
+   public static Integer L = null;
   
   public class Model
   {
@@ -100,6 +108,8 @@ public class SingleProteinModel implements Runnable, Processor
   public void run()
   {
     RealVectorMHProposal.bandWidth = bandwidth;
+    PhyloHMCMove.epsilon=epsilon;
+    PhyloHMCMove.L = L;
     factory.addProcessor(this);
     model = new Model();
     long startTime = System.currentTimeMillis();
@@ -112,8 +122,12 @@ public class SingleProteinModel implements Runnable, Processor
     mcmc.options.nMCMCSweeps = nMCMCIterations; 
     mcmc.options.burnIn = (int) Math.round(.1 * factory.mcmcOptions.nMCMCSweeps);
     mcmc.run();
+    String fileName = inputFile.getName();
+    FileNameString fileNameString = new FileNameString(fileName);
+    String numberOfSites = fileNameString.subStringBetween(fileName, "numSites", "Seed");
+    String whichSeedUsed = fileNameString.subStringBetween(fileName, "Seed", ".txt");
     logToFile("Total time in minutes: " + ((System.currentTimeMillis() - startTime)/60000.0));
-    File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+Results.getResultFolder().getName());
+    File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed+ "epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
     newDirectory.mkdir();
     try
     {
@@ -125,7 +139,7 @@ public class SingleProteinModel implements Runnable, Processor
     }
     
      }
-
+  
  public static void main(String [] args) 
   {
     Mains.instrumentedRun(args, new SingleProteinModel());

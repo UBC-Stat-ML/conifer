@@ -42,6 +42,17 @@ import conifer.ctmc.expfam.RateMtxNames;
  */
 public class PhylogeneticObservationFactory
 {
+  
+  private final List<String> orderedSymbols;
+  private final Map<String, Set<String>> ambiguousSymbols;
+  private final boolean caseSensitive;
+  
+  private transient Integer chunkLength = null;
+  private transient Indexer<String> _indexer;
+  private transient Map<String,double[]> _indicators;
+  private transient double[] _unknownIndicator;
+  private int nChunks;
+  
   /**
    * 
    * @return The PhylogeneticObservationFactory corresponding to the standard iupac encodings.
@@ -103,7 +114,7 @@ public class PhylogeneticObservationFactory
     Map<String,double[]> indicators = getIndicators();
     if (sequence.length() % chunkLength != 0)
       throw new RuntimeException("Sequence length was expected to be a multiple of " + chunkLength);
-    int nChunks = sequence.length() / chunkLength;
+    this.nChunks = sequence.length() / chunkLength;
     double [][] result = new double[nChunks][];
     for (int chunkIndex = 0; chunkIndex < nChunks; chunkIndex++)
     {
@@ -128,7 +139,7 @@ public class PhylogeneticObservationFactory
     return orderedSymbols.size();
   }
   
-  private int getChunkLength()
+  public int getChunkLength()
   {
      return orderedSymbols.get(0).length();
   }
@@ -176,15 +187,7 @@ public class PhylogeneticObservationFactory
     return _indicators;
   }
  
-  private final List<String> orderedSymbols;
-  private final Map<String, Set<String>> ambiguousSymbols;
-  private final boolean caseSensitive;
-  
-  private transient Integer chunkLength = null;
-  private transient Indexer<String> _indexer;
-  private transient Map<String,double[]> _indicators;
-  private transient double[] _unknownIndicator;
-  public int nChunks;
+ 
   
   private double[] getUnknownIndicator()
   {
@@ -234,14 +237,14 @@ public class PhylogeneticObservationFactory
   private static PhylogeneticObservationFactory _proteinFactory = null;
   private static PhylogeneticObservationFactory _proteinPairFactory=null;
   
-  public int nSites()
-  {
-      return nChunks;
-  }
+ // public int nSites()
+  //{
+ //     return this.nChunks;
+ // }
 
-//  public int nSites()
-//  {
-//    return BriefCollections.pick(getIndicators().values()).length;
+ public int nSites()
+ {
+    return BriefCollections.pick(getIndicators().values()).length;
 //    //return BriefCollections.pick(getIndicators().values()).length()/factory.getChunkLength());
-//  }
+    }
 }
