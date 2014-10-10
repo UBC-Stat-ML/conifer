@@ -37,8 +37,8 @@ public class PhyloHMCMove extends NodeMove
   @ConnectedFactor UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
   @ConnectedFactor IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior;
   
-  private Double epsilon = null;
-  private Integer L = null;
+  public Double epsilon = null;
+  public Integer L = null;
 
   @Override
   public void execute(Random rand)
