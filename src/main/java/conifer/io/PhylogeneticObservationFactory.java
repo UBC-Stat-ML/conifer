@@ -67,7 +67,7 @@ public class PhylogeneticObservationFactory
   /**
    * Reads the specifications of a PhylogeneticObservationFactory from a JSON file.
    * 
-   * @see src/main/resources/conifer/io/dna-iupac-encoding.txt for an example of the format.
+   * See src/main/resources/conifer/io/dna-iupac-encoding.txt for an example of the format.
    * 
    * @param jsonFile
    * @return

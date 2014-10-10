@@ -197,7 +197,7 @@ public class UnrootedTree
   }
 
   /**
-   * @see UnrootedTreeUtils.leaves()
+   * See UnrootedTreeUtils.leaves()
    * @return
    */
   public List<TreeNode> leaves()
@@ -206,7 +206,7 @@ public class UnrootedTree
   }
   
   /**
-   * @see UnrootedTreeUtils.allTotalBranchLengthDistances()
+   * See UnrootedTreeUtils.allTotalBranchLengthDistances()
    * @return
    */
   public Counter<UnorderedPair<TreeNode,TreeNode>> allTotalBranchLengthDistances()
@@ -217,9 +217,7 @@ public class UnrootedTree
   /**
    * Reads the contents of the given file and parse it as a newick string.
    * 
-   * @see {@link #fromNewickString(String) fromNewickStrin(String)}
-   * @param f
-   * @return
+   * See {@link #fromNewickString(String) fromNewickStrin(String)}
    */
   public static UnrootedTree fromNewick(File f)
   {
@@ -322,9 +320,6 @@ public class UnrootedTree
    * This instance will be modified in place to remove all the edges and nodes in the returned
    * tree, except for the node removedRoot.
    * 
-   * @param removedRoot
-   * @param detached
-   * @return
    */
   public UnrootedTree prune(TreeNode removedRoot, TreeNode detachedNode)
   {
