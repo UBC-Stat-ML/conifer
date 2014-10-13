@@ -39,6 +39,8 @@ public class PhyloHMCMove extends NodeMove
   
   public Double epsilon = null;
   public Integer L = null;
+  
+  public int nItersPerPathAuxVar = 1000;
 
   @Override
   public void execute(Random rand)
@@ -66,11 +68,8 @@ public class PhyloHMCMove extends NodeMove
       // but may not be needed (already quite a bit of gains by doing large number of steps (L) 
       // within the doIter() method below
       DataStruct hmcResult = null;
-      for (int i = 0; i < 1000; i++)
-      {
+      for (int i = 0; i < nItersPerPathAuxVar; i++)
         hmcResult = HMC.doIter(rand, L, epsilon, i == 0 ? new DoubleMatrix(initialPoint) : hmcResult.next_q, objective, objective);
-//        System.out.println(hmcResult.energy + "\t" + Arrays.toString(hmcResult.next_q.data));
-      }
       newPoint = hmcResult.next_q.data;
     }
     else
@@ -79,6 +78,7 @@ public class PhyloHMCMove extends NodeMove
       newPoint = ahmc.sample(rand).data;
       epsilon = ahmc.getEpsilon();
       L = ahmc.getL();
+      System.out.println("adapted: L="+L + ",epsilon="+epsilon);
     }
     
     parameters.setVector(newPoint);
