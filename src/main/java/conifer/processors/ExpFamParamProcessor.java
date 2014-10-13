@@ -74,7 +74,7 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
     }
     
     current++;
-    if ((progressInfo && current == interval) || context.isLastProcessCall())
+    if (context.getOptions().CODA && ((progressInfo && current == interval) || context.isLastProcessCall()))
       try
       {
         samplesOutput.flush();
@@ -116,7 +116,7 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
   {
     if (samplesOutput != null)
       return;
-    progressInfo = context.getOptions().progressCODA;
+    progressInfo = context.getOptions().progressCODA && context.getOptions().CODA;
     watch.start();
     samplesOutput = new OutputManager();
     output = new OutputManager();

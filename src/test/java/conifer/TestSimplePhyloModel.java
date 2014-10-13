@@ -36,6 +36,7 @@ public class TestSimplePhyloModel extends MCMCRunner
   public void checkStationarity()
   {
     this.factory.mcmcOptions.random = new Random(10001);
+    this.factory.mcmcOptions.CODA = false;
     this.factory.setCheckAllNodesCoveredByMCMCMoves(false);
     
 //    this.factory.excludeNodeMove(AllBranchesScaling.class);
