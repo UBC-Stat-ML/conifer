@@ -28,6 +28,7 @@ import briefj.opt.OptionSet;
 import briefj.run.Mains;
 import briefj.run.Results;
 import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.io.FastaUtils;
@@ -64,6 +65,9 @@ public class TestPhyloModel implements Runnable, Processor
 
 	@Option
 	public int nSites = 500;
+	
+	@Option(gloss="provide rate matrix model")
+	public RateMtxNames selectedRateMtx;
 
 	public class Model
 	{
@@ -76,8 +80,8 @@ public class TestPhyloModel implements Runnable, Processor
 		@DefineFactor(onObservations = true)
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
 		UnrootedTreeLikelihood//.createEmpty(nSites, leaves)
-		.fromFastaFile(new File(alignmentFilePath))
-		.withExpFamMixture(ExpFamMixture.kimura1980())
+		.fromFastaFile(new File(alignmentFilePath), selectedRateMtx)
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx))
 		.withTree(new File(initialTreeFilePath));
 
 		@DefineFactor

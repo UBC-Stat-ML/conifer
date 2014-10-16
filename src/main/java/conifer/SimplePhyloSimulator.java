@@ -33,6 +33,7 @@ import com.google.common.collect.Maps;
 
 import conifer.TestPhyloModel.Model;
 import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.io.FastaUtils;
@@ -75,6 +76,8 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 	@Option
 	public boolean fixedBranchLength = false;
 	
+	@Option(gloss="select rate matrix model")
+	public RateMtxNames selectedRateMtx;
 	
 	
 	public List<TreeNode> makeLeaves(int nTaxa, String prefix) 
@@ -90,8 +93,8 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 	{
 		@DefineFactor(onObservations = true)
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
-		UnrootedTreeLikelihood.createEmpty(nSites, makeLeaves(nTaxa, "t"))		
-		.withExpFamMixture(ExpFamMixture.kimura1980());
+		UnrootedTreeLikelihood.createEmpty(nSites, makeLeaves(nTaxa, "t"), selectedRateMtx)		
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx));
 
 		@DefineFactor
 		NonClockTreePrior<RateParameterization> treePrior = 
@@ -119,8 +122,8 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 	{
 		@DefineFactor(onObservations = true)
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
-		UnrootedTreeLikelihood.createEmpty(nSites, makeLeaves(nSites, "t"))		
-		.withExpFamMixture(ExpFamMixture.kimura1980());
+		UnrootedTreeLikelihood.createEmpty(nSites, makeLeaves(nSites, "t"), selectedRateMtx)		
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx));
 
 		@DefineFactor
 		NonClockTreePrior<RateParameterization> treePrior = 
