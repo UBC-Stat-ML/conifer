@@ -3,17 +3,17 @@ package conifer.moves;
 import java.util.List;
 import java.util.Random;
 
-import com.google.common.collect.Lists;
-
-import conifer.TreeNode;
-import conifer.UnrootedTree;
-
 import bayonet.distributions.DiscreteUniform;
 import blang.factors.Factor;
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.MHProposalDistribution;
 import blang.mcmc.SampledVariable;
 import briefj.collections.UnorderedPair;
+
+import com.google.common.collect.Lists;
+
+import conifer.TreeNode;
+import conifer.UnrootedTree;
 
 
 
@@ -28,10 +28,9 @@ public class SingleBranchScaling implements MHProposalDistribution
   @Override
   public Proposal propose(Random rand)
   {
-//    System.out.println("Computing single branch scaling move");
     List<UnorderedPair<TreeNode, TreeNode>> allEdges = Lists.newArrayList(tree.getTopology().edgeSet());
     final UnorderedPair<TreeNode, TreeNode> edge = DiscreteUniform.sample(allEdges, rand);
-    final double oldValue = tree.getBranchLengths().get(edge);
+    final double oldValue = tree.getBranchLength(edge);
     double u = rand.nextDouble();
     final double m = Math.exp(lambda * (u - 0.5));
     final double newValue = m * oldValue;
@@ -53,15 +52,4 @@ public class SingleBranchScaling implements MHProposalDistribution
       }
     };
   }
-  
-
-  
-  // TODO: need to merge bayonet.distribution, bayonet.mcmc.dist, fig stuff, etc
-  // at same time, check all for correctness
-  // TODO: add an argument to say the logDensity is normalized with respect to subset of variables
-  public static double nextDouble(Random rand, double left, double right)
-  {
-    return left + (right-left) * rand.nextDouble();
-  }
-
 }

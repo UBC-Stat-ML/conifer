@@ -5,10 +5,14 @@ import briefj.collections.Tree;
 import conifer.TreeNode;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.StringBufferInputStream;
 
+/**
+ * Source of grammar: https://code.google.com/p/phylopy/wiki/Newick
+ */
 public class NewickParser implements NewickParserConstants {
         private Tree<TreeNode> tree;
         private Map<TreeNode, Double> branchLengths;
@@ -26,90 +30,82 @@ public class NewickParser implements NewickParserConstants {
 
   final private Tree<TreeNode> tree() throws ParseException {
                                           Tree<TreeNode> result;
-    result = subtree();
+    result = node();
     jj_consume_token(7);
           {if (true) return result;}
     throw new Error("Missing return statement in function");
   }
 
-  final private Tree<TreeNode> subtree() throws ParseException {
-                                          Tree<TreeNode> result;
-    if (jj_2_1(10)) {
-      result = internal();
-          {if (true) return result;}
-    } else {
-      result = leaf();
-          {if (true) return result;}
-    }
-    throw new Error("Missing return statement in function");
-  }
-
-  final private Tree<TreeNode> leaf() throws ParseException {
-                                          String name;
-    name = name();
-          if (name == null) {if (true) throw new RuntimeException("Leaves should be named.");} {if (true) return new Tree(TreeNode.withLabel(name));}
-    throw new Error("Missing return statement in function");
-  }
-
-  final private Tree<TreeNode> internal() throws ParseException {
-                                          List<Tree<TreeNode>> children; String name;
-    jj_consume_token(8);
-    children = branchList();
-    jj_consume_token(9);
-    name = name();
-          {if (true) return new Tree<TreeNode>(name == null ? TreeNode.nextUnlabelled() : TreeNode.withLabel(name), children);}
-    throw new Error("Missing return statement in function");
-  }
-
-  final private List<Tree<TreeNode>> branchList() throws ParseException {
-        List<Tree<TreeNode>> branches = new ArrayList<Tree<TreeNode>>();
-        Tree<TreeNode> currentTree;
-    currentTree = branch();
-          branches.add(currentTree);
-    label_1:
-    while (true) {
-      if (jj_2_2(10)) {
-        ;
+  final private Tree<TreeNode> node() throws ParseException {
+                                          TreeNode label = TreeNode.nextUnlabelled(); List<Tree<TreeNode>> children = new ArrayList<Tree<TreeNode>>();
+    if (jj_2_5(10)) {
+      children = children();
+      if (jj_2_1(10)) {
+        label = label();
       } else {
-        break label_1;
+        ;
       }
-      jj_consume_token(10);
-      currentTree = branch();
-                  branches.add(currentTree);
-    }
-          {if (true) return branches;}
-    throw new Error("Missing return statement in function");
-  }
-
-  final private Tree<TreeNode> branch() throws ParseException {
-                                                          Tree<TreeNode> result;
-    result = subtree();
-    if (jj_2_3(10)) {
-      length(result.getLabel());
+      if (jj_2_2(10)) {
+        length(label);
+      } else {
+        ;
+      }
+          {if (true) return new Tree<TreeNode>(label, children);}
+    } else if (jj_2_6(10)) {
+      if (jj_2_3(10)) {
+        children = children();
+      } else {
+        ;
+      }
+      label = label();
+      if (jj_2_4(10)) {
+        length(label);
+      } else {
+        ;
+      }
+          {if (true) return new Tree<TreeNode>(label, children);}
     } else {
-      ;
+      jj_consume_token(-1);
+      throw new ParseException();
     }
-          {if (true) return result;}
     throw new Error("Missing return statement in function");
   }
 
-  final private String name() throws ParseException {
+  final private TreeNode label() throws ParseException {
                                                   Token t;
-    if (jj_2_4(10)) {
-      t = jj_consume_token(NODE_NAME_STRING);
-          {if (true) return t.image;}
-    } else {
-          {if (true) return null;}
-    }
+    t = jj_consume_token(NODE_NAME_STRING);
+          {if (true) return TreeNode.withLabel(t.image);}
     throw new Error("Missing return statement in function");
   }
 
   final private void length(TreeNode label) throws ParseException {
                                                           Token t;
-    jj_consume_token(11);
+    jj_consume_token(8);
     t = jj_consume_token(NUMBER_STRING);
                 Double length = Double.parseDouble(t.image);
                 branchLengths.put(label, length);
+  }
+
+  final private List<Tree<TreeNode>> children() throws ParseException {
+        List<Tree<TreeNode>> children = new ArrayList<Tree<TreeNode>>();
+        Tree<TreeNode> child;
+    jj_consume_token(9);
+    child = node();
+          children.add(child);
+    label_1:
+    while (true) {
+      if (jj_2_7(10)) {
+        ;
+      } else {
+        break label_1;
+      }
+      jj_consume_token(10);
+      child = node();
+                  children.add(child);
+    }
+    jj_consume_token(11);
+          {if (true) return children;}
+    throw new Error("Missing return statement in function");
   }
 
   private boolean jj_2_1(int xla) {
@@ -140,61 +136,61 @@ public class NewickParser implements NewickParserConstants {
     finally { jj_save(3, xla); }
   }
 
-  private boolean jj_3R_2() {
-    if (jj_scan_token(8)) return true;
-    if (jj_3R_5()) return true;
-    if (jj_scan_token(9)) return true;
-    if (jj_3R_6()) return true;
-    return false;
+  private boolean jj_2_5(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_5(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(4, xla); }
   }
 
-  private boolean jj_3_2() {
-    if (jj_scan_token(10)) return true;
+  private boolean jj_2_6(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_6(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(5, xla); }
+  }
+
+  private boolean jj_2_7(int xla) {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return !jj_3_7(); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(6, xla); }
+  }
+
+  private boolean jj_3_4() {
     if (jj_3R_3()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_3() {
-    if (jj_3R_7()) return true;
-    Token xsp;
-    xsp = jj_scanpos;
-    if (jj_3_3()) jj_scanpos = xsp;
-    return false;
-  }
-
-  private boolean jj_3R_10() {
-    if (jj_3R_6()) return true;
-    return false;
-  }
-
-  private boolean jj_3R_9() {
-    if (jj_3R_10()) return true;
     return false;
   }
 
   private boolean jj_3R_4() {
-    if (jj_scan_token(11)) return true;
-    if (jj_scan_token(NUMBER_STRING)) return true;
-    return false;
-  }
-
-  private boolean jj_3R_5() {
-    if (jj_3R_3()) return true;
+    if (jj_scan_token(9)) return true;
+    if (jj_3R_5()) return true;
     Token xsp;
     while (true) {
       xsp = jj_scanpos;
-      if (jj_3_2()) { jj_scanpos = xsp; break; }
+      if (jj_3_7()) { jj_scanpos = xsp; break; }
     }
+    if (jj_scan_token(11)) return true;
     return false;
   }
 
-  private boolean jj_3R_7() {
+  private boolean jj_3_3() {
+    if (jj_3R_4()) return true;
+    return false;
+  }
+
+  private boolean jj_3_6() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_1()) {
-    jj_scanpos = xsp;
-    if (jj_3R_9()) return true;
-    }
+    if (jj_3_3()) jj_scanpos = xsp;
+    if (jj_3R_2()) return true;
+    xsp = jj_scanpos;
+    if (jj_3_4()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3_2() {
+    if (jj_3R_3()) return true;
     return false;
   }
 
@@ -203,27 +199,40 @@ public class NewickParser implements NewickParserConstants {
     return false;
   }
 
-  private boolean jj_3R_8() {
-    return false;
-  }
-
-  private boolean jj_3R_6() {
+  private boolean jj_3R_5() {
     Token xsp;
     xsp = jj_scanpos;
-    if (jj_3_4()) {
+    if (jj_3_5()) {
     jj_scanpos = xsp;
-    if (jj_3R_8()) return true;
+    if (jj_3_6()) return true;
     }
     return false;
   }
 
-  private boolean jj_3_4() {
-    if (jj_scan_token(NODE_NAME_STRING)) return true;
+  private boolean jj_3_5() {
+    if (jj_3R_4()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_1()) jj_scanpos = xsp;
+    xsp = jj_scanpos;
+    if (jj_3_2()) jj_scanpos = xsp;
     return false;
   }
 
-  private boolean jj_3_3() {
-    if (jj_3R_4()) return true;
+  private boolean jj_3_7() {
+    if (jj_scan_token(10)) return true;
+    if (jj_3R_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_3() {
+    if (jj_scan_token(8)) return true;
+    if (jj_scan_token(NUMBER_STRING)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_2() {
+    if (jj_scan_token(NODE_NAME_STRING)) return true;
     return false;
   }
 
@@ -246,7 +255,7 @@ public class NewickParser implements NewickParserConstants {
    private static void jj_la1_init_0() {
       jj_la1_0 = new int[] {};
    }
-  final private JJCalls[] jj_2_rtns = new JJCalls[4];
+  final private JJCalls[] jj_2_rtns = new JJCalls[7];
   private boolean jj_rescan = false;
   private int jj_gc = 0;
 
@@ -471,7 +480,7 @@ public class NewickParser implements NewickParserConstants {
 
   private void jj_rescan_token() {
     jj_rescan = true;
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 7; i++) {
     try {
       JJCalls p = jj_2_rtns[i];
       do {
@@ -482,6 +491,9 @@ public class NewickParser implements NewickParserConstants {
             case 1: jj_3_2(); break;
             case 2: jj_3_3(); break;
             case 3: jj_3_4(); break;
+            case 4: jj_3_5(); break;
+            case 5: jj_3_6(); break;
+            case 6: jj_3_7(); break;
           }
         }
         p = p.next;

@@ -5,16 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import com.google.common.collect.Lists;
-
-import conifer.TreeNode;
-import conifer.UnrootedTree;
-import conifer.UnrootedTreeUtils;
-import conifer.factors.NonClockTreePrior;
-import conifer.factors.UnrootedTreeLikelihood;
-import conifer.models.EvolutionaryModel;
-import conifer.models.EvolutionaryModelUtils;
-import conifer.models.LikelihoodComputationContext;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jgrapht.Graphs;
 
 import bayonet.distributions.DiscreteUniform;
 import bayonet.distributions.Multinomial;
@@ -25,6 +17,16 @@ import blang.mcmc.ConnectedFactor;
 import blang.mcmc.NodeMove;
 import blang.mcmc.SampledVariable;
 import briefj.collections.UnorderedPair;
+
+import com.google.common.collect.Lists;
+
+import conifer.TreeNode;
+import conifer.UnrootedTree;
+import conifer.factors.NonClockTreePrior;
+import conifer.factors.UnrootedTreeLikelihood;
+import conifer.models.EvolutionaryModel;
+import conifer.models.EvolutionaryModelUtils;
+import conifer.models.LikelihoodComputationContext;
 
 
 /**
@@ -71,34 +73,18 @@ public class SPRMove extends NodeMove
     UnrootedTree prunedSubtree = tree.prune(removedRoot, detached);
     
     final double 
-      remRootThirdLen = tree.getBranchLength(removedRoot, third),
-      newRootRemRootLen=tree.getBranchLength(removedRoot, newRoot);
+      remRootThirdLen  =  tree.getBranchLength(removedRoot, third),
+      newRootRemRootLen = tree.getBranchLength(removedRoot, newRoot);
       
     if (remRootThirdLen == 0.0 || newRootRemRootLen == 0.0)
       throw new RuntimeException("SPR does not support zero branch lengths.");
     
-    // calculate the branch ratio
-    // TODO: sample another at random
-    double referenceLengthFromBot = remRootThirdLen;
-    double joinedLength = referenceLengthFromBot + newRootRemRootLen;
-    double fixedRatioFromBot = referenceLengthFromBot / joinedLength;
-    
-    if (fixedRatioFromBot == 1.0) // rounding problem: can cause branches of len zero
-      fixedRatioFromBot = 1.0 - 1e-15; // note that double are less precise around 1.0 than around 0.0
-    
-    // compute the factor graphs (one per potentical category) for the subtree, and run the sum product on these
+    // compute the factor graphs (one per potential category) for the subtree, and run the sum product on these
     // TODO: consider more than one stem lengths
     EvolutionaryModel evolutionaryModel = treeLikelihood.evolutionaryModel;
     List<UnaryFactor<TreeNode>> prunedSubtreeMarginals = EvolutionaryModelUtils.getRootMarginalsFromFactorGraphs(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, prunedSubtree, removedRoot, treeLikelihood.observations), removedRoot);
     
-    // form an edge joining the two edge connected to a node of arity two caused by the disconnect
-    tree.simplify(third, removedRoot, newRoot);
-    
-    // create intermediate nodes in the main tree
-    double additionalRatio = rand.nextDouble();
-    double smallRatio = Math.min(additionalRatio, fixedRatioFromBot);
-    double largerRatio= Math.max(additionalRatio, fixedRatioFromBot);
-    List<TreeNode> attachmentPoints = tree.addAuxiliaryInternalNodes(smallRatio, largerRatio, newRoot);
+    List<TreeNode> attachmentPoints = tree.addAuxiliaryInternalNodes(rand, removedRoot);//smallRatio, largerRatio, newRoot);
     
     // run the sum product on the main tree
     List<SumProduct<TreeNode>> mainTreeSumProducts = EvolutionaryModelUtils.getSumProductsFromFactorGraphs(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, tree, newRoot, treeLikelihood.observations, false), newRoot);
@@ -118,17 +104,50 @@ public class SPRMove extends NodeMove
         currentFullUnaries.add(currentMainTreeSumProduct.getFactorGraph().factorOperations().pointwiseProduct(Arrays.asList(prunedSubtreeMarginal, currentMainTreeMarginal)));
       }
       
+      Pair<Double,Double> neighborBLs = neighborBranchLengths(attachmentPoint, tree);
+      final double 
+        b1 = neighborBLs.getLeft(), 
+        b2 = neighborBLs.getRight();
+
+      double priorFactor = 
+        + treePrior.branchLengthLogDensity(b1) + treePrior.branchLengthLogDensity(b2) 
+        - treePrior.branchLengthLogDensity(b1 + b2);
+      
       LikelihoodComputationContext context = new LikelihoodComputationContext(currentFullUnaries);
-      samplingArray[i] = evolutionaryModel.computeLogLikelihood(context);
+      final double likelihood = evolutionaryModel.computeLogLikelihood(context);
+      
+      samplingArray[i] = priorFactor + likelihood;
     }
     
     // sample a re-attachment point
     Multinomial.expNormalize(samplingArray);
     int sampledIndex = Multinomial.sampleMultinomial(rand, samplingArray);
-    TreeNode sampledAttachment = attachmentPoints.get(sampledIndex);
+    
+    double 
+      proposedBranches = sum(neighborBranchLengths(attachmentPoints.get(sampledIndex), tree)),
+      oriBranches      = sum(neighborBranchLengths(removedRoot, tree));
+    double ratio = (proposedBranches) / (oriBranches);
+    
+    TreeNode sampledAttachment = rand.nextDouble() < ratio ? attachmentPoints.get(sampledIndex) : removedRoot;
     
     // do the re-attachment
     tree.regraft(prunedSubtree, removedRoot, sampledAttachment);
     tree.simplify();
+  }
+
+  private static double sum(Pair<Double,Double> pair)
+  {
+    return pair.getLeft() + pair.getRight();
+  }
+  
+  private static Pair<Double,Double> neighborBranchLengths(TreeNode treeNode, UnrootedTree tree)
+  {
+    List<TreeNode> attachmentNeighbors = Graphs.neighborListOf(tree.getTopology(), treeNode);
+    if (attachmentNeighbors.size() != 2)
+      throw new RuntimeException();
+    double
+      b1 = tree.getBranchLength(attachmentNeighbors.get(0), treeNode), 
+      b2 = tree.getBranchLength(attachmentNeighbors.get(1), treeNode);
+    return Pair.of(b1, b2);
   }
 }

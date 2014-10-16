@@ -6,10 +6,14 @@ import briefj.collections.Tree;
 import conifer.TreeNode;
 import java.util.Map;
 import java.util.LinkedHashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.StringBufferInputStream;
 
+/**
+ * Source of grammar: https://code.google.com/p/phylopy/wiki/Newick
+ */
 public class NewickParser 
 {
 	private Tree<TreeNode> tree;
@@ -31,64 +35,32 @@ PARSER_END(NewickParser)
 SKIP : { " " |	"\r" |	"\t" |	"\n" }
 TOKEN : 
 {
-  < NUMBER_STRING: ( ["0"-"9",".","E","e","-"] )+ >
+  < NUMBER_STRING: ["0"-"9",".","-"] ( ["0"-"9",".","E","e","-"] )* >
 |	
-  < NODE_NAME_STRING: ( ["a"-"z","A"-"Z","_","-","0"-"9","."] )+ >
+  < NODE_NAME_STRING: ["a"-"z","A"-"Z","_"] ( ["a"-"z","A"-"Z","_","-","0"-"9","."] )* >
 }
 private Tree<TreeNode> tree() :         { Tree<TreeNode> result; }
 {
-	result = subtree()     
+	result = node()     
 	";"
 	{ return result; }
-}
-private Tree<TreeNode> subtree() :      { Tree<TreeNode> result; }
+}     
+private Tree<TreeNode> node() :         { TreeNode label = TreeNode.nextUnlabelled(); List<Tree<TreeNode>> children = new ArrayList<Tree<TreeNode>>(); }
 {
-	result = internal() 
-	{ return result; }
+	children = children()
+	[label = label()]
+	[length(label)]
+	{ return new Tree<TreeNode>(label, children); }
 |
-	result = leaf()     
-	{ return result; } 
-}
-private Tree<TreeNode> leaf() :         { String name; }
-{
-	name = name()     
-	{ if (name == null) throw new RuntimeException("Leaves should be named."); return new Tree(TreeNode.withLabel(name)); }
-}
-private Tree<TreeNode> internal() :     { List<Tree<TreeNode>> children; String name; }
-{
-	"("
-	children = branchList()
-	")"
-	name = name()				
-	{ return new Tree<TreeNode>(name == null ? TreeNode.nextUnlabelled() : TreeNode.withLabel(name), children); }
-}
-private List<Tree<TreeNode>> branchList() :   
-{ 
-	List<Tree<TreeNode>> branches = new ArrayList<Tree<TreeNode>>(); 
-	Tree<TreeNode> currentTree; 
-}
-{
-	currentTree = branch() 	
-	{ branches.add(currentTree); }
-	( 
-		","
-		currentTree = branch() 	
-		{ branches.add(currentTree); }
-	)*											
-	{ return branches; }
-}
-private Tree<TreeNode> branch() : 			{ Tree<TreeNode> result; }
-{
-	result = subtree()
-	[ length(result.getLabel()) ]
-	{ return result; }
-}
-private String name() : 			{ Token t; }
+	[children = children()]
+	label = label()
+	[length(label)]
+	{ return new Tree<TreeNode>(label, children); }
+} 
+private TreeNode label() : 			{ Token t; }
 {
 	t = <NODE_NAME_STRING> 	
-	{ return t.image; }
-|
-	{ return null; }
+	{ return TreeNode.withLabel(t.image); }
 }
 private void length(TreeNode label) : 			{ Token t; }
 {
@@ -99,6 +71,24 @@ private void length(TreeNode label) : 			{ Token t; }
 		branchLengths.put(label, length);
 	}
 }
+private List<Tree<TreeNode>> children() :
+{ 
+	List<Tree<TreeNode>> children = new ArrayList<Tree<TreeNode>>(); 
+	Tree<TreeNode> child; 
+}
+{
+	"("
+	child = node() 	
+	{ children.add(child); }
+	( 
+		","
+		child = node() 	
+		{ children.add(child); }
+	)*
+	")"											
+	{ return children; }
+}
+
 
 
 

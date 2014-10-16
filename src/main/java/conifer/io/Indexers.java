@@ -2,6 +2,7 @@ package conifer.io;
 
 import conifer.ctmc.expfam.RateMtxNames;
 import conifer.ctmc.expfam.SerializedExpFamMixture;
+import conifer.models.CNPair;
 import briefj.Indexer;
 
 
@@ -31,6 +32,11 @@ public class Indexers
     return selectedRateMtx.getIndexer();
   }
 
+
+	public static Indexer<CNPair> CNPairIndexer()
+	{
+		return CNObservationFactory.defaultFactory().getIndexer();
+	}
 }
 
 

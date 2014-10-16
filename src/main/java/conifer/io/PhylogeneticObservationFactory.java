@@ -1,6 +1,7 @@
 package conifer.io;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,21 +39,10 @@ import conifer.ctmc.expfam.RateMtxNames;
  * an ambiguous symbol.
  * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
- *
+ * @author Sohrab Salehi (sohrab.salehi@gmail.com)
  */
 public class PhylogeneticObservationFactory
 {
-  
-  private final List<String> orderedSymbols;
-  private final Map<String, Set<String>> ambiguousSymbols;
-  private final boolean caseSensitive;
-  
-  private transient Integer chunkLength = null;
-  private transient Indexer<String> _indexer;
-  private transient Map<String,double[]> _indicators;
-  private transient double[] _unknownIndicator;
-  private int nChunks;
-  
   /**
    * 
    * @return The PhylogeneticObservationFactory corresponding to the standard iupac encodings.
@@ -114,7 +104,7 @@ public class PhylogeneticObservationFactory
     Map<String,double[]> indicators = getIndicators();
     if (sequence.length() % chunkLength != 0)
       throw new RuntimeException("Sequence length was expected to be a multiple of " + chunkLength);
-    this.nChunks = sequence.length() / chunkLength;
+    int nChunks = sequence.length() / chunkLength;
     double [][] result = new double[nChunks][];
     for (int chunkIndex = 0; chunkIndex < nChunks; chunkIndex++)
     {
@@ -187,7 +177,32 @@ public class PhylogeneticObservationFactory
     return _indicators;
   }
  
- 
+  /**
+   * 
+   * @return Inverse of getIndicators(), with string value of the indicator arrays as keys and the 
+   * string chunk as values.
+   *  
+   */
+  public Map<String,String> getIndicator2ChunkMap() 
+  {
+	  Map<String, String> a2s = Maps.newHashMap();
+	  // TODO: this will not include U, as it comes after T, what could be done for not 1-to-1 relations?
+	  for (Map.Entry<String, double[]> e : this.getIndicators().entrySet()) {
+		  if (e.getKey() != "U")
+			  a2s.put(Arrays.toString(e.getValue()), e.getKey());
+	  }
+	  
+	  return a2s;
+  }
+  
+  private final List<String> orderedSymbols;
+  private final Map<String, Set<String>> ambiguousSymbols;
+  private final boolean caseSensitive;
+  
+  private transient Integer chunkLength = null;
+  private transient Indexer<String> _indexer;
+  private transient Map<String,double[]> _indicators;
+  private transient double[] _unknownIndicator;
   
   private double[] getUnknownIndicator()
   {
@@ -236,15 +251,10 @@ public class PhylogeneticObservationFactory
   private static PhylogeneticObservationFactory _nucleotideFactory = null;
   private static PhylogeneticObservationFactory _proteinFactory = null;
   private static PhylogeneticObservationFactory _proteinPairFactory=null;
-  
- // public int nSites()
-  //{
- //     return this.nChunks;
- // }
 
- public int nSites()
- {
+  public int nSites()
+  {
     return BriefCollections.pick(getIndicators().values()).length;
-//    //return BriefCollections.pick(getIndicators().values()).length()/factory.getChunkLength());
-    }
+    //return BriefCollections.pick(getIndicators().values()).length()/factory.getChunkLength());
+  }
 }

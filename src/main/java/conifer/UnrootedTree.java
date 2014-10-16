@@ -3,6 +3,7 @@ package conifer;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.UndirectedGraph;
@@ -23,6 +24,7 @@ import conifer.moves.SingleBranchScaling;
 import conifer.moves.SingleNNI;
 import conifer.processors.TotalTreeLengthProcessor;
 import conifer.processors.TreeDiameterProcessor;
+import conifer.processors.TreeDistanceProcessor;
 
 
 /**
@@ -32,22 +34,38 @@ import conifer.processors.TreeDiameterProcessor;
  *
  */
 @Samplers({
-  SingleNNI.class, 
-  SingleBranchScaling.class,
-  AllBranchesScaling.class,
-  SPRMove.class
+  SingleNNI.class, 				// only topology
+  SingleBranchScaling.class, // only branch length
+  AllBranchesScaling.class, // affect only branch length
+  SPRMove.class				// only topology
 })
 @Processors({
   TotalTreeLengthProcessor.class,
-  TreeDiameterProcessor.class
+  TreeDiameterProcessor.class,
+  TreeDistanceProcessor.class
 })
 public class UnrootedTree
 {
   /**
    * Note if other fields are added, setTo() should be modified as well.
    */
-  private UndirectedGraph<TreeNode, UnorderedPair<TreeNode, TreeNode>> topology = GraphUtils.newUndirectedGraph();
-  private Map<UnorderedPair<TreeNode, TreeNode>,Double> branchLengths = Maps.newLinkedHashMap();
+  private UndirectedGraph<TreeNode, UnorderedPair<TreeNode, TreeNode>> topology;
+  private Map<UnorderedPair<TreeNode, TreeNode>,Double> branchLengths;
+  
+  public UnrootedTree(UnrootedTree model)
+  {
+    this.topology = GraphUtils.newUndirectedGraph(model.topology);
+    this.branchLengths = Maps.newLinkedHashMap(model.branchLengths);
+  }
+  
+  /**
+   * Create an empty tree.
+   */
+  public UnrootedTree()
+  {
+    topology = GraphUtils.newUndirectedGraph();
+    branchLengths = Maps.newLinkedHashMap();
+  }
   
   /**
    * Add a node (species)
@@ -74,6 +92,11 @@ public class UnrootedTree
   {
     topology.removeEdge(n1, n2);
     branchLengths.remove(UnorderedPair.of(n1, n2));
+  }
+  
+  public void removeEdge(UnorderedPair<TreeNode, TreeNode> edge)
+  {
+    removeEdge(edge.getFirst(), edge.getSecond());
   }
   
   /**
@@ -104,6 +127,12 @@ public class UnrootedTree
   {
     return branchLengths.get(new UnorderedPair<TreeNode, TreeNode>(node1, node2));
   }
+  
+  public double getBranchLength(UnorderedPair<TreeNode, TreeNode> edge)
+  {
+    return branchLengths.get(edge);
+  }
+ 
   
   /**
    * Modifies in place the length of a branch.
@@ -168,7 +197,7 @@ public class UnrootedTree
   }
 
   /**
-   * @see UnrootedTreeUtils.leaves()
+   * See UnrootedTreeUtils.leaves()
    * @return
    */
   public List<TreeNode> leaves()
@@ -177,7 +206,7 @@ public class UnrootedTree
   }
   
   /**
-   * @see UnrootedTreeUtils.allTotalBranchLengthDistances()
+   * See UnrootedTreeUtils.allTotalBranchLengthDistances()
    * @return
    */
   public Counter<UnorderedPair<TreeNode,TreeNode>> allTotalBranchLengthDistances()
@@ -187,8 +216,8 @@ public class UnrootedTree
   
   /**
    * Reads the contents of the given file and parse it as a newick string.
-   * @param f
-   * @return
+   * 
+   * See {@link #fromNewickString(String) fromNewickStrin(String)}
    */
   public static UnrootedTree fromNewick(File f)
   {
@@ -197,6 +226,12 @@ public class UnrootedTree
   
   /**
    * Parse a tree from a string containing a newick specification.
+   * 
+   * Limitations:
+   * - Names of taxa should have no space, start with ["a"-"z","A"-"Z","_"], and have character from ["a"-"z","A"-"Z","_","-","0"-"9","."] for the rest
+   * - Leaves should be named (not required for internal)
+   * - Leaf names should be distrinct
+   * - All edges should have a branch length attached to it
    * 
    * For example: UnrootedTree.fromNewickString("((A:1.0,Z:2.0):3.0,(B:4.0,C:5.0):6.0,X:100);");
    * @param string
@@ -219,35 +254,37 @@ public class UnrootedTree
   }
 
   /**
-   * Iterate the edge (oriented with the provided root) and add two dummy internal nodes on 
-   * each edge. The nodes are placed at the given fractions from the bottom node of each edge. 
+   * Iterate the edge (oriented with the provided root) and add a dummy internal node on 
+   * each edge, except for edges connected to current. 
+   * 
+   * The nodes are placed at a uniform fractions from the bottom node of each edge. 
    * This modifies the tree in place.
    */
-  public List<TreeNode> addAuxiliaryInternalNodes(double smallRatio, double largerRatio, 
-      TreeNode root)
+  public List<TreeNode> addAuxiliaryInternalNodes(Random rand, TreeNode current)
   {
     List<TreeNode> result = Lists.newArrayList();
     
-    for (Pair<TreeNode,TreeNode> edge : getRootedEdges(root))
+    for (Pair<TreeNode,TreeNode> edge : getRootedEdges(current))
     {
-      double originalBL = getBranchLength(edge.getLeft(), edge.getRight());
-      double
-        bottomBL = smallRatio * originalBL,
-        middleBL = (largerRatio - smallRatio) * originalBL,
-        top_BL = (1.0 - largerRatio) * originalBL;
-
-      removeEdge(edge.getLeft(), edge.getRight());
-      TreeNode 
-        lowerDummyNode = TreeNode.nextUnlabelled(),
-        upperDummyNode = TreeNode.nextUnlabelled();
-      addNode(lowerDummyNode);
-      addNode(upperDummyNode);
-      // left = complete top
-      addEdge(edge.getLeft(), upperDummyNode, top_BL);
-      addEdge(upperDummyNode, lowerDummyNode, middleBL);
-      addEdge(lowerDummyNode, edge.getRight(), bottomBL);
-      result.add(lowerDummyNode);
-      result.add(upperDummyNode);
+      if (edge.getLeft().equals(current) || edge.getRight().equals(current))
+        result.add(current);
+      else
+      {
+        double ratio = rand.nextDouble();
+        double originalBL = getBranchLength(edge.getLeft(), edge.getRight());
+        double
+          bottomBL = ratio * originalBL,
+          top_BL = (1.0 - ratio) * originalBL;
+  
+        removeEdge(edge.getLeft(), edge.getRight());
+        TreeNode 
+          dummyNode = TreeNode.nextUnlabelled();
+        addNode(dummyNode);
+        // left = complete top
+        addEdge(edge.getLeft(), dummyNode, top_BL);
+        addEdge(dummyNode, edge.getRight(), bottomBL);
+        result.add(dummyNode);
+      }
     }
     
     return result;
@@ -283,9 +320,6 @@ public class UnrootedTree
    * This instance will be modified in place to remove all the edges and nodes in the returned
    * tree, except for the node removedRoot.
    * 
-   * @param removedRoot
-   * @param detached
-   * @return
    */
   public UnrootedTree prune(TreeNode removedRoot, TreeNode detachedNode)
   {
@@ -344,5 +378,8 @@ public class UnrootedTree
   {
     UnrootedTreeUtils.simplify(this);
   }
- 
+
+
+
+
 }

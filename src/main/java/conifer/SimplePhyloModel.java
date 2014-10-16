@@ -61,6 +61,14 @@ public class SimplePhyloModel extends MCMCRunner
   private final PrintWriter treeWriter = BriefIO.output(Results.getFileInResultFolder("FES.trees.newick"));
 
   private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
+	public static void main(String [] args) throws ClassNotFoundException, IOException
+	{
+		SimplePhyloModel runner = new SimplePhyloModel();
+		runner.factory.mcmcOptions.nMCMCSweeps = 10000;
+		runner.factory.mcmcOptions.burnIn = (int) Math.round(.1 * runner.factory.mcmcOptions.nMCMCSweeps);
+		
+		// run
+		runner.run();
 
   public static void main(String [] args) throws ClassNotFoundException, IOException
   {
@@ -94,6 +102,11 @@ public class SimplePhyloModel extends MCMCRunner
       SimplePhyloModel runner = new SimplePhyloModel();
       runner.factory.mcmcOptions.nMCMCSweeps = 1000;
       runner.factory.mcmcOptions.burnIn = (int) Math.round(.1 * runner.factory.mcmcOptions.nMCMCSweeps);
+		// compute the tree
+		MajorityRuleTree.buildAndWriteConsensusTree(
+				Results.getFileInResultFolder("FES.trees.newick"),
+				Results.getFileInResultFolder("FESConsensusTree.Nexus"));
+	}
 
       String excluding = "Excluding " + experiment.toString();
       for (String moveClassName : experiment) {
@@ -103,6 +116,11 @@ public class SimplePhyloModel extends MCMCRunner
         Class<? extends Move> castedMoveClass = (Class<? extends Move>) moveClass;
         runner.factory.excludeNodeMove(castedMoveClass);
       }
+	protected void process(ProcessorContext context)
+	{
+		treeWriter.println(likelihood.tree.toNewick());
+		treeWriter.flush();
+	}
 
       // log experiment information
       runner.logToFile("Experiment Title:" + excluding);

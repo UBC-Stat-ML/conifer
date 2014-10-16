@@ -28,10 +28,10 @@ public interface NewickParserConstants {
     "<NUMBER_STRING>",
     "<NODE_NAME_STRING>",
     "\";\"",
-    "\"(\"",
-    "\")\"",
-    "\",\"",
     "\":\"",
+    "\"(\"",
+    "\",\"",
+    "\")\"",
   };
 
 }

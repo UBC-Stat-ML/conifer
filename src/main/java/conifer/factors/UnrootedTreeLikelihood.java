@@ -16,6 +16,7 @@ import briefj.BriefCollections;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
+import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.RateMatrices;
 import conifer.ctmc.SimpleRateMatrix;
 import conifer.ctmc.expfam.ExpFamMixture;
@@ -52,6 +53,7 @@ public class UnrootedTreeLikelihood
   /**
    * 
    */
+  // TODO: @Sohrab, is this the best way to supress sampling of the tree (fixed topology and branch lenght?)
   @FactorArgument
   public final UnrootedTree tree;
   
@@ -123,6 +125,18 @@ public class UnrootedTreeLikelihood
   {
     MultiCategorySubstitutionModel<ExpFamMixture> subModel = new MultiCategorySubstitutionModel<ExpFamMixture>(mixture, this.observations.nSites());
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>>(this.tree, subModel, this.observations);
+  }
+  
+  public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> withSingleRateMatrix(CTMCParameters ctmc)
+  {
+    DiscreteGammaMixture mix = new DiscreteGammaMixture(RealVariable.real(0), RealVariable.real(1.0), ctmc, 1);
+    MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(mix, this.observations.nSites()); //observations.nSites()/factory.getChunkLength());
+    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(this.tree, subModel, this.observations);
+  }
+  
+  public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> withSingleRateMatrix(double [][] matrix)
+  {
+    return withSingleRateMatrix(new SimpleRateMatrix(matrix, null));
   }
   
   public UnrootedTreeLikelihood<M> withTree(File newickFile)
