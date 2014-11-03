@@ -65,13 +65,20 @@ public class PhylogeneticObservationFactory
    }
   
   
-  public static PhylogeneticObservationFactory copyNumberFactory()
+  public static PhylogeneticObservationFactory copyNumberEmissionFactory()
   {
 	  if(_copyNumberFactory == null)
-		  _copyNumberFactory = fromResource("/conifer/io/cn-iupac-encoding.txt");
+		  _copyNumberFactory = fromResource("/conifer/io/cn-emission-iupac-encoding.txt");
 	  return _copyNumberFactory;
   }
  
+  public static PhylogeneticObservationFactory copyNumberCTMCFactory()
+  {
+	  if(_copyNumberFactory == null)
+		  _copyNumberFactory = fromResource("/conifer/io/cn-ctmc-iupac-encoding.txt");
+	  return _copyNumberFactory;
+  }
+  
   
   /**
    * Reads the specifications of a PhylogeneticObservationFactory from a JSON file.

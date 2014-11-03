@@ -18,3 +18,5 @@ src/main/resources/conifer/sampleInput/FES_8.g.fasta
 src/main/resources/conifer/sampleInput/UTY.ape.4.nwk
 src/main/resources/conifer/sampleInput/UTY_4.fasta
 src/main/resources/conifer/sampleInput/UTY_4.g.fasta
+
+.DS_Store

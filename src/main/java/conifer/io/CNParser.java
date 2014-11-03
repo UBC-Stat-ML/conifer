@@ -15,6 +15,11 @@ import com.google.common.collect.Maps;
 
 import conifer.TreeNode;
 
+/**
+ * Create TreeNode to CharSequence map
+ * @author Sohrab Salehi (sohrab.salehi@gmail.com)
+ *
+ */
 public class CNParser {
 
 	public static LinkedHashMap<TreeNode, List<CNPair>> readCNPairs(File f) {
@@ -23,6 +28,8 @@ public class CNParser {
 		/**
 		 * We allow a line of comment, a line for header 
 		 */
+		
+		String WHITE_SPACE = "(\\s+$|^\\s+)";
 		
 		//CSVReader reader = new CSVReader(new FileReader(f));
 		int lineNumber = 0;
@@ -47,9 +54,9 @@ public class CNParser {
 					if (elements.length > 3) {
 						
 						// parse the line
-						String speciesName = elements[0].replaceAll("(\\s+$|^\\s+)", "");
-						CNPair currentPair = CNPair.withCounts(Integer.parseInt(elements[2].replaceAll("(\\s+$|^\\s+)", "")), 
-								Integer.parseInt(elements[3].replaceAll("(\\s+$|^\\s+)", "")));
+						String speciesName = elements[0].replaceAll(WHITE_SPACE, "");
+						CNPair currentPair = CNPair.withCounts(Integer.parseInt(elements[2].replaceAll(WHITE_SPACE, "")), 
+								Integer.parseInt(elements[3].replaceAll(WHITE_SPACE, "")));
 						
 						// the first line
 						if (currentTaxonName == null) {
@@ -112,8 +119,11 @@ public class CNParser {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		File f = new File("src/main/resources/conifer/sampleInput/testCopyNumber.txt");
+		//File f = new File("src/main/resources/conifer/sampleInput/testCopyNumber.txt");
+		File f = new File("src/main/resources/conifer/sampleInput/testPatientData.txt");
 		LinkedHashMap<TreeNode, List<CNPair>> leaves = CNParser.readCNPairs(f);
+		
+		System.out.println(leaves.keySet().size());
 		
 		for (Map.Entry<TreeNode, List<CNPair>> e: leaves.entrySet()) {
 			for (int i = 0; i < e.getValue().size(); i++) {

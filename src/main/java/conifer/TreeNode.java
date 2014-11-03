@@ -7,7 +7,7 @@ package conifer;
  * and the latter case, unlabelled.
  * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
- *
+ * @author Sohrab Salehi (sohrab.salehi@gmail.com)
  */
 public final class TreeNode
 {

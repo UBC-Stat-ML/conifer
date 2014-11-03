@@ -29,7 +29,7 @@ import conifer.models.MultiCategorySubstitutionModel;
  * test the resampling of the rate matrix parameterizations
  * 
  * @author Sean Jewell (jewellsean@gmail.com)
- *
+ * CTMC
  */
 public class BasicPhyloModel implements Runnable, Processor 
 {

@@ -22,6 +22,8 @@ import conifer.UnrootedTree;
 import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.RateMatrices;
 import conifer.ctmc.SimpleRateMatrix;
+import conifer.ctmc.cnv.CopyNumberEmissionModel;
+import conifer.ctmc.cnv.CopyNumberMatrix;
 import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.io.CNObservationFactory;
@@ -108,17 +110,39 @@ public class UnrootedTreeLikelihood
    */
   public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) 
   {
+	// read in the emission data
     LinkedHashMap<TreeNode, CharSequence> data = CNParser.readCN(cnFile);
-    UnrootedTree tree = defaultTree(data.keySet());
-    tree.addNode(TreeNode.withLabel("root"));
-    // add custom rate matrix construction
-    // gammaMixture not supported
-    PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.copyNumberFactory();
+    
+    // convert emission data from CharSequence to indicators
+    PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.copyNumberEmissionFactory();
     TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).length()/factory.getChunkLength());
     MultiCategorySubstitutionModel.loadObservations(observations, data, factory);
     
+    // plug-in emission observations into CNEmissionModel
+    CopyNumberEmissionModel cnEmissionModel = new CopyNumberEmissionModel(observations);
     
-    // testing
+    // add custom rate matrix construction
+    // plug-in CNEmissionModel into CopyNumberMatrix
+    CopyNumberMatrix cnRateMatrix = RateMatrices.singleCellCopyNumber(cnEmissionModel);
+    
+    // create CNMixture (gammaMixture not supported)
+    CopyNumberMixture cnMixture = new CopyNumberMixture(cnRateMatrix);
+
+    // TODO: convert emission observations into CTMC states at the leaves
+    TreeObservations treeObservations = cnEmissionModel.sampleCTMCStates();
+        
+    // plug-in CTMC states as the tree observation
+    MultiCategorySubstitutionModel<CopyNumberMixture> subModel 
+    = new MultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, treeObservations.nSites());
+    
+    // make the tree
+    UnrootedTree tree = defaultTree(data.keySet());
+    tree.addNode(TreeNode.withLabel("root"));
+
+    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
+    
+    /*
+    // testing (what?)
     Map<String,String> a2s = PhylogeneticObservationFactory.copyNumberFactory().getIndicator2ChunkMap();
  
 	StringBuilder result = new StringBuilder();
@@ -134,11 +158,8 @@ public class UnrootedTreeLikelihood
 	}
 	
 	System.out.println(result.toString());
-    
-    
-    
-    return null;
-    
+       */ 
+  
   }
   
   
@@ -157,7 +178,8 @@ public class UnrootedTreeLikelihood
     DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0.1), RealVariable.real(1.0), baseRateMatrix, 4);
     PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.nucleotidesFactory();
     TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).length());
-    MultiCategorySubstitutionModel.loadObservations(observations, data, factory); 
+    MultiCategorySubstitutionModel.loadObservations(observations, data, factory);
+    
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, observations.nSites());
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, observations);
   }

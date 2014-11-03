@@ -21,9 +21,14 @@ public class Indexers
 		return PhylogeneticObservationFactory.proteinPairFactory().getIndexer();
 	}
 
-	public static Indexer<String> copyNumberIndexer()
+	public static Indexer<String> copyNumberCTMCIndexer()
 	{
-		return PhylogeneticObservationFactory.copyNumberFactory().getIndexer();
+		return PhylogeneticObservationFactory.copyNumberCTMCFactory().getIndexer();
+	}
+	
+	public static Indexer<String> copyNumberEmissionIndexer()
+	{
+		return PhylogeneticObservationFactory.copyNumberEmissionFactory().getIndexer();
 	}
 	
 	
@@ -33,7 +38,7 @@ public class Indexers
 	}
 	
 	public static void main(String[] args) {
-		Indexer<String> i = Indexers.copyNumberIndexer();
+		Indexer<String> i = Indexers.copyNumberCTMCIndexer();
 		for (Object j : i.objectsList()) {
 			System.out.println(j.toString());
 		}
