@@ -51,7 +51,6 @@ public class RateMatrixUtils
 
   /**
    * Check off diagonals are non-negative and  sum to the negative of diagonals.
-   * @param rateMatrix
    */
   public static void checkValidRateMatrix(double [][] rates)
   {

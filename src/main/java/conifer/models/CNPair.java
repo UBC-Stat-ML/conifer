@@ -1,6 +1,5 @@
 package conifer.models;
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import conifer.io.CNObservationFactory;
 
 
@@ -20,8 +19,6 @@ public class CNPair {
 			//throw new ValueException("Counts can't be over " + CNObservationFactory.maximumMutantCopyNumber);
 			System.err.println("Value over CTMC bound!");
 		}
-			
-		
 		
 		this.ra = ra;
 		this.rA = rA;
@@ -42,9 +39,5 @@ public class CNPair {
 	@Override
 	public String toString() {
 		return "(" + ra + ", " + rA + ")";
-	}
-	
-	public String toRawString() {
-		return "" + ra + "," + rA;
 	}
 }

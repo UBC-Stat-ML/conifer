@@ -18,7 +18,7 @@ import conifer.TreeNode;
 /**
  * Reads sequences in the FASTA format.
  * 
- * The first line of blocks of lines starting with '>' will become the sequence label.
+ * The first line of blocks of lines starting with greater than sign will become the sequence label.
  * 
  * The contents of the lines in between will be concatenated (ignoring blank sequence) and will
  * become the sequence associated with the the last block of comments.

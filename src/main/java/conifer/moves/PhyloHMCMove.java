@@ -4,7 +4,6 @@ import hmc.AHMC;
 import hmc.DataStruct;
 import hmc.HMC;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -38,8 +37,10 @@ public class PhyloHMCMove extends NodeMove
   @ConnectedFactor UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
   @ConnectedFactor IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior;
   
-  private Double epsilon = null;
-  private Integer L = null;
+  public Double epsilon = null;
+  public Integer L = null;
+  
+  public int nItersPerPathAuxVar = 1000;
 
   @Override
   public void execute(Random rand)
@@ -54,7 +55,7 @@ public class PhyloHMCMove extends NodeMove
     
     List<PathStatistics> pathStatistics = likelihood.evolutionaryModel.samplePosteriorPaths(rand, likelihood.observations, likelihood.tree);
     
-    ExpectedStatistics<CTMCState> convertedStat = convert(pathStatistics); 
+    ExpectedStatistics<CTMCState> convertedStat = convert(pathStatistics, parameters, likelihood); 
     CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective objective = parameters.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0/variance, convertedStat);
     
     double [] initialPoint = parameters.getVector();
@@ -67,11 +68,8 @@ public class PhyloHMCMove extends NodeMove
       // but may not be needed (already quite a bit of gains by doing large number of steps (L) 
       // within the doIter() method below
       DataStruct hmcResult = null;
-      for (int i = 0; i < 1000; i++)
-      {
+      for (int i = 0; i < nItersPerPathAuxVar; i++)
         hmcResult = HMC.doIter(rand, L, epsilon, i == 0 ? new DoubleMatrix(initialPoint) : hmcResult.next_q, objective, objective);
-//        System.out.println(hmcResult.energy + "\t" + Arrays.toString(hmcResult.next_q.data));
-      }
       newPoint = hmcResult.next_q.data;
     }
     else
@@ -80,6 +78,7 @@ public class PhyloHMCMove extends NodeMove
       newPoint = ahmc.sample(rand).data;
       epsilon = ahmc.getEpsilon();
       L = ahmc.getL();
+      System.out.println("adapted: L="+L + ",epsilon="+epsilon);
     }
     
     parameters.setVector(newPoint);
@@ -90,8 +89,10 @@ public class PhyloHMCMove extends NodeMove
     return epsilon != null;
   }
 
-  private ExpectedStatistics<CTMCState> convert(
-      List<PathStatistics> pathStatistics)
+  public static ExpectedStatistics<CTMCState> convert(
+      List<PathStatistics> pathStatistics,
+      ExpFamParameters parameters,
+      UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood)
   {
     ExpectedStatistics<CTMCState> result = new ExpectedStatistics<CTMCState>(parameters.globalExponentialFamily);
     CTMCStateSpace space = likelihood.evolutionaryModel.rateMatrixMixture.stateSpace;
@@ -122,7 +123,7 @@ public class PhyloHMCMove extends NodeMove
     return result;
   }
 
-  private List<CTMCState> states(int category, CTMCStateSpace space)
+  public static List<CTMCState> states(int category, CTMCStateSpace space)
   {
     List<CTMCState> result = Lists.newArrayList();
     

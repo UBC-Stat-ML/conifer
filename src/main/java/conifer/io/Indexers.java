@@ -30,19 +30,19 @@ public class Indexers
 	{
 		return PhylogeneticObservationFactory.copyNumberEmissionFactory().getIndexer();
 	}
-	
-	
+
 	public static Indexer<CNPair> CNPairIndexer()
 	{
 		return CNObservationFactory.defaultFactory().getIndexer();
 	}
-	
+    
 	public static void main(String[] args) {
 		Indexer<String> i = Indexers.copyNumberCTMCIndexer();
 		for (Object j : i.objectsList()) {
 			System.out.println(j.toString());
 		}
 	}
+
 }
 
 

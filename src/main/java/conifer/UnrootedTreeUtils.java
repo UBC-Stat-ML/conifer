@@ -52,8 +52,6 @@ public class UnrootedTreeUtils
   
   /**
    *{@link conifer.UnrootedTree#fromNewickString(String) UnrootedTree.fromNewick()}
-   * @param f
-   * @return
    */
   public static UnrootedTree fromNewickString(String newickString)
   {

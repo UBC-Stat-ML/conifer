@@ -52,7 +52,6 @@ public class EigenCTMC implements CTMC
    * 
    * It should be recreated each time a likelihood 
    * calculation is performed.
-   * @param rateMatrix
    */
     
  public EigenCTMC(double [][] rates)

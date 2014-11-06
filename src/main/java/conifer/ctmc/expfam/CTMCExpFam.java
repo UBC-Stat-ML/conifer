@@ -78,9 +78,6 @@ public class CTMCExpFam<S>
   /**
    * Note that the order of the two arguments in transitionFeatureExtractor calls is made canonical automatically
    * (hence the reversible part of the name of this method)
-   * @param counts
-   * @param state1
-   * @param state2
    */
   public void extractReversibleBivariateFeatures(Collection<? extends BivariateFeatureExtractor<S>> bivariateFeatureExtractors)
   {

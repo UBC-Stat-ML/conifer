@@ -43,4 +43,5 @@ public class CNObservationFactory {
     // TODO: needed for loading observations 
     return null;
   }
+
 }

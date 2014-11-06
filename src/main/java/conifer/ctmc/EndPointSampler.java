@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
  * 
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  * The objective of this code is to sample the full path given the initial states and the final states.
- * The number of transitions and sojourn time is unkown and needs to be sampled.
+ * The number of transitions and sojourn time is unknown and needs to be sampled.
  * The theory behind this code can be found at 
  * http://www.stat.ubc.ca/~bouchard/courses/stat547-sp2013-14/lecture/2014/02/05/lecture10.html
  *

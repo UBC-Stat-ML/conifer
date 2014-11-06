@@ -1,11 +1,20 @@
 # this is just a csv testing
+<<<<<<< HEAD
+species, citeName, ra, rA
+=======
 species, siteName, ra, rA
+>>>>>>> 681d1a1fcef84f4e5f65b8c4e5a9887784389f9f
 1, s1, 1, 1
 1, s2, 2,2
 1, s3, 3,3
 2, s1, 4,0
+<<<<<<< HEAD
+3, s1, 5,6
+
+=======
 2, s2, 5,0
 2, s3, 0,1
 3, s1, 5,3
 3, s2, 5,4
 3, s3, 0,0
+>>>>>>> 681d1a1fcef84f4e5f65b8c4e5a9887784389f9f

@@ -15,6 +15,11 @@ import com.google.common.collect.Maps;
 
 import conifer.TreeNode;
 
+
+public class CNParser {
+
+	public static LinkedHashMap<TreeNode, List<CNPair>> readCN(File f) throws NumberFormatException, IOException {
+
 /**
  * Create TreeNode to CharSequence map
  * @author Sohrab Salehi (sohrab.salehi@gmail.com)
@@ -23,6 +28,7 @@ import conifer.TreeNode;
 public class CNParser {
 
 	public static LinkedHashMap<TreeNode, List<CNPair>> readCNPairs(File f) {
+
 		LinkedHashMap<TreeNode, List<CNPair>> map = Maps.newLinkedHashMap();
 		
 		/**
@@ -91,13 +97,6 @@ public class CNParser {
 	}
 	
 	
-	/**
-	 * Reads the CNPairs line by line and creates a 
-	 * @param f
-	 * @return
-	 * @throws NumberFormatException
-	 * @throws IOException
-	 */
 	
 	public static LinkedHashMap<TreeNode, CharSequence> readCN(File f)  {
 		LinkedHashMap<TreeNode, CharSequence> result = Maps.newLinkedHashMap();
@@ -123,7 +122,6 @@ public class CNParser {
 		File f = new File("src/main/resources/conifer/sampleInput/testPatientData.txt");
 		LinkedHashMap<TreeNode, List<CNPair>> leaves = CNParser.readCNPairs(f);
 		
-		System.out.println(leaves.keySet().size());
 		
 		for (Map.Entry<TreeNode, List<CNPair>> e: leaves.entrySet()) {
 			for (int i = 0; i < e.getValue().size(); i++) {
@@ -134,6 +132,7 @@ public class CNParser {
 		// example of an indexer
 		Indexer<CNPair> indexer = Indexers.CNPairIndexer();
 		System.out.println(indexer.i2o(5));
+
 		
 		// rawString representation
 		LinkedHashMap<TreeNode, CharSequence> l = CNParser.readCN(f);

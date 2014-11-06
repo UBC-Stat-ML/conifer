@@ -104,10 +104,6 @@ public class MajorityRuleTree {
 	 * Constructs a nwk topology with branch lengths from the given fastaFile, basically, 
 	 * gets the fasta file, parses it and extracts species names and creates a tree 
 	 * and augment with branch lengths and writes to file.
-	 * @param fastaFile
-	 * @return
-	 * @throws IOException
-	 * 
 	 */ 
 	public static File randomUnrootedPhylogenyFromMultipleAlignmentFastaFile(File fastaFile) {
 		
