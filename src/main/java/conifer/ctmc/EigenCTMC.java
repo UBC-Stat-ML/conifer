@@ -30,7 +30,7 @@ import Jama.Matrix;
 import org.jblas.Eigen;
 /**
  * A continuous time Markov chain. The main functionalities consists
- * in computing a marginal transition probability and a stationary distibution
+ * in computing a marginal transition probability and a stationary distribution
  * (see below).
  * 
  * This implementation is based on caching the eigendecomposition
@@ -100,8 +100,6 @@ public class EigenCTMC implements CTMC
    
  }
 
-  
-  
   
   /**
    * Compute and cache the stationary (called by the constructor)

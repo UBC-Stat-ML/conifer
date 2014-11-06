@@ -107,28 +107,29 @@ public class CopyNumberMatrix implements CTMCParameters
 		return resourceMatrix.getRateMatrix();
 	}
 	
-	/**
-	 * @ Test method. Return some default values.
-	 * @param cnEmissionModel
-	 * @return
-	 */
-	public static CopyNumberMatrix testSingleCellCopyNumber(CopyNumberEmissionModel cnEmissionModel) {
-		// TODO Auto-generated method stub
-		Set<String> labels = new HashSet<>();
-		labels.add("mutationQ"); 
-		labels.add("increaseQ");
-		labels.add("decreaseQ");
-
-		Map<String, String> resources = new HashMap<>();
-		for(String lbl : labels)
-			resources.put(lbl, "/conifer/ctmc/kimura1980.txt");
-
-		return new CopyNumberMatrix(
-				getResourceFromLabel("mutationQ", resources),
-				getResourceFromLabel("increaseQ", resources),
-				getResourceFromLabel("decreaseQ", resources),
-				cnEmissionModel);
-	}
+// Breaking compilation, strongly deprecate for now 
+//	/**
+//	 * @ Test method. Return some default values.
+//	 * @param cnEmissionModel
+//	 * @return
+//	 */
+//	public static CopyNumberMatrix testSingleCellCopyNumber(CopyNumberEmissionModel cnEmissionModel) {
+//		// TODO Auto-generated method stub
+//		Set<String> labels = new HashSet<>();
+//		labels.add("mutationQ"); 
+//		labels.add("increaseQ");
+//		labels.add("decreaseQ");
+//
+//		Map<String, String> resources = new HashMap<>();
+//		for(String lbl : labels)
+//			resources.put(lbl, "/conifer/ctmc/kimura1980.txt");
+//
+//		return new CopyNumberMatrix(
+//				getResourceFromLabel("mutationQ", resources),
+//				getResourceFromLabel("increaseQ", resources),
+//				getResourceFromLabel("decreaseQ", resources),
+//				cnEmissionModel);
+//	}
 
 
 

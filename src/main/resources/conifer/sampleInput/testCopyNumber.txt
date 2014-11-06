@@ -1,5 +1,5 @@
 # this is just a csv testing
-species, citeName, ra, rA
+species, siteName, ra, rA
 1, s1, 1, 1
 1, s2, 2,2
 1, s3, 3,3
