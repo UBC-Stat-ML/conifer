@@ -1,6 +1,7 @@
 package conifer.models;
 
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import conifer.ctmc.Path;
 import conifer.ctmc.PathStatistics;
 import conifer.ctmc.RateMatrixToEmissionModel;
 import conifer.factors.NonClockTreePrior;
+import conifer.io.CNObservationFactory;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
 
@@ -469,6 +471,30 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
       observations.set(treeNode, indicators);
     }
   }
+  
+  
+//  /**
+//   * new load observations for cn
+//   *  
+//   *  TODO: potentially possible to cast into charsequence...look at protein  
+//   *  
+//   * @param observations
+//   * @param rawStrings
+//   * @param observationFactory
+//   */
+//  public static void loadCNObservations(
+//      TreeObservations observations, 
+//      Map<TreeNode, List<CNPair>> rawStrings, 
+//      CNObservationFactory observationFactory)
+//  {
+//    for (TreeNode treeNode : rawStrings.keySet())
+//    {
+//      String rawString = rawStrings.get(treeNode).toString();
+//      double [][] indicators = observationFactory.site2CharacterIndicators(rawString);
+//      observations.set(treeNode, indicators);
+//    }
+//  }
+  
   
   /**
    * 

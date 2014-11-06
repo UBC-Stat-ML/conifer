@@ -15,9 +15,10 @@ public class CNPair {
 	public CNPair(int ra, int rA) {
 		
 		if (ra < 0 || rA < 0) throw new RuntimeException("Counts can't be negative.");
-		if (ra > CNObservationFactory.maximumNormalCopyNumber || rA > CNObservationFactory.maximumMutantCopyNumber) 
-			throw new RuntimeException("Counts can't be over " + CNObservationFactory.maximumMutantCopyNumber);
-		
+		if (ra > CNObservationFactory.maximumNormalCopyNumber || rA > CNObservationFactory.maximumMutantCopyNumber) {
+			//throw new ValueException("Counts can't be over " + CNObservationFactory.maximumMutantCopyNumber);
+			System.err.println("Value over CTMC bound!");
+		}
 		
 		this.ra = ra;
 		this.rA = rA;

@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import briefj.BriefCollections;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 

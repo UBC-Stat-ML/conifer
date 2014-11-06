@@ -37,4 +37,11 @@ public class CNObservationFactory {
 	public static CNObservationFactory defaultFactory() {
 		return new CNObservationFactory();
 	}
+
+  public double[][] site2CharacterIndicators(String rawString)
+  {
+    // TODO: needed for loading observations 
+    return null;
+  }
+
 }

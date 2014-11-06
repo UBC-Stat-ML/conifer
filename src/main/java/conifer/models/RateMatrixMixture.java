@@ -15,7 +15,7 @@ public interface RateMatrixMixture
   public CTMCParameters getRateMatrix(int index);
   
   /**
-   * @return Prior probability of each of the category.
+   * @return Prior probability of each category.
    */
   public List<Double> getLogPriorProbabilities();
 

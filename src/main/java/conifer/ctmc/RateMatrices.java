@@ -2,6 +2,9 @@ package conifer.ctmc;
 
 import java.util.Random;
 
+import conifer.ctmc.cnv.CopyNumberEmissionModel;
+import conifer.ctmc.cnv.CopyNumberMatrix;
+import conifer.ctmc.cnv.CopyNumberMixture;
 import bayonet.distributions.Multinomial;
 
 
@@ -60,4 +63,9 @@ public class RateMatrices
   {
     return randomGTR(rand, size, null);
   }
+  
+  public static CopyNumberMatrix singleCellCopyNumber(CopyNumberEmissionModel cnEmissionModel) {
+	  return CopyNumberMatrix.testSingleCellCopyNumber(cnEmissionModel);
+  }
+  
 }

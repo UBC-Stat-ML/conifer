@@ -64,6 +64,22 @@ public class PhylogeneticObservationFactory
     return _proteinPairFactory;
    }
   
+  
+  public static PhylogeneticObservationFactory copyNumberEmissionFactory()
+  {
+	  if(_copyNumberFactory == null)
+		  _copyNumberFactory = fromResource("/conifer/io/cn-emission-iupac-encoding.txt");
+	  return _copyNumberFactory;
+  }
+ 
+  public static PhylogeneticObservationFactory copyNumberCTMCFactory()
+  {
+	  if(_copyNumberFactory == null)
+		  _copyNumberFactory = fromResource("/conifer/io/cn-ctmc-iupac-encoding.txt");
+	  return _copyNumberFactory;
+  }
+  
+  
   /**
    * Reads the specifications of a PhylogeneticObservationFactory from a JSON file.
    * 
@@ -114,7 +130,7 @@ public class PhylogeneticObservationFactory
     return orderedSymbols.size();
   }
   
-  private int getChunkLength()
+  public int getChunkLength()
   {
      return orderedSymbols.get(0).length();
   }
@@ -235,7 +251,8 @@ public class PhylogeneticObservationFactory
   
   private static PhylogeneticObservationFactory _nucleotideFactory = null;
   private static PhylogeneticObservationFactory _proteinFactory = null;
-  private static PhylogeneticObservationFactory _proteinPairFactory=null;
+  private static PhylogeneticObservationFactory _proteinPairFactory = null;
+  private static PhylogeneticObservationFactory _copyNumberFactory = null;
 
   public int nSites()
   {
