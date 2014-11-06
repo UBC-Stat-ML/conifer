@@ -19,6 +19,8 @@ import conifer.ctmc.RateMatrixUtils;
 import conifer.ctmc.SimpleRateMatrix;
 
 /**
+ * Corresponds to notation in basic_model.pdf
+ * 
  * 
  * @author Sean Jewell (jewellsean@gmail.com)
  *
@@ -26,22 +28,28 @@ import conifer.ctmc.SimpleRateMatrix;
 public class CopyNumberMatrix implements CTMCParameters
 {
 	@FactorArgument
-	public final RealVariable increaseCNV = real(1); 
+	public final RealVariable alpha = real(1); 
 
 	@FactorArgument
-	public final RealVariable decreaseCNV = real(1); 
+	public final RealVariable beta = real(1); 
 
-	private final double mutationEpsilon = 0.001; 
+	@FactorArgument
+	public final RealVariable gamma = real(1); 
 
+	private final double DOLLO_EPSILON = 0.001;  
+	
+	
 	// Break the overall Q representation into a series of 3 matrices
-	private final SimpleMatrix mutationQ;
 	private final SimpleMatrix increaseQ; 
 	private final SimpleMatrix decreaseQ; 
-
+	private final SimpleMatrix mutationQ;
+	
 	private final RateMatrixToEmissionModel emissionModel;
 
-	public CopyNumberMatrix(double[][] mutationQ, double[][] increaseQ, 
-			double[][] decreaseQ,RateMatrixToEmissionModel emissionModel)
+	public CopyNumberMatrix(double[][] increaseQ, 
+			                double[][] decreaseQ,
+			                double[][] mutationQ,
+			                RateMatrixToEmissionModel emissionModel)
 	{
 		this.mutationQ = new SimpleMatrix(mutationQ); 
 		this.increaseQ = new SimpleMatrix(increaseQ); 
@@ -65,17 +73,18 @@ public class CopyNumberMatrix implements CTMCParameters
 
 	/**
 	 * Need to normalize the combined rate matrix 
-	 * then return a normalized Q
+	 * then return a normalized Q multiplied by DOLLO_EPSILON
+	 * this is needed for Stochastic Dollo intrepretation cf. Alex's convergence result
 	 */
 	@Override
 	public double[][] getRateMatrix()
 	{
 		double[][] rate = EJMLUtils.copyMatrixToArray(
-				mutationQ.scale(mutationEpsilon)
-				.plus(increaseQ.scale(increaseCNV.getValue()))
-				.plus(decreaseQ.scale(decreaseCNV.getValue())));
+				mutationQ.scale(gamma.getValue())
+				.plus(increaseQ.scale(alpha.getValue()))
+				.plus(decreaseQ.scale(beta.getValue())));
 		RateMatrixUtils.normalize(rate); 
-		return rate; 
+		return EJMLUtils.copyMatrixToArray((new SimpleMatrix(rate)).scale(DOLLO_EPSILON)); 
 	}
 
 	/* Syntactic Candy */ 
@@ -86,8 +95,6 @@ public class CopyNumberMatrix implements CTMCParameters
 	 */
 	public static CopyNumberMatrix fromResources(Map<String, String> resourceURLs)
 	{
-		//TODO: create the corresponding emission model.
-		// Is s (BetaBinomial hyperparameter, always fixed?)
 		return new CopyNumberMatrix(
 				getResourceFromLabel("mutationQ", resourceURLs),
 				getResourceFromLabel("increaseQ", resourceURLs),
@@ -107,30 +114,6 @@ public class CopyNumberMatrix implements CTMCParameters
 		return resourceMatrix.getRateMatrix();
 	}
 	
-// Breaking compilation, strongly deprecate for now 
-//	/**
-//	 * @ Test method. Return some default values.
-//	 * @param cnEmissionModel
-//	 * @return
-//	 */
-//	public static CopyNumberMatrix testSingleCellCopyNumber(CopyNumberEmissionModel cnEmissionModel) {
-//		// TODO Auto-generated method stub
-//		Set<String> labels = new HashSet<>();
-//		labels.add("mutationQ"); 
-//		labels.add("increaseQ");
-//		labels.add("decreaseQ");
-//
-//		Map<String, String> resources = new HashMap<>();
-//		for(String lbl : labels)
-//			resources.put(lbl, "/conifer/ctmc/kimura1980.txt");
-//
-//		return new CopyNumberMatrix(
-//				getResourceFromLabel("mutationQ", resources),
-//				getResourceFromLabel("increaseQ", resources),
-//				getResourceFromLabel("decreaseQ", resources),
-//				cnEmissionModel);
-//	}
-
 
 
 	public static void main(String args [])
@@ -150,8 +133,4 @@ public class CopyNumberMatrix implements CTMCParameters
 		System.out.println((new SimpleMatrix(cp.getRateMatrix())).toString());
 
 	}
-
-
-	
-
 }

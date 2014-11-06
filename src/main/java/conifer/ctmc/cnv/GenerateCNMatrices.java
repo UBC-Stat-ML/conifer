@@ -1,6 +1,32 @@
 package conifer.ctmc.cnv;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.ejml.simple.SimpleMatrix;
+
+import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
+
+/**
+ * Class to generate the simple copy number + point mutation process
+ * The size parameter is the ploidy number of wildtype (A), mutant (a) respectively
+ * State space is (A, a, b) where A, a \in {0,1,..., Size} and b \in {0,1} 
+ * 
+ * For biological reasons, state space is restrict in b = 0 state to: 
+ * 
+ * (0,0,0), (1,0,0), ... , (Size, 0, 0) 
+ * 
+ * For b = 1 no restrictions are imposed, that is space is of cardinality (Size + 1) * (Size + 1)
+ * 
+ * 
+ * Total size of matrix is thus, Size + 1 + (Size + 1)  * (Size + 1), 
+ * which is significantly less than niave implementation of 
+ * 2 * (Size + 1) * (Size + 1)  
+ * 
+ * @author jewellsean
+ *
+ */
+
 
 public class GenerateCNMatrices
 {
@@ -15,34 +41,61 @@ public class GenerateCNMatrices
    */
   public GenerateCNMatrices(int size)
   {
-    this.size = size;  
+    this.size = size + 1;  
     this.mutationQ = null; 
     this.increaseQ = null;
     this.decreaseQ = null;
   }
 
-  private int[] ind2Space(int index)
+  private Integer[] ind2Space(int index)
   {
-    int [] ind2Space = new int[2];
+    Integer [] ind2Space = new Integer[3];
+    
+    // constrained state space
+    if (index < size)
+    {
+        ind2Space[0] = index;
+        ind2Space[1] = 0;
+        ind2Space[2] = 0;
+        return ind2Space;
+    }
+    
+    index -= size; 
     ind2Space[0] = index / size; // int division
     ind2Space[1] = index % size;
+    ind2Space[2] = 1; 
     return ind2Space;
   }
 
-  private int space2Ind(int [] state)
+  private int space2Ind(Integer [] state)
   {
-    return state[0] * size + state[1];
+      if (state[2] == 0)
+          return state[0];
+      
+      return state[0] * size + state[1] + size;
   }
 
   private <T extends MutationSpecification> double [][] generateSpecification(T mutationSpecification) 
   {
-    double [][] rateMatrix = new double[size * size][size * size];
-    for(int row = 0; row < size * size; row++)
+    int len = size * (size + 1);
+    double [][] rateMatrix = new double[len][len];
+    for(int row = 0; row < len; row++)
     {
-      int [] state = ind2Space(row); 
-      state  = mutationSpecification.getValue(state, size);
-      int col = space2Ind(state);
-      rateMatrix[row][col] = 1;
+      Integer [] state = ind2Space(row);
+//      System.out.println("----- Start state:( " + state[0] + ", " + state[1] + ", " + state[2] + ")-----");
+      List<Integer[]> transitions = mutationSpecification.getValues(state, size);
+      
+      for (Integer[] transState : transitions)
+      {
+         if (transState != null)
+          {
+//             System.out.println("transition state:( " + transState[0] + ", " + transState[1] + ", " + transState[2] + ")");
+             int col = space2Ind(transState);
+             rateMatrix[row][col] = 1;
+          }
+      }
+//      System.out.println("   ");
+
     }
 
     return rateMatrix;
@@ -74,57 +127,87 @@ public class GenerateCNMatrices
   }
 
   /**
-   * Assumes that the state is (m,n)
+   * Assumes that the state is (A,a, b)
    *   
    * @author Sean Jewell (jewellsean@gmail.com)
    *
    */
   private interface MutationSpecification
   {
-    int[] getValue(int[] state, int size);
+    List<Integer[]> getValues(Integer[] state, int size);
   }
 
   private static class simpleMutationSpecification implements MutationSpecification
   {
     @Override
-    public int[] getValue(int[] state, int size)
+    public List<Integer[]> getValues(Integer[] state, int size)
     {
-      if(state[1] > 0 & state[0] < (size - 1))
-      {
-        state[0] += 1;
-        state[1] -= 1;
-        return state;
-      }
-      return state;
-    }
-  }
-
-  private static class decreaseSpecification implements MutationSpecification
-  {
-    @Override
-    public int[] getValue(int[] state, int size)
-    {
-      if(state[0] > 0 && state[0] < (size - 1))
-        state[0] += 1; 
-      if(state[1] > 0 && state[1] < (size - 1))
-        state[1] += 1;
-      return state;
+     List<Integer[]> transition = new ArrayList<Integer[]>();
+     transition.add(modState(-1, 1, state, size));
+     transition.add(modState(1, -1, state, size));
+     return transition;
     }
   }
 
   private static class increaseSpecification implements MutationSpecification
   {
     @Override
-    public int[] getValue(int[] state, int size)
+    public List<Integer[]> getValues(Integer[] state, int size)
     {
-      if(state[0] > 0)
-        state[0]-= 1; 
-      if(state[1] > 0) 
-        state[1] -= 1;
-      return state;
+        List<Integer[]> transition = new ArrayList<Integer[]>();
+        transition.add(modState(0, 1, state, size));
+        transition.add(modState(1, 0, state, size));
+        return transition;
+    }
+  }
+
+  private static class decreaseSpecification implements MutationSpecification
+  {
+    @Override
+    public List<Integer[]> getValues(Integer[] state, int size)
+    {
+        List<Integer[]> transition = new ArrayList<Integer[]>();
+        transition.add(modState(-1, 0, state, size));
+        transition.add(modState(0, -1, state, size));
+        return transition;
     } 
   }
 
+  private static Integer[] modState(int modWild, int modMutant,Integer[] state, int size)
+  {
+      boolean unrestrict = false;
+      // cannot get anywhere from this state
+      if (state[0] == 0 && state[1] == 0)
+          return null;
+
+      // Point mutation
+      if (modWild + modMutant == 0)
+      {
+          state[2] = 1;
+          unrestrict = true; 
+      }
+   
+      int s0 = state[0] + modWild;
+      int s1 = state[1] + modMutant;
+
+      // test for superfluous cn changes
+      if (!unrestrict && ((state[0] == 0 && modWild != 0) || (state[1] == 0 && modMutant != 0)))
+      {
+          return null; 
+      }
+      
+      // boundaries in state space 
+      if (s0 < 0 || s0 > (size - 1) || s1 < 0 || s1 > (size - 1))
+          return null;
+ 
+      Integer[] modState = new Integer[3];
+      modState[0] = s0;
+      modState[1] = s1;
+      modState[2] = state[2];
+      return modState; 
+  }
+  
+  
   public double [][] getMutationQ()
   {
     return mutationQ;
@@ -141,9 +224,12 @@ public class GenerateCNMatrices
     return decreaseQ;
   }
 
+
+  
   public static void main(String args[])
   {
     int size = 3;
+    
     GenerateCNMatrices cn = new GenerateCNMatrices(size);
     cn.ensureInitalize(); 
     SimpleMatrix decrease = new SimpleMatrix(cn.getDecreaseQ()); 
@@ -159,3 +245,4 @@ public class GenerateCNMatrices
     System.out.println(mutation.toString());
   }
 }
+
