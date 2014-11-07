@@ -2,42 +2,47 @@ package conifer.models;
 
 import conifer.io.CNObservationFactory;
 
-
 // TODO: add checks on the valid value of copy numbers
 public class CNPair {
 
-	// the normal read count
-	private int ra;
-	
-	// the mutant read count
+	// the wildtype read count
 	private int rA;
-	
-	public CNPair(int ra, int rA) {
-		
-		if (ra < 0 || rA < 0) throw new RuntimeException("Counts can't be negative.");
+
+	// the mutant read count
+	private int ra;
+
+	public CNPair(int rA, int ra) {
+
+		if (ra < 0 || rA < 0)
+			throw new RuntimeException("Counts can't be negative.");
 		if (ra > CNObservationFactory.maximumNormalCopyNumber || rA > CNObservationFactory.maximumMutantCopyNumber) {
-			//throw new ValueException("Counts can't be over " + CNObservationFactory.maximumMutantCopyNumber);
-			System.err.println("Value over CTMC bound!");
+			// throw new ValueException("Counts can't be over " +
+			// CNObservationFactory.maximumMutantCopyNumber);
+			//System.err.println("Value over CTMC bound!");
 		}
-		
-		this.ra = ra;
+
 		this.rA = rA;
+		this.ra = ra;
 	}
-	
+
 	public int getRa() {
 		return ra;
 	}
-	
+
 	public int getrA() {
 		return rA;
 	}
-	
-	public static CNPair withCounts(int ra, int rA) {
-		return new CNPair(ra, rA);
+
+	public int getN() {
+		return (rA + ra);
 	}
-	
+
+	public static CNPair withCounts(int rA, int ra) {
+		return new CNPair(rA, ra);
+	}
+
 	@Override
 	public String toString() {
-		return "(" + ra + ", " + rA + ")";
+		return "(" + rA + ", " + ra + ")";
 	}
 }

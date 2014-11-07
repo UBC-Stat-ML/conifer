@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import bayonet.distributions.Exponential;
 import bayonet.marginal.FactorGraph;
@@ -21,14 +22,17 @@ import conifer.UnrootedTree;
 import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.RateMatrices;
 import conifer.ctmc.SimpleRateMatrix;
+import conifer.ctmc.cnv.CopyNumberEmissionModel;
 import conifer.ctmc.cnv.CopyNumberMatrix;
 import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.io.CNParser;
+import conifer.io.CopyNumberTreeObservation;
 import conifer.io.FastaUtils;
 import conifer.io.FixedTreeObservations;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
+import conifer.models.CNSpecies;
 import conifer.models.DiscreteGammaMixture;
 import conifer.models.EvolutionaryModel;
 import conifer.models.EvolutionaryModelUtils;
@@ -106,33 +110,21 @@ public class UnrootedTreeLikelihood
    */
   public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) 
   {
-	// read in the emission data
-    LinkedHashMap<TreeNode, CharSequence> data = CNParser.readCN(cnFile);
-    
-    // convert emission data from CharSequence to indicators
-    PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.copyNumberEmissionFactory();
-    TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).length()/factory.getChunkLength());
-    MultiCategorySubstitutionModel.loadObservations(observations, data, factory);
-    
-    // plug-in emission observations into CNEmissionModel
-    CopyNumberEmissionModel cnEmissionModel = new CopyNumberEmissionModel(observations);
-    
-    // add custom rate matrix construction
-    // plug-in CNEmissionModel into CopyNumberMatrix
-    CopyNumberMatrix cnRateMatrix = RateMatrices.singleCellCopyNumber(cnEmissionModel);
-    
-    // create CNMixture (gammaMixture not supported)
-    CopyNumberMixture cnMixture = new CopyNumberMixture(cnRateMatrix);
-
-    // TODO: convert emission observations into CTMC states at the leaves
-    TreeObservations treeObservations = cnEmissionModel.sampleCTMCStates();
+	// read in the raw count data
+	Set<CNSpecies> data = CNParser.readCNPairs(cnFile);
         
-    // plug-in CTMC states as the tree observation
+    // create CNMatrix and CNMixture (gammaMixture not supported)
+	CopyNumberMatrix cnMatrix = CopyNumberMatrix.defaultMatrix();
+    CopyNumberMixture cnMixture = new CopyNumberMixture(cnMatrix);
+
+    // create treeObservations and initialize the CTMC states
+    TreeObservations treeObservations = new CopyNumberTreeObservation(data);
+    
     MultiCategorySubstitutionModel<CopyNumberMixture> subModel 
     = new MultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, treeObservations.nSites());
     
     // make the tree
-    UnrootedTree tree = defaultTree(data.keySet());
+    UnrootedTree tree = defaultTree(treeObservations.getObservedTreeNodes());
     tree.addNode(TreeNode.withLabel("root"));
 
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
@@ -290,17 +282,20 @@ public class UnrootedTreeLikelihood
   
   public static void main(String [] args)
   {
-	File f = new File("src/main/resources/conifer/sampleInput/testCopyNumber.txt");
-	UnrootedTreeLikelihood.fromCNFile(f);
+	File f = new File("src/main/resources/conifer/sampleInput/testPatientData.txt");
+	UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> treeLikelihood =
+	UnrootedTreeLikelihood.fromCNFile(f);	
+	System.out.println(treeLikelihood.observations.toString());
+	
 	System.err.println("Finished reading CN!");
 	  
 	  
-    UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> ll = fromFastaFile(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"));
-    System.out.println("nSites=" + ll.observations.nSites());
-    System.out.println("nNodes=" + ll.tree.getTopology().vertexSet().size());
-    Random rand = new Random(1);
-    ll.evolutionaryModel.samplePosteriorPaths(rand, ll.observations, ll.tree, BriefCollections.pick(ll.tree.getTopology().vertexSet()), null);
-    System.out.println("done!");
+//    UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> ll = fromFastaFile(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"));
+//    System.out.println("nSites=" + ll.observations.nSites());
+//    System.out.println("nNodes=" + ll.tree.getTopology().vertexSet().size());
+//    Random rand = new Random(1);
+//    ll.evolutionaryModel.samplePosteriorPaths(rand, ll.observations, ll.tree, BriefCollections.pick(ll.tree.getTopology().vertexSet()), null);
+//    System.out.println("done!");
 //    ll.
   }
 }

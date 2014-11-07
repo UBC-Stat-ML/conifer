@@ -65,7 +65,8 @@ public class RateMatrices
   }
   
   public static CopyNumberMatrix singleCellCopyNumber(CopyNumberEmissionModel cnEmissionModel) {
-	  return CopyNumberMatrix.testSingleCellCopyNumber(cnEmissionModel);
+	  //return CopyNumberMatrix.testSingleCellCopyNumber(cnEmissionModel);
+	  return null;
   }
   
 }
