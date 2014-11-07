@@ -8,6 +8,7 @@ import java.util.List;
  * @author Sohrab Salehi (sohrab.salehi@gmail.com)
  *
  */
+// TODO: strongly enforce ordering 
 public class CNSpecies {
 	
 	private String speciesName;

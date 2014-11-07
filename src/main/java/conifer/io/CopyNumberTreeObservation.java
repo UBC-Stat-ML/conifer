@@ -30,13 +30,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	// raw count data E(v)
 	private final Set<CNSpecies> cnSpecies = new LinkedHashSet<CNSpecies>();
 
-	// the probability vector
-	double[] probabilityVector;// = new
-								// double[Indexers.copyNumberCTMCIndexer().objectsList().size()];
-
-	// TODO: do we need a Map<Indicator, double> probabilityVector?
-
-	// Y(v)
+	// Y(v): v \in L
 	private LinkedHashMap<TreeNode, double[][]> currentCTMCState = Maps.newLinkedHashMap();
 
 	private final int nSites;
@@ -48,7 +42,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	public CopyNumberTreeObservation(Set<CNSpecies> cnSpecies) {
 		nSites = cnSpecies.iterator().next().getCnPairs().size();
 		setCNSpecies(cnSpecies);
-		initialize();
+//		initialize();
 	}
 
 	@Override
@@ -77,7 +71,6 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		// TODO: what is the expected behavior, clear all data or just clear the
 		// current state
 		getCnSpecies().clear();
-		probabilityVector = new double[Indexers.copyNumberCTMCIndexer().objectsList().size()];
 		currentCTMCState.clear();
 	}
 
@@ -115,30 +108,29 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	}
 
 	// TODO: complete implementation
-	public void initialize() {
-
-		int nSpecies = cnSpecies.size();
-
-		double[][] data = new double[nSpecies][nSites];
-
-		// initialize the probabilityVector
-		double[] alphas = new double[nCTMCStates];
-		for (int i = 0; i < alphas.length; i++) {
-			alphas[i] = 1;
-		}
-		probabilityVector = Dirichlet.generate(new Random(), alphas);
-
-		// initialize currentCTMCState
-		for (CNSpecies s : cnSpecies) {
-			for (int j = 0; j < nSites; j++) {
-				data[j] = Multinomial.generate(new Random(), 1, probabilityVector);
-			}
-			currentCTMCState.put(TreeNode.withLabel(s.getSpeciesName()), data);
-		}
+//	public void initialize() {
+//
+//		int nSpecies = cnSpecies.size();
+//
+//		double[][] data = new double[nSpecies][nSites];
+//
+//		// initialize the probabilityVector
+//		double[] alphas = new double[nCTMCStates];
+//		for (int i = 0; i < alphas.length; i++) {
+//			alphas[i] = 1;
+//		}
+//		
+//		// initialize currentCTMCState
+//		for (CNSpecies s : cnSpecies) {
+//			for (int j = 0; j < nSites; j++) {
+//				data[j] = Multinomial.generate(new Random(), 1, probabilityVector);
+//			}
+//			currentCTMCState.put(TreeNode.withLabel(s.getSpeciesName()), data);
+//		}
 
 		// TODO: do we have to manually make sure that in the initial state
 		// there's at least one state with b=1?
-	}
+//	}
 
 	// TODO: finish implementation
 	@Override
