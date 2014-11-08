@@ -39,6 +39,7 @@ import conifer.models.EvolutionaryModel;
 import conifer.models.EvolutionaryModelUtils;
 import conifer.models.LikelihoodComputationContext;
 import conifer.models.MultiCategorySubstitutionModel;
+import conifer.models.ParsimonyModel;
 
 
 /**
@@ -123,35 +124,19 @@ public class UnrootedTreeLikelihood
 	
     CopyNumberMixture cnMixture = new CopyNumberMixture(cnMatrix);
 
-    
+    int nSites = treeObservations.nSites();    
     CNMultiCategorySubstitutionModel<CopyNumberMixture> subModel 
-    = new CNMultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, treeObservations.nSites());
+    = new CNMultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, ParsimonyModel.initalization(nSites), nSites);
     
     // make the tree
     UnrootedTree tree = defaultTree(treeObservations.getObservedTreeNodes());
     tree.addNode(TreeNode.withLabel("root"));
+    
+    // this needs to be set to the correct values upon initalization...ie. the state space must be (2,0,0)! 
 
     return new UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
     
-    /*
-    // testing (what?)
-    Map<String,String> a2s = PhylogeneticObservationFactory.copyNumberFactory().getIndicator2ChunkMap();
  
-	StringBuilder result = new StringBuilder();
-	for (TreeNode node : observations.getObservedTreeNodes()) {
-		result.append(">" + node + "\n");
-		double[][] s = (double[][]) observations.get(node);
-		String charAtSite = "S";
-		for (int j = 0; j < s.length; j++) {
-			charAtSite = a2s.get(Arrays.toString(s[j]));
-			result.append(charAtSite);
-		}
-		result.append("\n");
-	}
-	
-	System.out.println(result.toString());
-       */ 
-  
   }
   
   
@@ -291,9 +276,9 @@ public class UnrootedTreeLikelihood
 			BriefIO.resourceToString("/conifer/ctmc/cn-42-increaseQ.txt");
 	  
 	
-	File f = new File("src/main/resources/conifer/sampleInput/testPatientData.txt");
-	UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> treeLikelihood =
-	UnrootedTreeLikelihood.fromCNFile(f);
+//	File f = new File("src/main/resources/conifer/sampleInput/testPatientData.txt");
+//	UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> treeLikelihood =
+//	UnrootedTreeLikelihood.fromCNFile(f);
 //	System.out.println(treeLikelihood.observations.toString());
 //	
 //	System.err.println("Finished reading CN!");

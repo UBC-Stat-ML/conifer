@@ -9,6 +9,15 @@ public class ParsimonyVector
 {
     private int[] M; 
     
+    public static ParsimonyVector oneInit(int nSites)
+    {
+        int[] M = new int[nSites];
+        for (int i = 0; i < nSites; i++)
+            M[i] = 1;
+        return new ParsimonyVector(M);
+    }
+            
+    
     
     public ParsimonyVector(int[] M)
     {

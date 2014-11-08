@@ -23,9 +23,8 @@ import conifer.models.CNSpecies;
  * @author Sean Jewell (jewellsean@gmail.com)
  */
 public class CopyNumberTreeObservation implements TreeObservations {
-	private final int nCTMCStates = Indexers.copyNumberCTMCIndexer().objectsList().size();
-
-	private Map<String, Integer> leafOrder = null;
+	
+    private Map<String, Integer> leafOrder = null;
 	
 	public Map<String, Integer> getLeafOrder()
 	{

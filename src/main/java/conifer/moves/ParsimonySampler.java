@@ -1,6 +1,8 @@
 package conifer.moves;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -20,7 +22,7 @@ import conifer.models.RateMatrixMixture;
 
 /**
  * 
- * @author jewellsean
+ * @author Sean Jewell (jewellsean@gmail.com)
  *
  */
 public class ParsimonySampler implements MHProposalDistribution
@@ -33,18 +35,28 @@ public class ParsimonySampler implements MHProposalDistribution
 
 //    @ConnectedFactor need for s variable 
 
+    
+    private List<Integer> visitSiteInRandomOrder(Random rand, int nSites)
+    {
+        List<Integer> visitOrder = new ArrayList<Integer>();
+        for (Integer i = 0; i < nSites; i++)
+            visitOrder.add(i);
+        Collections.shuffle(visitOrder, rand);
+        return visitOrder;
+    }
+    
     @Override
     public Proposal propose(Random rand)
     {
         CopyNumberTreeObservation data = (CopyNumberTreeObservation) likelihood.observations;
-         
-        
-        int nSites = data.nSites();
-        for(int i = 0; i < nSites; i++)
+                
+        List<Integer> visitOrder = visitSiteInRandomOrder(rand, data.nSites());
+                
+        for(Integer i : visitOrder)
         {
-            Map<String, CNPair> emissions = data.getEmissionAtSite(i);
-            int Mi = oneSiteGibbs(rand, emissions, i);
-            parsimony.getM().setIndex(i, Mi);
+            Map<String, CNPair> emissions = data.getEmissionAtSite(i.intValue());
+            int Mi = oneSiteGibbs(rand, emissions, i.intValue());
+            parsimony.getM().setIndex(i.intValue(), Mi);
         }
         return new ProposalRealization();
     }
@@ -52,24 +64,25 @@ public class ParsimonySampler implements MHProposalDistribution
 
     private int oneSiteGibbs(Random rand, Map<String, CNPair> emissions, int site)
     {
-        double[] loglikelihood; 
         int noLeaves = emissions.keySet().size(); 
-
+        double[] loglikelihood = new double[noLeaves];
+        
         for (int v = 0; v < noLeaves; v++)
         {
-            updateAllLeavesFixedSite(emissions, v, betaBinomialPrecision, site);
+            updateAllLeavesFixedSite(emissions, v, site);
             loglikelihood[v] = likelihood.logDensity();
         }
 
         int mi = bayonet.distributions.Multinomial.sampleMultinomial(rand, loglikelihood);
-        updateAllLeavesFixedSite(emissions, mi, betaBinomialPrecision, site);
+        updateAllLeavesFixedSite(emissions, mi, site);
         
         return mi; 
     }
 
     // for a fixed parsimony state, that is a fixed value of M update all of the leaves with new Y vectors
-    private void updateAllLeavesFixedSite(Map<String, CNPair> emissions, int minLeaf, double betaBinomialPrecision, int site)
+    private void updateAllLeavesFixedSite(Map<String, CNPair> emissions, int minLeaf, int site)
     {
+        double betaBinomialPrecision = likelihood.evolutionaryModel.pm.betaBinomialPrecision.getValue();
         CopyNumberTreeObservation data = (CopyNumberTreeObservation) likelihood.observations;
         Map<String, Integer> leafMap = data.getLeafOrder();
         for (String leaf : emissions.keySet())

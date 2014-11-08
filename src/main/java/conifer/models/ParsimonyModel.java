@@ -1,8 +1,10 @@
 package conifer.models;
 
-import conifer.Parsimony;
 import blang.annotations.FactorArgument;
-import blang.annotations.FactorComponent;
+import blang.variables.RealVariable;
+import static blang.variables.RealVariable.real;
+import conifer.Parsimony;
+import conifer.ParsimonyVector;
 
 /**
  * 
@@ -11,14 +13,23 @@ import blang.annotations.FactorComponent;
  */
 public class ParsimonyModel
 {
-
-    @FactorArgument public final double betaBinomialPrecision; 
-    @FactorComponent public final Parsimony parsimony;  
+    @FactorArgument 
+    public final RealVariable betaBinomialPrecision; 
     
-    public ParsimonyModel(double betaBinomialPrecision, Parsimony parsimony)
+    @FactorArgument(makeStochastic=true)
+    public final Parsimony parsimony;  
+    
+    public ParsimonyModel(RealVariable betaBinomialPrecision, Parsimony parsimony)
     {
         this.betaBinomialPrecision = betaBinomialPrecision;
         this.parsimony = parsimony; 
+    }
+    
+    public static ParsimonyModel initalization(int nSites)
+    {
+        RealVariable betaBinomial = real(1); 
+        Parsimony parsimony = new Parsimony(ParsimonyVector.oneInit(nSites));
+        return new ParsimonyModel(betaBinomial, parsimony);
     }
     
     
