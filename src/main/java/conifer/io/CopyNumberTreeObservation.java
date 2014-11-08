@@ -1,15 +1,13 @@
 package conifer.io;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
-
-import bayonet.distributions.Dirichlet;
-import bayonet.distributions.Multinomial;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -83,13 +81,6 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		return nSites;
 	}
 
-	/**
-	 * @return the cnspecies
-	 */
-	public Set<CNSpecies> getCnspecies() {
-		return getCnSpecies();
-	}
-
 	public Map<TreeNode, List<CNPair>> getTreeNodeRepresentation() {
 		return CNParser.getNodeMap(getCnSpecies());
 	}
@@ -107,6 +98,22 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		}
 	}
 
+	public Map<String, CNPair> getEmissionAtSite(int i)
+    {
+        Map<String, CNPair> emissions = new HashMap<String, CNPair>();
+        Iterator<CNSpecies> itPairs = cnSpecies.iterator();
+        
+        while(itPairs.hasNext())
+        {
+            CNSpecies pairs = itPairs.next();
+            emissions.put(pairs.getSpeciesName(), pairs.getCnPairs().get(i));
+        }
+        
+        return emissions; 
+    }
+	
+	
+	
 	// TODO: complete implementation
 //	public void initialize() {
 //
@@ -129,7 +136,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
 //		}
 
 		// TODO: do we have to manually make sure that in the initial state
-		// there's at least one state with b=1?
+		// there's at least one state with b=1?...yes, but through aux variable
 //	}
 
 	// TODO: finish implementation

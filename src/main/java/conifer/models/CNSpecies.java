@@ -1,7 +1,9 @@
 package conifer.models;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Contains CNPairs and Cluster_ID
@@ -21,6 +23,7 @@ public class CNSpecies {
 		this.speciesName = speciesName;
 	}
 
+	
 	/**
 	 * @return the clusterID
 	 */

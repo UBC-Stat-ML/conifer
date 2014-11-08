@@ -12,6 +12,11 @@ import conifer.processors.ParsimonyProcessor;
 @Samplers({ParsimonySampler.class})
 @Processors({ParsimonyProcessor.class})
 
+/**
+ * 
+ * @author jewellsean
+ *
+ */
 public class Parsimony
 {
 

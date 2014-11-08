@@ -2,6 +2,12 @@ package conifer.models;
 
 import blang.annotations.FactorComponent;
 
+/**
+ * 
+ * @author jewellsean
+ *
+ * @param <T>
+ */
 public class CNMultiCategorySubstitutionModel<T extends RateMatrixMixture> extends
         MultiCategorySubstitutionModel<T>
 {

@@ -4,6 +4,11 @@ import conifer.Parsimony;
 import blang.annotations.FactorArgument;
 import blang.annotations.FactorComponent;
 
+/**
+ * 
+ * @author jewellsean
+ *
+ */
 public class ParsimonyModel
 {
 
