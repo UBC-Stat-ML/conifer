@@ -20,10 +20,10 @@ public class Parsimony
  * this is the current state of affairs 
  * 
  */
-    private int[] M; 
+    private ParsimonyVector M; 
     private UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> fullTree;  
     
-    public Parsimony(int[] M, 
+    public Parsimony(ParsimonyVector M, 
             UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> fullTree)
     {
         this.M = M; 
@@ -35,7 +35,7 @@ public class Parsimony
         return fullTree; 
     }
     
-    public int[] getM()
+    public ParsimonyVector getM()
     {
         return M; 
     }

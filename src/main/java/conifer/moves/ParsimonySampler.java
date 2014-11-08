@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Random;
 
 import conifer.Parsimony;
+import conifer.factors.UnrootedTreeLikelihood;
+import conifer.models.CNMultiCategorySubstitutionModel;
+import conifer.models.ParsimonyModel;
+import conifer.models.RateMatrixMixture;
 import blang.factors.Factor;
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.MHProposalDistribution;
@@ -18,8 +22,9 @@ public class ParsimonySampler implements MHProposalDistribution
     @Override
     public Proposal propose(Random rand)
     {
-        // need to sample the M based on all leaves
-        // site by site 
+        UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> fullTree = parsimony.getFullTree();
+        ParsimonyModel pm = fullTree.evolutionaryModel.pm;
+        
         
         return new ProposalRealization();
     }
