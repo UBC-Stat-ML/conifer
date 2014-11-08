@@ -18,7 +18,10 @@ public class ParsimonySampler implements MHProposalDistribution
     @Override
     public Proposal propose(Random rand)
     {
-         return new ProposalRealization();
+        // need to sample the M based on all leaves
+        // site by site 
+        
+        return new ProposalRealization();
     }
     
     private class ProposalRealization implements Proposal

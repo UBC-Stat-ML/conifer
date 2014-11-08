@@ -7,12 +7,12 @@ import blang.annotations.FactorComponent;
 public class ParsimonyModel
 {
 
-    @FactorArgument public final double precision; 
+    @FactorArgument public final double betaBinomialPrecision; 
     @FactorComponent public final Parsimony parsimony;  
     
-    public ParsimonyModel(double precision, Parsimony parsimony)
+    public ParsimonyModel(double betaBinomialPrecision, Parsimony parsimony)
     {
-        this.precision = precision;
+        this.betaBinomialPrecision = betaBinomialPrecision;
         this.parsimony = parsimony; 
     }
     

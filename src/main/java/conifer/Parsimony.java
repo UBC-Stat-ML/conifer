@@ -1,10 +1,17 @@
 package conifer;
 
+import blang.annotations.Processors;
 import blang.annotations.Samplers;
+import conifer.factors.UnrootedTreeLikelihood;
+import conifer.io.CopyNumberTreeObservation;
+import conifer.models.CNMultiCategorySubstitutionModel;
+import conifer.models.RateMatrixMixture;
 import conifer.moves.ParsimonySampler;
+import conifer.processors.ParsimonyProcessor;
 
 @Samplers({ParsimonySampler.class})
-//@Processors({})
+@Processors({ParsimonyProcessor.class})
+
 public class Parsimony
 {
 
@@ -14,11 +21,23 @@ public class Parsimony
  * 
  */
     private int[] M; 
-
-    public Parsimony(int[] M)
+    private UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> fullTree;  
+    
+    public Parsimony(int[] M, 
+            UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> fullTree)
     {
         this.M = M; 
+        this.fullTree = fullTree; 
     }
     
+    public UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> getFullTree()
+    {
+        return fullTree; 
+    }
+    
+    public int[] getM()
+    {
+        return M; 
+    }
 
 }
