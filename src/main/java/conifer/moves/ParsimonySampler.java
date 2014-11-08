@@ -1,24 +1,18 @@
 package conifer.moves;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
+import blang.mcmc.ConnectedFactor;
+import blang.mcmc.MHProposalDistribution;
+import blang.mcmc.SampledVariable;
+import briefj.opt.Option;
 import conifer.Parsimony;
-import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.io.CopyNumberTreeObservation;
 import conifer.models.CNMultiCategorySubstitutionModel;
 import conifer.models.CNPair;
-import conifer.models.CNSpecies;
-import conifer.models.MultiCategorySubstitutionModel;
-import conifer.models.ParsimonyModel;
 import conifer.models.RateMatrixMixture;
-import blang.factors.Factor;
-import blang.mcmc.ConnectedFactor;
-import blang.mcmc.MHProposalDistribution;
-import blang.mcmc.SampledVariable;
 
 /**
  * 
@@ -27,9 +21,13 @@ import blang.mcmc.SampledVariable;
  */
 public class ParsimonySampler implements MHProposalDistribution
 {
+    @Option public final double DELTA = 0.1;
+    
     @SampledVariable Parsimony parsimony; 
     
     @ConnectedFactor UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> likelihood;
+    
+    @ConnectedFactor 
     
     @Override
     public Proposal propose(Random rand)
@@ -52,13 +50,28 @@ public class ParsimonySampler implements MHProposalDistribution
         double[] loglikelihood; 
         int noLeaves = emissions.keySet().size(); 
         
-        
-        
+        for (int i = 0; i < noLeaves; i++)
+        {
+            
+        }
+         
         
         loglikelihood[v] = likelihood.logDensity();
         
         return 0; 
     }
+    
+    
+    private double[] conditionalEmissionLikelihood(int N, int rA, double xi, double s)
+    {
+        
+    }
+    
+    private double constructXi(int A, int a)
+    {
+        return (A + DELTA) / (A + a + DELTA);
+    }
+    
     
     
     private class ProposalRealization implements Proposal
