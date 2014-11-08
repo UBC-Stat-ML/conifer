@@ -20,11 +20,33 @@ import conifer.models.CNSpecies;
  * Keeps the raw count data as CNSpacies,
  * 
  * @author Sohrab Salehi (sohrab.salehi@gmail.com)
- *
+ * @author Sean Jewell (jewellsean@gmail.com)
  */
 public class CopyNumberTreeObservation implements TreeObservations {
 	private final int nCTMCStates = Indexers.copyNumberCTMCIndexer().objectsList().size();
 
+	private Map<String, Integer> leafOrder = null;
+	
+	public Map<String, Integer> getLeafOrder()
+	{
+	    if (leafOrder != null)
+	    {
+	        return leafOrder;
+	    }
+	    
+	    Map<String, CNPair> emissions = getEmissionAtSite(0);
+	    leafOrder = new HashMap<String, Integer>();
+	    Integer i = 0; 
+	    for (String s : emissions.keySet())
+	        leafOrder.put(s, i++);
+	    return leafOrder; 
+	}
+	
+	public int getLeafOrder(String s)
+	{
+	    return getLeafOrder().get(s).intValue();
+	}
+	
 	// raw count data E(v)
 	private final Set<CNSpecies> cnSpecies = new LinkedHashSet<CNSpecies>();
 
@@ -56,6 +78,19 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		return currentCTMCState.get(leaf);
 	}
 
+	public double[] getSite(TreeNode leaf, int site) {
+         double[][] ctmcStateSpace = currentCTMCState.get(leaf);
+         return ctmcStateSpace[site];
+    }
+	
+	public void setSite(TreeNode leaf, int site, double[] ctmcUpdate)
+	{
+	    double[][] ctmc = currentCTMCState.get(leaf);
+	    ctmc[site] = ctmcUpdate; 
+	    currentCTMCState.put(leaf, ctmc);
+	}
+	
+	
 	@Override
 	public void set(TreeNode leaf, Object data) {
 		double[][] cast = (double[][]) data;
