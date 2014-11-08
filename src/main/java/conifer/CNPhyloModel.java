@@ -12,6 +12,7 @@ import blang.annotations.DefineFactor;
 import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.processing.ProcessorContext;
 import briefj.BriefIO;
+import briefj.opt.Option;
 import briefj.run.Results;
 import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.factors.NonClockTreePrior;
@@ -19,18 +20,19 @@ import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
 
 
-
 public class CNPhyloModel extends MCMCRunner
 {
-    File inputFile 
-    = new File("src/main/resources/conifer/sampleInput/FES_4.fasta");
+
+    @Option(required = true, gloss = "file containing raw reads") String emissionData;
+    
+    File inputFile = new File(emissionData);
 
     @DefineFactor(onObservations = true)
     public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
     UnrootedTreeLikelihood
     .fromFastaFile(inputFile)
-    .withExpFamMixture(ExpFamMixture.kimura1980())
-    .withTree(new File("src/main/resources/conifer/sampleInput/FES.ape.4.nwk"));
+    .withExpFamMixture(ExpFamMixture.kimura1980());
+   
 
     @DefineFactor
     NonClockTreePrior<RateParameterization> treePrior = 
