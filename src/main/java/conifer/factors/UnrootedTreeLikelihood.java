@@ -16,6 +16,7 @@ import blang.annotations.FactorComponent;
 import blang.factors.GenerativeFactor;
 import blang.variables.RealVariable;
 import briefj.BriefCollections;
+import briefj.BriefIO;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
@@ -30,6 +31,7 @@ import conifer.io.CNParser;
 import conifer.io.CopyNumberTreeObservation;
 import conifer.io.FastaUtils;
 import conifer.io.FixedTreeObservations;
+import conifer.io.Indexers;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
 import conifer.models.CNSpecies;
@@ -108,17 +110,18 @@ public class UnrootedTreeLikelihood
    * 
    * 
    */
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) 
-  {
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) {
 	// read in the raw count data
 	Set<CNSpecies> data = CNParser.readCNPairs(cnFile);
+	
+    // create treeObservations
+    TreeObservations treeObservations = new CopyNumberTreeObservation(data);
         
     // create CNMatrix and CNMixture (gammaMixture not supported)
-	CopyNumberMatrix cnMatrix = CopyNumberMatrix.defaultMatrix();
+	CopyNumberMatrix cnMatrix = CopyNumberMatrix.matrixOfSize(Indexers.copyNumberCTMCIndexer().objects().size() - 1);
+	
     CopyNumberMixture cnMixture = new CopyNumberMixture(cnMatrix);
 
-    // create treeObservations and initialize the CTMC states
-    TreeObservations treeObservations = new CopyNumberTreeObservation(data);
     
     MultiCategorySubstitutionModel<CopyNumberMixture> subModel 
     = new MultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, treeObservations.nSites());
@@ -282,12 +285,17 @@ public class UnrootedTreeLikelihood
   
   public static void main(String [] args)
   {
+//	String jsonString = BriefIO.resourceToString("src/main/resources/conifer/ctmc/cn-42-increaseQ.txt");
+	String jsonString = 
+			BriefIO.resourceToString("/conifer/ctmc/cn-42-increaseQ.txt");
+	  
+	
 	File f = new File("src/main/resources/conifer/sampleInput/testPatientData.txt");
 	UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> treeLikelihood =
-	UnrootedTreeLikelihood.fromCNFile(f);	
-	System.out.println(treeLikelihood.observations.toString());
-	
-	System.err.println("Finished reading CN!");
+	UnrootedTreeLikelihood.fromCNFile(f);
+//	System.out.println(treeLikelihood.observations.toString());
+//	
+//	System.err.println("Finished reading CN!");
 	  
 	  
 //    UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> ll = fromFastaFile(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"));

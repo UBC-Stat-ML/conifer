@@ -1,5 +1,6 @@
 package conifer.ctmc.cnv;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -10,6 +11,7 @@ import org.ejml.simple.SimpleMatrix;
 import bayonet.math.EJMLUtils;
 import blang.annotations.FactorArgument;
 import blang.variables.RealVariable;
+import briefj.opt.Option;
 import static blang.variables.RealVariable.real;
 import conifer.ctmc.CTMC;
 import conifer.ctmc.CTMCParameters;
@@ -27,6 +29,7 @@ import conifer.ctmc.SimpleRateMatrix;
  */
 public class CopyNumberMatrix implements CTMCParameters
 {
+	
 	@FactorArgument
 	public final RealVariable alpha = real(1); 
 
@@ -36,8 +39,8 @@ public class CopyNumberMatrix implements CTMCParameters
 	@FactorArgument
 	public final RealVariable gamma = real(1); 
 
-	private final double DOLLO_EPSILON = 0.001;  
-	
+	@Option(gloss="Dollo percision parameters")
+	public final double DOLLO_EPSILON = .1;  
 	
 	// Break the overall Q representation into a series of 3 matrices
 	private final SimpleMatrix increaseQ; 
@@ -51,13 +54,12 @@ public class CopyNumberMatrix implements CTMCParameters
 			                double[][] mutationQ,
 			                RateMatrixToEmissionModel emissionModel)
 	{
+		System.out.println("HelloThere");
 		this.mutationQ = new SimpleMatrix(mutationQ); 
 		this.increaseQ = new SimpleMatrix(increaseQ); 
 		this.decreaseQ = new SimpleMatrix(decreaseQ); 
 		this.emissionModel = emissionModel;
 	}
-
-
 
 	@Override
 	public CTMC getProcess()
@@ -82,9 +84,9 @@ public class CopyNumberMatrix implements CTMCParameters
 		double[][] rate = EJMLUtils.copyMatrixToArray(
 				mutationQ.scale(gamma.getValue())
 				.plus(increaseQ.scale(alpha.getValue()))
-				.plus(decreaseQ.scale(beta.getValue())));
-		RateMatrixUtils.normalize(rate); 
-		return EJMLUtils.copyMatrixToArray((new SimpleMatrix(rate)).scale(DOLLO_EPSILON)); 
+				.plus(decreaseQ.scale(beta.getValue())).scale(DOLLO_EPSILON));
+		RateMatrixUtils.fillRateMatrixDiagonalEntries(rate);
+		return rate; 
 	}
 
 	/* Syntactic Candy */ 
@@ -111,25 +113,30 @@ public class CopyNumberMatrix implements CTMCParameters
 	public static double[][] fromResource(String resourceURL)
 	{
 		SimpleRateMatrix resourceMatrix = SimpleRateMatrix.fromResource(resourceURL);
+		System.out.println(resourceMatrix);
 		return resourceMatrix.getRateMatrix();
 	}
 	
-	public static CopyNumberMatrix defaultMatrix() {
+	public static CopyNumberMatrix matrixOfSize(int size) 
+	{	
 		Set<String> labels = new HashSet<>();
 		labels.add("mutationQ"); 
 		labels.add("increaseQ");
 		labels.add("decreaseQ");
 
-
 		Map<String, String> resources = new HashMap<>();
 		for(String lbl : labels)
-			resources.put(lbl, "/conifer/ctmc/kimura1980.txt");
+			resources.put(lbl, GenerateCNMatrices.getPathForMatrix(lbl, size));
 
+		System.out.println(resources);
 		return fromResources(resources);
 	}
 
 	public static void main(String args [])
 	{
+		
+//		CopyNumberMatrix cp = CopyNumberMatrix.matricesForSize(3);
+		int size = 3;
 		Set<String> labels = new HashSet<>();
 		labels.add("mutationQ"); 
 		labels.add("increaseQ");
@@ -137,12 +144,12 @@ public class CopyNumberMatrix implements CTMCParameters
 
 
 		Map<String, String> resources = new HashMap<>();
-		for(String lbl : labels)
-			resources.put(lbl, "/conifer/ctmc/kimura1980.txt");
-
+		for(String lbl : labels) {
+			resources.put(lbl, GenerateCNMatrices.getPathForMatrix(lbl, size));
+			
+		}
 		CopyNumberMatrix cp = fromResources(resources);
-
+		System.out.println(Arrays.deepToString(cp.getRateMatrix()));
 		System.out.println((new SimpleMatrix(cp.getRateMatrix())).toString());
-
 	}
 }

@@ -8,8 +8,6 @@ import org.ejml.simple.SimpleMatrix;
 import com.google.gson.Gson;
 
 import conifer.ctmc.expfam.SerializedExpFamMixture;
-
-
 import bayonet.math.EJMLUtils;
 import briefj.BriefIO;
 
@@ -59,7 +57,9 @@ public class SimpleRateMatrix implements CTMCParameters
   }
   public static SimpleRateMatrix fromResource(String resourceURL)
   {
-    String jsonString = BriefIO.resourceToString(resourceURL); 
+	System.out.println("HelloHere" + " " + resourceURL);
+    String jsonString = BriefIO.resourceToString(resourceURL);
+    System.out.println(jsonString);
     return fromJSONString(jsonString);
   }
   

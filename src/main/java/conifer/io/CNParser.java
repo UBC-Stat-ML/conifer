@@ -227,5 +227,12 @@ public class CNParser {
 		Indexer<String> indexer = Indexers.copyNumberCTMCIndexer();
 		System.out.println(indexer.i2o(5));
 		System.out.println(indexer.objectsList().size());
+		
+		for (int i=0; i<42; i++ ) {
+			// System.out.println(indexer.i2o(i));
+			String[] p = indexer.i2o(i).split(",");
+			System.out.println(Integer.valueOf(p[1]).intValue());
+		}
+				
 	}
 }
