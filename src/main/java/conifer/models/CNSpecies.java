@@ -1,13 +1,16 @@
 package conifer.models;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Contains CNPairs and Cluster_ID
  * @author Sohrab Salehi (sohrab.salehi@gmail.com)
  *
  */
+// TODO: strongly enforce ordering 
 public class CNSpecies {
 	
 	private String speciesName;
@@ -20,6 +23,7 @@ public class CNSpecies {
 		this.speciesName = speciesName;
 	}
 
+	
 	/**
 	 * @return the clusterID
 	 */

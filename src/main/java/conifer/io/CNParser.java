@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import briefj.BriefIO;
 import briefj.Indexer;
 import conifer.models.CNPair;
@@ -169,8 +171,7 @@ public class CNParser {
 		}
 		return result;
 	}
-
-
+	
 	public static void main(String[] args) throws IOException {
 		// File("src/main/resources/conifer/sampleInput/testCopyNumber.txt");
 		File file = new File("src/main/resources/conifer/sampleInput/testPatientData.txt");

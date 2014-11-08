@@ -3,7 +3,6 @@ package conifer.factors;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -23,7 +22,6 @@ import conifer.UnrootedTree;
 import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.RateMatrices;
 import conifer.ctmc.SimpleRateMatrix;
-import conifer.ctmc.cnv.CopyNumberEmissionModel;
 import conifer.ctmc.cnv.CopyNumberMatrix;
 import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.ctmc.expfam.ExpFamMixture;
@@ -34,6 +32,7 @@ import conifer.io.FixedTreeObservations;
 import conifer.io.Indexers;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
+import conifer.models.CNMultiCategorySubstitutionModel;
 import conifer.models.CNSpecies;
 import conifer.models.DiscreteGammaMixture;
 import conifer.models.EvolutionaryModel;
@@ -110,7 +109,9 @@ public class UnrootedTreeLikelihood
    * 
    * 
    */
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) {
+
+  public static UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) 
+  {
 	// read in the raw count data
 	Set<CNSpecies> data = CNParser.readCNPairs(cnFile);
 	
@@ -123,14 +124,14 @@ public class UnrootedTreeLikelihood
     CopyNumberMixture cnMixture = new CopyNumberMixture(cnMatrix);
 
     
-    MultiCategorySubstitutionModel<CopyNumberMixture> subModel 
-    = new MultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, treeObservations.nSites());
+    CNMultiCategorySubstitutionModel<CopyNumberMixture> subModel 
+    = new CNMultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, treeObservations.nSites());
     
     // make the tree
     UnrootedTree tree = defaultTree(treeObservations.getObservedTreeNodes());
     tree.addNode(TreeNode.withLabel("root"));
 
-    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
+    return new UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
     
     /*
     // testing (what?)

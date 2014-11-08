@@ -31,7 +31,6 @@ public class AllBranchesScaling extends NodeMove
   public void execute(Random rand)
   {
     // hack for now to make this sampled less often
-	// TODO: @Sohrab What does this hack affect?
     if (rand.nextInt(10) != 0)
       return;
     
