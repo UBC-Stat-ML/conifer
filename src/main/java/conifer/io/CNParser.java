@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,6 +46,10 @@ public class CNParser {
 		String speciesName = null;
 
 		for (String line : BriefIO.readLines(file)) {
+			
+			if (lineNumber % 100 == 0) System.out.print(".");
+			if (lineNumber% 200 == 0) System.out.println();
+			
 			if (line.length() > 0) {
 				// nextLine[] is an array of values from the line
 				// TODO: make it more general
@@ -174,7 +177,8 @@ public class CNParser {
 	
 	public static void main(String[] args) throws IOException {
 		// File("src/main/resources/conifer/sampleInput/testCopyNumber.txt");
-		File file = new File("src/main/resources/conifer/sampleInput/testPatientData.txt");
+		//File file = new File("src/main/resources/conifer/sampleInput/testPatientData.txt");
+		File file = new File("src/main/resources/conifer/sampleInput/central_data_points.tsv");
 
 		Set<CNSpecies> cnSpecies = CNParser.readCNPairs(file);
 

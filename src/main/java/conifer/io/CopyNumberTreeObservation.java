@@ -173,23 +173,25 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		// there's at least one state with b=1?...yes, but through aux variable
 //	}
 
-	// TODO: finish implementation
-	@Override
-	public String toString() {
 
-		StringBuilder result = new StringBuilder();
-		
-		PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.copyNumberCTMCFactory();
-		//Map<String,String> map = factory.getIndicator2ChunkMap();
-		TreeNode t = currentCTMCState.keySet().iterator().next();
-		double[][] d = currentCTMCState.get(t);
-//		System.out.println(map.get(Arrays.toString(d[1])));
-		System.out.println(Arrays.toString(d[1]));
-		
-	    //for (TreeNode node : currentCTMCState.keySet())
-	     // result.append(node.toString() + " : " + Arrays.deepToString(currentCTMCState.get(node)) + "\n");
-		return Arrays.toString(d[1]);
-//		return "Fixed Data: " + Arrays.deepToString(this.cnSpecies.toArray()) + "\n" + 
-//				"Current CTMCStates at leaves: " + result.toString();
-	}
+	
+	// TODO: finish implementation
+//	@Override
+//	public String toString() {
+//
+//		StringBuilder result = new StringBuilder();
+//		
+//		PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.copyNumberCTMCFactory();
+//		//Map<String,String> map = factory.getIndicator2ChunkMap();
+//		TreeNode t = currentCTMCState.keySet().iterator().next();
+//		double[][] d = currentCTMCState.get(t);
+////		System.out.println(map.get(Arrays.toString(d[1])));
+//		System.out.println(Arrays.toString(d[1]));
+//		
+//	    //for (TreeNode node : currentCTMCState.keySet())
+//	     // result.append(node.toString() + " : " + Arrays.deepToString(currentCTMCState.get(node)) + "\n");
+//		return Arrays.toString(d[1]);
+////		return "Fixed Data: " + Arrays.deepToString(this.cnSpecies.toArray()) + "\n" + 
+////				"Current CTMCStates at leaves: " + result.toString();
+//	}
 }

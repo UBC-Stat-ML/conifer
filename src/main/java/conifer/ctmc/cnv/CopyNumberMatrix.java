@@ -11,6 +11,7 @@ import org.ejml.simple.SimpleMatrix;
 import bayonet.math.EJMLUtils;
 import blang.annotations.FactorArgument;
 import blang.variables.RealVariable;
+import blang.variables.RealVectorInterface;
 import briefj.opt.Option;
 import static blang.variables.RealVariable.real;
 import conifer.ctmc.CTMC;
@@ -54,7 +55,6 @@ public class CopyNumberMatrix implements CTMCParameters
 			                double[][] mutationQ,
 			                RateMatrixToEmissionModel emissionModel)
 	{
-		System.out.println("HelloThere");
 		this.mutationQ = new SimpleMatrix(mutationQ); 
 		this.increaseQ = new SimpleMatrix(increaseQ); 
 		this.decreaseQ = new SimpleMatrix(decreaseQ); 
@@ -113,7 +113,7 @@ public class CopyNumberMatrix implements CTMCParameters
 	public static double[][] fromResource(String resourceURL)
 	{
 		SimpleRateMatrix resourceMatrix = SimpleRateMatrix.fromResource(resourceURL);
-		System.out.println(resourceMatrix);
+		//System.out.println(resourceMatrix);
 		return resourceMatrix.getRateMatrix();
 	}
 	
@@ -128,7 +128,7 @@ public class CopyNumberMatrix implements CTMCParameters
 		for(String lbl : labels)
 			resources.put(lbl, GenerateCNMatrices.getPathForMatrix(lbl, size));
 
-		System.out.println(resources);
+		//System.out.println(resources);
 		return fromResources(resources);
 	}
 
@@ -152,4 +152,5 @@ public class CopyNumberMatrix implements CTMCParameters
 		System.out.println(Arrays.deepToString(cp.getRateMatrix()));
 		System.out.println((new SimpleMatrix(cp.getRateMatrix())).toString());
 	}
+	
 }

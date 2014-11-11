@@ -163,9 +163,9 @@ public class TestPhyloModel implements Runnable, Processor
 		logToFile("Total time in minutes: " + ((System.currentTimeMillis() - startTime)/60000.0));
 
 		// compute the tree
-		MajorityRuleTree.buildAndWriteConsensusTree(
-				Results.getFileInResultFolder("FES.trees.newick"),
-				Results.getFileInResultFolder("FESConsensusTree.Nexus"));
+//		MajorityRuleTree.buildAndWriteConsensusTree(
+//				Results.getFileInResultFolder("FES.trees.newick"),
+//				Results.getFileInResultFolder("FESConsensusTree.Nexus"));
 		//
 		//		// copy the results to another folder 
 		//		File newDirectory = new File(Results.getResultFolder().getParent() + "/experiment." + Results.getResultFolder().getName() + "." + 1 + "." + System.currentTimeMillis());
@@ -218,8 +218,8 @@ public class TestPhyloModel implements Runnable, Processor
 		args[2] = "-alignmentFile";
 		args[3] = "/Users/sohrab/project/conifer/src/main/resources/conifer/sampleInput/FES_4.fasta";
 
-		//args = new String[1];
-		//args[0] = "-help";
+		args = new String[1];
+		args[0] = "-help";
 
 		// TODO: remove this
 		for (int i = 0; i < args.length; i++) {

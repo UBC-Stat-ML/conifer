@@ -3,77 +3,109 @@ package conifer;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-
+import java.util.Arrays;
+import java.util.List;
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
-import bayonet.distributions.Normal.MeanVarianceParameterization;
-import blang.MCMCRunner;
+import blang.MCMCAlgorithm;
+import blang.MCMCFactory;
 import blang.annotations.DefineFactor;
-import blang.factors.IIDRealVectorGenerativeFactor;
+import blang.processing.Processor;
 import blang.processing.ProcessorContext;
 import briefj.BriefIO;
 import briefj.opt.Option;
+import briefj.opt.OptionSet;
+import briefj.run.Mains;
 import briefj.run.Results;
-import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
-import conifer.models.MultiCategorySubstitutionModel;
+import conifer.models.CNMultiCategorySubstitutionModel;
 
+public class CNPhyloModel implements Runnable, Processor {
+	@Option(required = true, gloss = "file containing raw reads")
+	public String emissionData;
 
-public class CNPhyloModel extends MCMCRunner
-{
+	@OptionSet(name = "factory")
+	public final MCMCFactory factory = new MCMCFactory();
 
-    @Option(required = true, gloss = "file containing raw reads") String emissionData;
-    
-    File inputFile = new File(emissionData);
+	@Option
+	public int nMCMCSweeps = 100;
 
-    @DefineFactor(onObservations = true)
-    public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
-    UnrootedTreeLikelihood
-    .fromFastaFile(inputFile)
-    .withExpFamMixture(ExpFamMixture.kimura1980());
-   
+	public class Model {
+		File inputFile = new File(emissionData);
 
-    @DefineFactor
-    NonClockTreePrior<RateParameterization> treePrior = 
-    NonClockTreePrior
-    .on(likelihood.tree);
+		@DefineFactor(onObservations = true)
+		public final UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>> likelihood = UnrootedTreeLikelihood
+				.fromCNFile(inputFile);
 
-    @DefineFactor
-    Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = 
-    Exponential
-    .on(treePrior.branchDistributionParameters.rate)
-    .withMean(10.0);
+		@DefineFactor
+		NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
 
-    @DefineFactor
-    public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior =
-    IIDRealVectorGenerativeFactor
-    .iidNormalOn(likelihood.evolutionaryModel.rateMatrixMixture.parameters);
+		@DefineFactor
+		Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(
+				treePrior.branchDistributionParameters.rate).withMean(10.0);
 
-    private final PrintWriter treeWriter = BriefIO.output(Results.getFileInResultFolder("FES.trees.newick"));
+		// TODO: maybe later put all these in a vector
+		// TODO: is this a good choice of prior?
+		@DefineFactor
+		Exponential<Exponential.MeanParameterization> priorAlpha = Exponential.on(
+				likelihood.evolutionaryModel.rateMatrixMixture.parameters.alpha).withMean(10.0);
 
-    public static void main(String [] args) throws ClassNotFoundException, IOException
-    {
-        CNPhyloModel runner = new CNPhyloModel();
-        runner.factory.mcmcOptions.nMCMCSweeps = 10000;
-        runner.factory.mcmcOptions.burnIn = (int) Math.round(.1 * runner.factory.mcmcOptions.nMCMCSweeps);
-        
-        // run
-        runner.run();
+		@DefineFactor
+		Exponential<Exponential.MeanParameterization> priorBeta = Exponential.on(
+				likelihood.evolutionaryModel.rateMatrixMixture.parameters.beta).withMean(10.0);
 
-        // compute the tree
-        MajorityRuleTree.buildAndWriteConsensusTree(
-                Results.getFileInResultFolder("FES.trees.newick"),
-                Results.getFileInResultFolder("FESConsensusTree.Nexus"));
-    }
+		@DefineFactor
+		Exponential<Exponential.MeanParameterization> priorGamma = Exponential.on(
+				likelihood.evolutionaryModel.rateMatrixMixture.parameters.gamma).withMean(10.0);
+	}
 
-    protected void process(ProcessorContext context)
-    {
-        treeWriter.println(likelihood.tree.toNewick());
-        treeWriter.flush();
-    }
+	public Model model;
 
-    public String getInputFile() {
-        return inputFile.getAbsolutePath();
-    }
+	private PrintWriter treeWriter;
+
+	@Override
+	public void run() {
+		treeWriter = BriefIO.output(Results.getFileInResultFolder("cntrees.newick"));
+
+		// init the model
+		factory.addProcessor(this);
+		model = new Model();
+		MCMCAlgorithm mcmc = factory.build(model, false);
+		mcmc.options.CODA = false;
+		// System.out.println(mcmc.model.toString()); // TOO LONG!
+
+		// run
+		mcmc.run();
+
+		// compute the tree
+		MajorityRuleTree.buildAndWriteConsensusTree(Results.getFileInResultFolder("cntrees.newick"),
+				Results.getFileInResultFolder("cnConsensusTree.Nexus"));
+
+	}
+
+	public static String[] getDummyArguments() {
+		List<String> arguments = Arrays.asList("-emissionData",
+				"src/main/resources/conifer/sampleInput/central_data_points.tsv", "-factory.mcmc.nMCMCSweeps", "100",
+				"-factory.mcmc.CODA", "false", "-factory.mcmc.burnIn", "10");
+		// arguments = Arrays.asList("-help");
+		return arguments.toArray(new String[0]);
+	}
+
+	public static void main(String[] args) throws ClassNotFoundException, IOException {
+		args = CNPhyloModel.getDummyArguments();
+
+		for (int i = 0; i < args.length; i++)
+			System.out.println(args[i]);
+
+		Mains.instrumentedRun(args, new CNPhyloModel());
+	}
+
+	@Override
+	public void process(ProcessorContext context) {
+		treeWriter.println(model.likelihood.tree.toNewick());
+		treeWriter.flush();
+	}
+
 }

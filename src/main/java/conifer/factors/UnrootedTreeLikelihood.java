@@ -121,7 +121,6 @@ public class UnrootedTreeLikelihood
         
     // create CNMatrix and CNMixture (gammaMixture not supported)
 	CopyNumberMatrix cnMatrix = CopyNumberMatrix.matrixOfSize(Indexers.copyNumberCTMCIndexer().objects().size() - 1);
-	
     CopyNumberMixture cnMixture = new CopyNumberMixture(cnMatrix);
 
     int nSites = treeObservations.nSites();    
@@ -132,11 +131,10 @@ public class UnrootedTreeLikelihood
     UnrootedTree tree = defaultTree(treeObservations.getObservedTreeNodes());
     tree.addNode(TreeNode.withLabel("root"));
     
-    // this needs to be set to the correct values upon initalization...ie. the state space must be (2,0,0)! 
-
-    return new UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
+    ;
     
- 
+    // this needs to be set to the correct values upon initialisation...i.e., the state space must be (2,0,0)! 
+    return new UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
   }
   
   
