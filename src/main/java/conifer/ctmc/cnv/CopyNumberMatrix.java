@@ -1,5 +1,6 @@
 package conifer.ctmc.cnv;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,10 +9,11 @@ import java.util.Set;
 
 import org.ejml.simple.SimpleMatrix;
 
+import com.sun.org.apache.xml.internal.serializer.utils.SystemIDResolver;
+
 import bayonet.math.EJMLUtils;
 import blang.annotations.FactorArgument;
 import blang.variables.RealVariable;
-import blang.variables.RealVectorInterface;
 import briefj.opt.Option;
 import static blang.variables.RealVariable.real;
 import conifer.ctmc.CTMC;
@@ -76,7 +78,7 @@ public class CopyNumberMatrix implements CTMCParameters
 	/**
 	 * Need to normalize the combined rate matrix 
 	 * then return a normalized Q multiplied by DOLLO_EPSILON
-	 * this is needed for Stochastic Dollo intrepretation cf. Alex's convergence result
+	 * this is needed for Stochastic Dollo interpretation cf. Alex's convergence result
 	 */
 	@Override
 	public double[][] getRateMatrix()
@@ -113,12 +115,16 @@ public class CopyNumberMatrix implements CTMCParameters
 	public static double[][] fromResource(String resourceURL)
 	{
 		SimpleRateMatrix resourceMatrix = SimpleRateMatrix.fromResource(resourceURL);
-		//System.out.println(resourceMatrix);
 		return resourceMatrix.getRateMatrix();
 	}
 	
 	public static CopyNumberMatrix matrixOfSize(int size) 
 	{	
+		GenerateCNMatrices cn = new GenerateCNMatrices(size);
+		cn.ensureInitalize();
+		cn.saveMatricesAsJSON();
+		return new CopyNumberMatrix(cn.getIncreaseQ(), cn.getDecreaseQ(), cn.getMutationQ(), null);
+		/*
 		Set<String> labels = new HashSet<>();
 		labels.add("mutationQ"); 
 		labels.add("increaseQ");
@@ -128,29 +134,39 @@ public class CopyNumberMatrix implements CTMCParameters
 		for(String lbl : labels)
 			resources.put(lbl, GenerateCNMatrices.getPathForMatrix(lbl, size));
 
-		//System.out.println(resources);
 		return fromResources(resources);
+		*/
 	}
 
 	public static void main(String args [])
 	{
+		int size = 30;
+		/*
 		
-//		CopyNumberMatrix cp = CopyNumberMatrix.matricesForSize(3);
-		int size = 3;
 		Set<String> labels = new HashSet<>();
 		labels.add("mutationQ"); 
 		labels.add("increaseQ");
 		labels.add("decreaseQ");
 
-
 		Map<String, String> resources = new HashMap<>();
 		for(String lbl : labels) {
 			resources.put(lbl, GenerateCNMatrices.getPathForMatrix(lbl, size));
-			
 		}
 		CopyNumberMatrix cp = fromResources(resources);
-		System.out.println(Arrays.deepToString(cp.getRateMatrix()));
-		System.out.println((new SimpleMatrix(cp.getRateMatrix())).toString());
+		double[][] rateMatrix = cp.getRateMatrix();
+		System.out.println(Arrays.deepToString(rateMatrix));
+		System.out.println((new SimpleMatrix(rateMatrix)).toString());
+		*/
+		
+		CopyNumberMatrix cp = CopyNumberMatrix.matrixOfSize(size);
+		double[][] rateMatrix = cp.getRateMatrix();
+		
+		// check if it's a valid rate matrix:
+		try {
+			RateMatrixUtils.checkValidRateMatrix(rateMatrix);
+		} catch(Exception e) {
+			System.out.println(e.getStackTrace());
+		}
 	}
 	
 }

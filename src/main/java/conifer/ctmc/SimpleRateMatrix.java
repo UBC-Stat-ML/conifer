@@ -57,6 +57,7 @@ public class SimpleRateMatrix implements CTMCParameters
   }
   public static SimpleRateMatrix fromResource(String resourceURL)
   {
+	System.out.println(resourceURL);
     String jsonString = BriefIO.resourceToString(resourceURL);
     return fromJSONString(jsonString);
   }

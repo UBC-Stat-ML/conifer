@@ -282,7 +282,8 @@ public class GenerateCNMatrices {
 			cn.saveMatricesAsJSON();
 		}
 		
-//		return ("src/main/resources/conifer/ctmc/" + cn.nameForType(matrixType));
+		//return ("src/main/resources/conifer/ctmc/" + cn.nameForType(matrixType));
 		return ("/conifer/ctmc/" + cn.nameForType(matrixType));
+//		return ("/Users/sohrab/project/conifercp/src/main/resources/conifer/ctmc/" + cn.nameForType(matrixType));
 	}
 }
