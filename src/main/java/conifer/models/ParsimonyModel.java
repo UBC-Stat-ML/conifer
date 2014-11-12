@@ -32,8 +32,6 @@ public class ParsimonyModel implements Factor
         return new ParsimonyModel(betaBinomial, parsimony);
     }
 
-    
-    
     @Override
     public double logDensity()
     {

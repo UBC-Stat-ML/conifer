@@ -18,6 +18,7 @@ import conifer.io.CopyNumberTreeObservation;
 import conifer.io.Indexers;
 import conifer.models.CNMultiCategorySubstitutionModel;
 import conifer.models.CNPair;
+import conifer.models.ParsimonyModel;
 import conifer.models.RateMatrixMixture;
 
 /**
@@ -32,7 +33,8 @@ public class ParsimonySampler implements MHProposalDistribution
     
     @SampledVariable Parsimony parsimony; 
 
-    @ConnectedFactor UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> likelihood; 
+    @ConnectedFactor UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> likelihood;
+    @ConnectedFactor ParsimonyModel parsimoneyEnforcement;
 
     private List<Integer> visitSiteInRandomOrder(Random rand, int nSites)
     {

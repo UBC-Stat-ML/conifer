@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.ejml.simple.SimpleMatrix;
 
-import com.sun.org.apache.xml.internal.serializer.utils.SystemIDResolver;
 
 import bayonet.math.EJMLUtils;
 import blang.annotations.FactorArgument;
@@ -164,8 +163,10 @@ public class CopyNumberMatrix implements CTMCParameters
 		// check if it's a valid rate matrix:
 		try {
 			RateMatrixUtils.checkValidRateMatrix(rateMatrix);
+			cp.getProcess();
 		} catch(Exception e) {
-			System.out.println(e.getStackTrace());
+			System.err.println(e);
+			System.err.println(e.getStackTrace());
 		}
 	}
 	

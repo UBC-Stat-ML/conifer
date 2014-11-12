@@ -3,8 +3,6 @@ package conifer;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.List;
 
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
@@ -76,7 +74,7 @@ public class CNPhyloModel implements Runnable, Processor {
 		model = new Model();
 		MCMCAlgorithm mcmc = factory.build(model, false);
 		mcmc.options.CODA = false;
-		 System.out.println(mcmc.model.toString()); // TOO LONG!
+		System.out.println(mcmc.model.toString());
 
 		// run
 		mcmc.run();
