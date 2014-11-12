@@ -28,14 +28,12 @@ import conifer.models.RateMatrixMixture;
 public class ParsimonySampler implements MHProposalDistribution
 {
     @Option public final double DELTA = 0.1;
-
+    @Option public final double betaBinomialPrecision = 1;
+    
     @SampledVariable Parsimony parsimony; 
 
-    @ConnectedFactor UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> likelihood;
+    @ConnectedFactor UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> likelihood; 
 
-//    @ConnectedFactor need for s variable 
-
-    
     private List<Integer> visitSiteInRandomOrder(Random rand, int nSites)
     {
         List<Integer> visitOrder = new ArrayList<Integer>();
@@ -82,7 +80,7 @@ public class ParsimonySampler implements MHProposalDistribution
     // for a fixed parsimony state, that is a fixed value of M update all of the leaves with new Y vectors
     private void updateAllLeavesFixedSite(Map<String, CNPair> emissions, int minLeaf, int site)
     {
-        double betaBinomialPrecision = likelihood.evolutionaryModel.pm.betaBinomialPrecision.getValue();
+//        double betaBinomialPrecision = .betaBinomialPrecision.getValue();
         CopyNumberTreeObservation data = (CopyNumberTreeObservation) likelihood.observations;
         Map<String, Integer> leafMap = data.getLeafOrder();
         for (String leaf : emissions.keySet())

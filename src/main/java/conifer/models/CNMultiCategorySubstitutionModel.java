@@ -1,6 +1,7 @@
 package conifer.models;
 
-import blang.annotations.FactorComponent;
+import blang.annotations.FactorArgument;
+import conifer.Parsimony;
 
 /**
  * 
@@ -12,13 +13,12 @@ public class CNMultiCategorySubstitutionModel<T extends RateMatrixMixture> exten
         MultiCategorySubstitutionModel<T>
 {
 
-    public CNMultiCategorySubstitutionModel(T rateMatrixMixture, ParsimonyModel pm, int nSites)
+    public CNMultiCategorySubstitutionModel(T rateMatrixMixture, Parsimony parsimony, int nSites)
     {
         super(rateMatrixMixture, nSites);
-        this.pm = pm; 
+        this.parsimony = parsimony; 
     }
 
-    @FactorComponent
-    public final ParsimonyModel pm; 
+    public final Parsimony parsimony; 
     
 }

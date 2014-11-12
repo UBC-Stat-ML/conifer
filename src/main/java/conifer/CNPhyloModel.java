@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
+
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
 import blang.MCMCAlgorithm;
@@ -21,6 +22,7 @@ import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.CNMultiCategorySubstitutionModel;
+import conifer.models.ParsimonyModel;
 
 public class CNPhyloModel implements Runnable, Processor {
 	@Option(required = true, gloss = "file containing raw reads")
@@ -28,9 +30,6 @@ public class CNPhyloModel implements Runnable, Processor {
 
 	@OptionSet(name = "factory")
 	public final MCMCFactory factory = new MCMCFactory();
-
-	@Option
-	public int nMCMCSweeps = 100;
 
 	public class Model {
 		File inputFile = new File(emissionData);
@@ -40,25 +39,28 @@ public class CNPhyloModel implements Runnable, Processor {
 				.fromCNFile(inputFile);
 
 		@DefineFactor
+		ParsimonyModel parsimonyEnforcement = ParsimonyModel.on(likelihood.evolutionaryModel.parsimony);
+		
+		@DefineFactor
 		NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
 
 		@DefineFactor
 		Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(
 				treePrior.branchDistributionParameters.rate).withMean(10.0);
 
-		// TODO: maybe later put all these in a vector
-		// TODO: is this a good choice of prior?
-		@DefineFactor
-		Exponential<Exponential.MeanParameterization> priorAlpha = Exponential.on(
-				likelihood.evolutionaryModel.rateMatrixMixture.parameters.alpha).withMean(10.0);
-
-		@DefineFactor
-		Exponential<Exponential.MeanParameterization> priorBeta = Exponential.on(
-				likelihood.evolutionaryModel.rateMatrixMixture.parameters.beta).withMean(10.0);
-
-		@DefineFactor
-		Exponential<Exponential.MeanParameterization> priorGamma = Exponential.on(
-				likelihood.evolutionaryModel.rateMatrixMixture.parameters.gamma).withMean(10.0);
+//		// TODO: maybe later put all these in a vector
+//		// TODO: is this a good choice of prior?
+//		@DefineFactor
+//		Exponential<Exponential.MeanParameterization> priorAlpha = Exponential.on(
+//				likelihood.evolutionaryModel.rateMatrixMixture.parameters.alpha).withMean(10.0);
+//
+//		@DefineFactor
+//		Exponential<Exponential.MeanParameterization> priorBeta = Exponential.on(
+//				likelihood.evolutionaryModel.rateMatrixMixture.parameters.beta).withMean(10.0);
+//
+//		@DefineFactor
+//		Exponential<Exponential.MeanParameterization> priorGamma = Exponential.on(
+//				likelihood.evolutionaryModel.rateMatrixMixture.parameters.gamma).withMean(10.0);
 	}
 
 	public Model model;
@@ -74,7 +76,7 @@ public class CNPhyloModel implements Runnable, Processor {
 		model = new Model();
 		MCMCAlgorithm mcmc = factory.build(model, false);
 		mcmc.options.CODA = false;
-		// System.out.println(mcmc.model.toString()); // TOO LONG!
+		 System.out.println(mcmc.model.toString()); // TOO LONG!
 
 		// run
 		mcmc.run();
@@ -85,20 +87,7 @@ public class CNPhyloModel implements Runnable, Processor {
 
 	}
 
-	public static String[] getDummyArguments() {
-		List<String> arguments = Arrays.asList("-emissionData",
-				"src/main/resources/conifer/sampleInput/central_data_points.tsv", "-factory.mcmc.nMCMCSweeps", "100",
-				"-factory.mcmc.CODA", "false", "-factory.mcmc.burnIn", "10");
-		// arguments = Arrays.asList("-help");
-		return arguments.toArray(new String[0]);
-	}
-
 	public static void main(String[] args) throws ClassNotFoundException, IOException {
-		args = CNPhyloModel.getDummyArguments();
-
-		for (int i = 0; i < args.length; i++)
-			System.out.println(args[i]);
-
 		Mains.instrumentedRun(args, new CNPhyloModel());
 	}
 

@@ -100,8 +100,6 @@ public class CopyNumberTreeObservation implements TreeObservations {
 
 	@Override
 	public void clear() {
-		// TODO: what is the expected behavior, clear all data or just clear the
-		// current state
 		getCnSpecies().clear();
 		currentCTMCState.clear();
 	}
@@ -145,53 +143,4 @@ public class CopyNumberTreeObservation implements TreeObservations {
         
         return emissions; 
     }
-	
-	
-	
-	// TODO: complete implementation
-//	public void initialize() {
-//
-//		int nSpecies = cnSpecies.size();
-//
-//		double[][] data = new double[nSpecies][nSites];
-//
-//		// initialize the probabilityVector
-//		double[] alphas = new double[nCTMCStates];
-//		for (int i = 0; i < alphas.length; i++) {
-//			alphas[i] = 1;
-//		}
-//		
-//		// initialize currentCTMCState
-//		for (CNSpecies s : cnSpecies) {
-//			for (int j = 0; j < nSites; j++) {
-//				data[j] = Multinomial.generate(new Random(), 1, probabilityVector);
-//			}
-//			currentCTMCState.put(TreeNode.withLabel(s.getSpeciesName()), data);
-//		}
-
-		// TODO: do we have to manually make sure that in the initial state
-		// there's at least one state with b=1?...yes, but through aux variable
-//	}
-
-
-	
-	// TODO: finish implementation
-//	@Override
-//	public String toString() {
-//
-//		StringBuilder result = new StringBuilder();
-//		
-//		PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.copyNumberCTMCFactory();
-//		//Map<String,String> map = factory.getIndicator2ChunkMap();
-//		TreeNode t = currentCTMCState.keySet().iterator().next();
-//		double[][] d = currentCTMCState.get(t);
-////		System.out.println(map.get(Arrays.toString(d[1])));
-//		System.out.println(Arrays.toString(d[1]));
-//		
-//	    //for (TreeNode node : currentCTMCState.keySet())
-//	     // result.append(node.toString() + " : " + Arrays.deepToString(currentCTMCState.get(node)) + "\n");
-//		return Arrays.toString(d[1]);
-////		return "Fixed Data: " + Arrays.deepToString(this.cnSpecies.toArray()) + "\n" + 
-////				"Current CTMCStates at leaves: " + result.toString();
-//	}
 }

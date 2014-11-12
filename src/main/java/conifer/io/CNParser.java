@@ -46,8 +46,6 @@ public class CNParser {
 		String speciesName = null;
 
 		for (String line : BriefIO.readLines(file)) {
-			if (lineNumber > 2 && lineNumber % 2 == 0) System.out.print(".");
-			if (lineNumber > 2 && lineNumber% 100 == 0) System.out.println();
 			
 			if (line.length() > 0) {
 				// nextLine[] is an array of values from the line
@@ -92,9 +90,6 @@ public class CNParser {
 			}
 			lineNumber++;
 		}
-		
-		// last break after dots
-		System.out.println();
 		
 		// put the last list too
 		if (currentPairs != null) { 

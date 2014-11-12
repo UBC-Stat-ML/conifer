@@ -16,6 +16,8 @@ import blang.factors.GenerativeFactor;
 import blang.variables.RealVariable;
 import briefj.BriefCollections;
 import briefj.BriefIO;
+import conifer.Parsimony;
+import conifer.ParsimonyVector;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
@@ -39,7 +41,6 @@ import conifer.models.EvolutionaryModel;
 import conifer.models.EvolutionaryModelUtils;
 import conifer.models.LikelihoodComputationContext;
 import conifer.models.MultiCategorySubstitutionModel;
-import conifer.models.ParsimonyModel;
 
 
 /**
@@ -125,13 +126,11 @@ public class UnrootedTreeLikelihood
 
     int nSites = treeObservations.nSites();    
     CNMultiCategorySubstitutionModel<CopyNumberMixture> subModel 
-    = new CNMultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, ParsimonyModel.initalization(nSites), nSites);
+    = new CNMultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, new Parsimony(ParsimonyVector.oneInit(nSites)), nSites);
     
     // make the tree
     UnrootedTree tree = defaultTree(treeObservations.getObservedTreeNodes());
     tree.addNode(TreeNode.withLabel("root"));
-    
-    ;
     
     // this needs to be set to the correct values upon initialisation...i.e., the state space must be (2,0,0)! 
     return new UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
