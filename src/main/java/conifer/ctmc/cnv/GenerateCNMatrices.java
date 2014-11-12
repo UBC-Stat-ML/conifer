@@ -1,5 +1,6 @@
 package conifer.ctmc.cnv;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -271,10 +272,15 @@ public class GenerateCNMatrices {
 	 * @param size
 	 * @return
 	 */
-	public static String getPathForMatrix(String matrixType, int size) {
+	public static String getPathForMatrix(String matrixType, int size) 
+	{
 		GenerateCNMatrices cn = new GenerateCNMatrices(size);
-		cn.ensureInitalize();
-		cn.saveMatricesAsJSON();
+		String filePath = "src/main/resources/conifer/ctmc/" + cn.nameForType(matrixType);
+		File f = new File(filePath);
+		if(!f.exists() || f.isDirectory()) {
+			cn.ensureInitalize();
+			cn.saveMatricesAsJSON();
+		}
 		
 //		return ("src/main/resources/conifer/ctmc/" + cn.nameForType(matrixType));
 		return ("/conifer/ctmc/" + cn.nameForType(matrixType));

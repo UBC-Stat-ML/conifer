@@ -1,5 +1,7 @@
 package conifer.ctmc.cnv;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import blang.annotations.FactorComponent;
@@ -27,13 +29,11 @@ public class CopyNumberMixture implements RateMatrixMixture
   }
 
   
-   // what are these probabilities? 
-  
+  // TODO: what are these probabilities? (In the interface it says: prior probability of each category. Let's assume we have one and return 1).
   @Override
   public List<Double> getLogPriorProbabilities()
   {
-    // TODO Auto-generated method stub
-    return null;
+    return Arrays.asList(1.0);
   }
 
 }

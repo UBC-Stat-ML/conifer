@@ -46,9 +46,8 @@ public class CNParser {
 		String speciesName = null;
 
 		for (String line : BriefIO.readLines(file)) {
-			
-			if (lineNumber % 100 == 0) System.out.print(".");
-			if (lineNumber% 200 == 0) System.out.println();
+			if (lineNumber > 2 && lineNumber % 2 == 0) System.out.print(".");
+			if (lineNumber > 2 && lineNumber% 100 == 0) System.out.println();
 			
 			if (line.length() > 0) {
 				// nextLine[] is an array of values from the line
@@ -57,7 +56,7 @@ public class CNParser {
 
 				// skip header & comments & malformed elements
 				if (line.charAt(0) == '#' || elements.length < 3 || isHeader(elements)) {
-					System.out.println("This line was skipped: " + line);
+					//System.out.println("This line was skipped: " + line);
 					continue;
 				} 
 				
@@ -83,9 +82,6 @@ public class CNParser {
 					currentPairs.add(currentPair);
 				} else {
 					// new species, put the last one, and renew
-					TreeNode currentTaxon = TreeNode.withLabel(currentTaxonName);
-
-					// add to the new representation 
 					cnSpecies.add(new CNSpecies(currentPairs, clusterID, speciesName));
 
 					// add the new item
@@ -96,7 +92,10 @@ public class CNParser {
 			}
 			lineNumber++;
 		}
-
+		
+		// last break after dots
+		System.out.println();
+		
 		// put the last list too
 		if (currentPairs != null) { 
 			cnSpecies.add(new CNSpecies(currentPairs, clusterID, speciesName));
@@ -209,7 +208,6 @@ public class CNParser {
 			System.out.println("ClusterID:" + clusterID);
 			Map<TreeNode, List<CNPair>> l = clustersT.get(clusterID);
 			Collection<List<CNPair>> ll = l.values();
-			@SuppressWarnings("unchecked")
 			Object[] lll = ll.toArray();
 			for (Object cnpairs: lll) {
 				System.out.println(cnpairs.toString());
