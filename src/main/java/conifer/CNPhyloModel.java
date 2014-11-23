@@ -17,10 +17,9 @@ import briefj.opt.OptionSet;
 import briefj.run.Mains;
 import briefj.run.Results;
 import conifer.ctmc.cnv.CopyNumberMixture;
-import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
-import conifer.models.CNMultiCategorySubstitutionModel;
-import conifer.models.ParsimonyModel;
+import conifer.io.CopyNumberTreeObservation;
+import conifer.models.MultiCategorySubstitutionModel;
 
 public class CNPhyloModel implements Runnable, Processor {
 	@Option(required = true, gloss = "file containing raw reads")
@@ -32,33 +31,21 @@ public class CNPhyloModel implements Runnable, Processor {
 	public class Model {
 		File inputFile = new File(emissionData);
 
-		@DefineFactor(onObservations = true)
-		public final UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>> likelihood = UnrootedTreeLikelihood
+		@DefineFactor
+		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> likelihood = UnrootedTreeLikelihood
 				.fromCNFile(inputFile);
-
-		@DefineFactor
-		ParsimonyModel parsimonyEnforcement = ParsimonyModel.on(likelihood.evolutionaryModel.parsimony);
-		
-		@DefineFactor
-		NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
-
-		@DefineFactor
-		Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(
-				treePrior.branchDistributionParameters.rate).withMean(10.0);
-
-//		// TODO: maybe later put all these in a vector
-//		// TODO: is this a good choice of prior?
+			
 //		@DefineFactor
-//		Exponential<Exponential.MeanParameterization> priorAlpha = Exponential.on(
-//				likelihood.evolutionaryModel.rateMatrixMixture.parameters.alpha).withMean(10.0);
+//		NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
 //
 //		@DefineFactor
-//		Exponential<Exponential.MeanParameterization> priorBeta = Exponential.on(
-//				likelihood.evolutionaryModel.rateMatrixMixture.parameters.beta).withMean(10.0);
-//
+//		Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(
+//				treePrior.branchDistributionParameters.rate).withMean(10.0);
+
+		// emission process beta binomial precision parameters
 //		@DefineFactor
-//		Exponential<Exponential.MeanParameterization> priorGamma = Exponential.on(
-//				likelihood.evolutionaryModel.rateMatrixMixture.parameters.gamma).withMean(10.0);
+//		Exponential<RateParameterization> priorGamma = Exponential.on(
+//		        ((CopyNumberTreeObservation) likelihood.observations).betaBinomialprecision);
 	}
 
 	public Model model;
@@ -73,7 +60,9 @@ public class CNPhyloModel implements Runnable, Processor {
 		factory.addProcessor(this);
 		model = new Model();
 		MCMCAlgorithm mcmc = factory.build(model, false);
-		mcmc.options.CODA = false;
+		File graph = Results.getFileInResultFolder("probability-graph.dot");	
+		mcmc.model.printGraph(graph);
+		mcmc.options.CODA = true;
 		System.out.println(mcmc.model.toString());
 
 		// run

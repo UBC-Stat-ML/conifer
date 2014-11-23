@@ -1,6 +1,7 @@
 package conifer.io;
 
-import java.util.Arrays;
+import static blang.variables.RealVariable.real;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -9,12 +10,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import blang.annotations.FactorArgument;
+import blang.annotations.Samplers;
+import blang.variables.RealVariable;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import conifer.Parsimony;
+import conifer.ParsimonyVector;
 import conifer.TreeNode;
 import conifer.models.CNPair;
 import conifer.models.CNSpecies;
+import conifer.moves.CopyNumberTreeSampler;
+
+@Samplers({CopyNumberTreeSampler.class})
 
 /**
  * Keeps the raw count data as CNSpacies,
@@ -24,6 +34,11 @@ import conifer.models.CNSpecies;
  */
 public class CopyNumberTreeObservation implements TreeObservations {
 	
+    @FactorArgument
+    public final RealVariable betaBinomialprecision = real(1);
+    
+    public final Parsimony parsimony;
+    
     private Map<String, Integer> leafOrder = null;
 	
 	public Map<String, Integer> getLeafOrder()
@@ -54,14 +69,16 @@ public class CopyNumberTreeObservation implements TreeObservations {
 
 	private final int nSites;
 
-	public CopyNumberTreeObservation(int nSites) {
+	public CopyNumberTreeObservation(int nSites, Parsimony parsimony) {
 		this.nSites = nSites;
+		this.parsimony = parsimony; 
 	}
 
+	
 	public CopyNumberTreeObservation(Set<CNSpecies> cnSpecies) {
 		nSites = cnSpecies.iterator().next().getCnPairs().size();
 		setCNSpecies(cnSpecies);
-//		initialize();
+		this.parsimony = new Parsimony(ParsimonyVector.oneInit(nSites));
 	}
 
 	@Override

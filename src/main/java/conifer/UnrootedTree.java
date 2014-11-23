@@ -12,6 +12,7 @@ import bayonet.graphs.GraphUtils;
 import bayonet.marginal.algo.EdgeSorter;
 import blang.annotations.Processors;
 import blang.annotations.Samplers;
+import briefj.BriefCollections;
 import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
 
@@ -173,6 +174,23 @@ public class UnrootedTree
   {
     modifyBranch(fixed1, moved1, fixed2);
     modifyBranch(fixed2, moved2, fixed1);
+  }
+  
+  public TreeNode getTreeNode(String label)
+  {
+      if (topology.containsVertex(TreeNode.withLabel(label)))
+          for(TreeNode n : topology.vertexSet())
+          {
+              if (n.toString() == "root")
+                  return n;
+          }
+      return null;
+  }
+  
+  public TreeNode getInternalNode()
+  {
+      List<TreeNode> internalNodes = GraphUtils.internalNodes(topology);
+      return BriefCollections.pick(internalNodes);
   }
   
   private void modifyBranch(

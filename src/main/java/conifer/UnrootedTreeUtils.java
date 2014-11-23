@@ -119,6 +119,17 @@ public class UnrootedTreeUtils
     return result.toString();
   }
   
+  public static String toNewickWithRoot(UnrootedTree tree, TreeNode root)
+  {
+    StringBuilder result = new StringBuilder();
+    TreeNode pseudoRoot = root;
+    toNewick(tree, null, pseudoRoot, result);
+    result.append(";");
+    return result.toString();
+  }
+  
+  
+  
   private static void toNewick(UnrootedTree tree, TreeNode parent, TreeNode current, StringBuilder builder)
   {
     List<TreeNode> children = Graphs.neighborListOf(tree.getTopology(), current);

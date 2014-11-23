@@ -9,6 +9,7 @@ import conifer.Parsimony;
  *
  * @param <T>
  */
+@Deprecated
 public class CNMultiCategorySubstitutionModel<T extends RateMatrixMixture> extends
         MultiCategorySubstitutionModel<T>
 {

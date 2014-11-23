@@ -11,31 +11,28 @@ import blang.mcmc.MHProposalDistribution;
 import blang.mcmc.SampledVariable;
 import briefj.Indexer;
 import briefj.opt.Option;
-import conifer.Parsimony;
 import conifer.TreeNode;
+import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.io.CopyNumberTreeObservation;
 import conifer.io.Indexers;
-import conifer.models.CNMultiCategorySubstitutionModel;
 import conifer.models.CNPair;
+import conifer.models.MultiCategorySubstitutionModel;
 import conifer.models.ParsimonyModel;
-import conifer.models.RateMatrixMixture;
 
 /**
  * 
  * @author Sean Jewell (jewellsean@gmail.com)
  *
  */
-public class ParsimonySampler implements MHProposalDistribution
+public class CopyNumberTreeSampler implements MHProposalDistribution
 {
     @Option public final double DELTA = 0.1;
-    @Option public final double betaBinomialPrecision = 1;
     
-    @SampledVariable Parsimony parsimony; 
+    @SampledVariable CopyNumberTreeObservation tree; 
 
-    @ConnectedFactor UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<RateMatrixMixture>> likelihood;
-    @ConnectedFactor ParsimonyModel parsimoneyEnforcement;
-
+    @ConnectedFactor UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> likelihood;
+    
     private List<Integer> visitSiteInRandomOrder(Random rand, int nSites)
     {
         List<Integer> visitOrder = new ArrayList<Integer>();
@@ -56,7 +53,7 @@ public class ParsimonySampler implements MHProposalDistribution
         {
             Map<String, CNPair> emissions = data.getEmissionAtSite(i.intValue());
             int Mi = oneSiteGibbs(rand, emissions, i.intValue());
-            parsimony.getM().setIndex(i.intValue(), Mi);
+            tree.parsimony.getM().setIndex(i.intValue(), Mi);
         }
         return new ProposalRealization();
     }
@@ -87,7 +84,7 @@ public class ParsimonySampler implements MHProposalDistribution
         Map<String, Integer> leafMap = data.getLeafOrder();
         for (String leaf : emissions.keySet())
         {
-            double[] logLik = conditionalEmissionLogLikelihood(emissions.get(leaf), betaBinomialPrecision, leafMap.get(leaf), minLeaf);
+            double[] logLik = conditionalEmissionLogLikelihood(emissions.get(leaf), tree.betaBinomialprecision.getValue(), leafMap.get(leaf), minLeaf);
             data.setSite(TreeNode.withLabel(leaf), site, logLik);
         }
     }

@@ -9,10 +9,11 @@ import java.util.Set;
 
 import org.ejml.simple.SimpleMatrix;
 
-
 import bayonet.math.EJMLUtils;
 import blang.annotations.FactorArgument;
+import blang.variables.ProbabilitySimplex;
 import blang.variables.RealVariable;
+import blang.variables.RealVector;
 import briefj.opt.Option;
 import static blang.variables.RealVariable.real;
 import conifer.ctmc.CTMC;
@@ -31,17 +32,13 @@ import conifer.ctmc.SimpleRateMatrix;
  */
 public class CopyNumberMatrix implements CTMCParameters
 {
-	
-	@FactorArgument
-	public final RealVariable alpha = real(1); 
 
-	@FactorArgument
-	public final RealVariable beta = real(1); 
+    // Ordered as: mutation, increase, decrease
+    @FactorArgument
+	public final ProbabilitySimplex P = ProbabilitySimplex.repNormalize(3, 1);   
 
-	@FactorArgument
-	public final RealVariable gamma = real(1); 
 
-	@Option(gloss="Dollo percision parameters")
+	@Option(gloss="Dollo precision parameter")
 	public final double DOLLO_EPSILON = .1;  
 	
 	// Break the overall Q representation into a series of 3 matrices
@@ -82,10 +79,11 @@ public class CopyNumberMatrix implements CTMCParameters
 	@Override
 	public double[][] getRateMatrix()
 	{
+	    double[] probs = P.getVector();
 		double[][] rate = EJMLUtils.copyMatrixToArray(
-				mutationQ.scale(gamma.getValue())
-				.plus(increaseQ.scale(alpha.getValue()))
-				.plus(decreaseQ.scale(beta.getValue())).scale(DOLLO_EPSILON));
+				mutationQ.scale(probs[0])
+				.plus(increaseQ.scale(probs[1]))
+				.plus(decreaseQ.scale(probs[2])).scale(DOLLO_EPSILON));
 		RateMatrixUtils.fillRateMatrixDiagonalEntries(rate);
 		return rate; 
 	}

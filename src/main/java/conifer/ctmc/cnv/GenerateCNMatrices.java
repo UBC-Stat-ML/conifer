@@ -27,7 +27,7 @@ import com.sun.org.apache.xalan.internal.xsltc.util.IntegerArray;
  * 
  * 
  * Total size of matrix is thus, Size + 1 + (Size + 1) * (Size + 1), which is
- * significantly less than niave implementation of 2 * (Size + 1) * (Size + 1)
+ * significantly less than naive implementation of 2 * (Size + 1) * (Size + 1)
  * 
  * @author jewellsean
  *
@@ -135,8 +135,8 @@ public class GenerateCNMatrices {
 		@Override
 		public List<Integer[]> getValues(Integer[] state, int size) {
 			List<Integer[]> transition = new ArrayList<Integer[]>();
-			transition.add(modState(-1, 1, state, size));
-			transition.add(modState(1, -1, state, size));
+		    if (state[2].intValue() == 0)
+		        transition.add(modState(-1, 1, state, size));
 			return transition;
 		}
 	}
@@ -238,32 +238,24 @@ public class GenerateCNMatrices {
 	}
 
 	public static void main(String args[]) {
-		int size = 1;
+		int size = 3;
 
 		GenerateCNMatrices cn = new GenerateCNMatrices(size);
 		cn.ensureInitalize();
 		cn.saveMatricesAsJSON();
 		
-		
-		/*
 		SimpleMatrix decrease = new SimpleMatrix(cn.getDecreaseQ());
 		System.out.println("Decrease cn:");
 		System.out.println(decrease.toString());
+		
+		SimpleMatrix increase = new SimpleMatrix(cn.getIncreaseQ());
+		System.out.println("Increase cn:");
+		System.out.println(increase.toString());
 
-		System.out.println(Arrays.deepToString(cn.getDecreaseQ()));
-		System.out.println();
-
-		System.out.println(a);
-
-
-		 * SimpleMatrix increase = new SimpleMatrix(cn.getIncreaseQ());
-		 * System.out.println("Increase cn:");
-		 * System.out.println(increase.toString());
-		 * 
-		 * SimpleMatrix mutation = new SimpleMatrix(cn.getMutationQ());
-		 * System.out.println("Mutation cn:");
-		 * System.out.println(mutation.toString());
-		 */
+		SimpleMatrix mutation = new SimpleMatrix(cn.getMutationQ());
+		System.out.println("Mutation cn:");
+		System.out.println(mutation.toString());
+		 
 	}
 
 	/**

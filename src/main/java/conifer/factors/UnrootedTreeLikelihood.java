@@ -2,6 +2,7 @@ package conifer.factors;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +17,11 @@ import blang.factors.GenerativeFactor;
 import blang.variables.RealVariable;
 import briefj.BriefCollections;
 import briefj.BriefIO;
-import conifer.Parsimony;
-import conifer.ParsimonyVector;
+import briefj.run.Results;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
+import conifer.UnrootedTreeUtils;
 import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.RateMatrices;
 import conifer.ctmc.SimpleRateMatrix;
@@ -34,7 +35,6 @@ import conifer.io.FixedTreeObservations;
 import conifer.io.Indexers;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
-import conifer.models.CNMultiCategorySubstitutionModel;
 import conifer.models.CNSpecies;
 import conifer.models.DiscreteGammaMixture;
 import conifer.models.EvolutionaryModel;
@@ -112,28 +112,30 @@ public class UnrootedTreeLikelihood
    * 
    */
 
-  public static UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) 
+  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) 
   {
-	// read in the raw count data
 	Set<CNSpecies> data = CNParser.readCNPairs(cnFile);
 	
-    // create treeObservations
     TreeObservations treeObservations = new CopyNumberTreeObservation(data);
         
-    // create CNMatrix and CNMixture (gammaMixture not supported)
 	CopyNumberMatrix cnMatrix = CopyNumberMatrix.matrixOfSize(Indexers.copyNumberCTMCIndexer().objects().size() - 1);
     CopyNumberMixture cnMixture = new CopyNumberMixture(cnMatrix);
 
     int nSites = treeObservations.nSites();    
-    CNMultiCategorySubstitutionModel<CopyNumberMixture> subModel 
-    = new CNMultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, new Parsimony(ParsimonyVector.oneInit(nSites)), nSites);
+    MultiCategorySubstitutionModel<CopyNumberMixture> subModel 
+    = new MultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, nSites);
+           
+    UnrootedTree tree = defaultTree(CNParser.getNodeMap(data).keySet());  
+    TreeNode root = TreeNode.withLabel("root");
+    tree.addNode(root);
+    tree.addEdge(root, tree.getInternalNode(), 1);
     
-    // make the tree
-    UnrootedTree tree = defaultTree(treeObservations.getObservedTreeNodes());
-    tree.addNode(TreeNode.withLabel("root"));
+    PrintWriter treeWriter = BriefIO.output(Results.getFileInResultFolder("cntrees.newick"));
+    treeWriter.write(UnrootedTreeUtils.toNewickWithRoot(tree, tree.getTreeNode("root")));
+    treeWriter.flush(); 
     
     // this needs to be set to the correct values upon initialisation...i.e., the state space must be (2,0,0)! 
-    return new UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
+    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
   }
   
   
@@ -235,7 +237,10 @@ public class UnrootedTreeLikelihood
    */
   public TreeNode arbitraryNode()
   {
-    return TopologyUtils.arbitraryNode(tree);
+      if (tree.getTopology().containsVertex(TreeNode.withLabel("root")))
+          tree.getTreeNode("root");
+      
+      return TopologyUtils.arbitraryNode(tree);
   }
   
   
@@ -264,29 +269,5 @@ public class UnrootedTreeLikelihood
     if (!observations.getObservedTreeNodes().isEmpty())
       throw new RuntimeException("The method clear() seems to be incorrectly implemented in " + observations.getClass().getName());
     evolutionaryModel.generateObservationsInPlace(random, observations, tree, arbitraryNode());
-  }
-  
-  public static void main(String [] args)
-  {
-//	String jsonString = BriefIO.resourceToString("src/main/resources/conifer/ctmc/cn-42-increaseQ.txt");
-	String jsonString = 
-			BriefIO.resourceToString("/conifer/ctmc/cn-42-increaseQ.txt");
-	  
-	
-//	File f = new File("src/main/resources/conifer/sampleInput/testPatientData.txt");
-//	UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> treeLikelihood =
-//	UnrootedTreeLikelihood.fromCNFile(f);
-//	System.out.println(treeLikelihood.observations.toString());
-//	
-//	System.err.println("Finished reading CN!");
-	  
-	  
-//    UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> ll = fromFastaFile(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"));
-//    System.out.println("nSites=" + ll.observations.nSites());
-//    System.out.println("nNodes=" + ll.tree.getTopology().vertexSet().size());
-//    Random rand = new Random(1);
-//    ll.evolutionaryModel.samplePosteriorPaths(rand, ll.observations, ll.tree, BriefCollections.pick(ll.tree.getTopology().vertexSet()), null);
-//    System.out.println("done!");
-//    ll.
   }
 }

@@ -1,13 +1,5 @@
 package conifer;
 
-import blang.annotations.Processors;
-import blang.annotations.Samplers;
-import conifer.moves.ParsimonySampler;
-import conifer.processors.ParsimonyProcessor;
-
-@Samplers({ParsimonySampler.class})
-@Processors({ParsimonyProcessor.class})
-
 /**
  * 
  * @author jewellsean
