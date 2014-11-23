@@ -6,7 +6,7 @@ import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 
-import com.sun.media.jai.codecimpl.util.ImagingException;
+//import com.sun.media.jai.codecimpl.util.ImagingException;
 
 import bayonet.distributions.Normal.MeanVarianceParameterization;
 import blang.ForwardSampler;
@@ -127,14 +127,14 @@ public class SingleProteinModel implements Runnable, Processor
     String numberOfSites = fileNameString.subStringBetween(fileName, "numSites", "Seed");
     String whichSeedUsed = fileNameString.subStringBetween(fileName, "Seed", ".txt");
     logToFile("Total time in minutes: " + ((System.currentTimeMillis() - startTime)/60000.0));
-    File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed+ "epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
+    //File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed+ "epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
+    File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed);
     newDirectory.mkdir();
     try
     {
       FileUtils.copyDirectory(Results.getResultFolder(), newDirectory);
     } catch (IOException e)
     {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     
