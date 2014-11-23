@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.ejml.simple.SimpleMatrix;
+import org.jblas.DoubleMatrix;
 
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Multinomial;
@@ -26,9 +27,9 @@ public class EndPointSampler
 {
   private static final int MAX_N_TRANSITION = 1000000;
   private final CTMC ctmc;
-  private final SimpleMatrix uniformizedTransition;
+  private final DoubleMatrix uniformizedTransition;
   public final double maxDepartureRate;
-  private final List<SimpleMatrix> cache;
+  private final List<DoubleMatrix> cache;
   private double [] sojournWorkArray = new double[10];
   private final double [] transitionWorkArray;
   
@@ -36,7 +37,7 @@ public class EndPointSampler
   {
     this.ctmc = ctmc;
     this.maxDepartureRate = maxDepartureRate(ctmc.getRateMatrix());
-    this.uniformizedTransition = new SimpleMatrix(uniformizedTransition(ctmc.getRateMatrix(), maxDepartureRate));
+    this.uniformizedTransition = new DoubleMatrix(uniformizedTransition(ctmc.getRateMatrix(), maxDepartureRate));
     this.cache = initCache();
     this.transitionWorkArray = new double[ctmc.getRateMatrix().length];
   }
@@ -203,16 +204,16 @@ public class EndPointSampler
     return sojournWorkArray;
   }
   
-  private SimpleMatrix getUniformizedTransitionPower(int power)
+  private DoubleMatrix getUniformizedTransitionPower(int power)
   {
     ensureCache(power);
     return cache.get(power);
   }
 
-  private List<SimpleMatrix> initCache()
+  private List<DoubleMatrix> initCache()
   {
-    List<SimpleMatrix> result = Lists.newArrayList();
-    result.add(SimpleMatrix.identity(uniformizedTransition.numCols()));
+    List<DoubleMatrix> result = Lists.newArrayList();
+    result.add(DoubleMatrix.eye(uniformizedTransition.columns));
     return result;
   }
 
@@ -220,6 +221,10 @@ public class EndPointSampler
   {
     int maxPowerInCache = cache.size() - 1;
     for (int curPower = maxPowerInCache + 1; curPower <= power; curPower++)
-      cache.add(uniformizedTransition.mult(cache.get(curPower-1)));
+    {
+      DoubleMatrix tmpMatrix = cache.get(curPower-1);
+      cache.add(tmpMatrix.mmul(uniformizedTransition));
+    }
+      
   }
 }
