@@ -41,6 +41,7 @@ public class CopyNumberMatrix implements CTMCParameters
 	@Option(gloss="Dollo precision parameter")
 	public final double DOLLO_EPSILON = .1;  
 	
+	
 	// Break the overall Q representation into a series of 3 matrices
 	private final SimpleMatrix increaseQ; 
 	private final SimpleMatrix decreaseQ; 
@@ -62,7 +63,9 @@ public class CopyNumberMatrix implements CTMCParameters
 	@Override
 	public CTMC getProcess()
 	{
-		return new EigenCTMC(this.getRateMatrix());
+		double[] stationary = new double[increaseQ.numRows()];
+		stationary[2] = 1; // this is the normal state
+	    return new EigenCTMC(this.getRateMatrix(), stationary);
 	}
 
 	@Override
