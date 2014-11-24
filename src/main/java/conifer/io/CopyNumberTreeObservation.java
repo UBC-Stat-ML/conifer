@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import blang.annotations.FactorArgument;
+import blang.annotations.Processors;
 import blang.annotations.Samplers;
 import blang.variables.RealVariable;
 
@@ -23,9 +24,10 @@ import conifer.TreeNode;
 import conifer.models.CNPair;
 import conifer.models.CNSpecies;
 import conifer.moves.CopyNumberTreeSampler;
+import conifer.processors.CopyNumberTreeProcessor;
 
 @Samplers({CopyNumberTreeSampler.class})
-
+@Processors({CopyNumberTreeProcessor.class})
 /**
  * Keeps the raw count data as CNSpacies,
  * 

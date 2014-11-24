@@ -3,18 +3,16 @@ package conifer.processors;
 import java.io.File;
 import java.util.List;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import bayonet.coda.CodaParser;
 import bayonet.coda.EffectiveSize;
 import bayonet.coda.SimpleCodaPlots;
 import blang.processing.NodeProcessor;
 import blang.processing.ProcessorContext;
-import blang.variables.RealValued;
 import briefj.OutputManager;
 import briefj.run.Results;
+import conifer.Parsimony;
 import conifer.io.CopyNumberTreeObservation;
 
 public class CopyNumberTreeProcessor implements NodeProcessor<CopyNumberTreeObservation>
@@ -38,7 +36,10 @@ public class CopyNumberTreeProcessor implements NodeProcessor<CopyNumberTreeObse
         
         Parsimony parsimony = variable.parsimony;
         
-        samplesOutput.write(variableName, "mcmcIter", iteration, variableName, variable.getValue());
+        int[] M = parsimony.getM().getParsimony();
+        int len = M.length;
+        for (int site = 0; site < len; site++)
+            samplesOutput.write(variableName, "mcmcIter", iteration, "site " + site, M[site]);
         
         if (CODA)
         {
