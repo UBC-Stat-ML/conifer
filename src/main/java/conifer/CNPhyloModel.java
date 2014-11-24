@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import bayonet.distributions.Exponential;
-import bayonet.distributions.Exponential.RateParameterization;
 import blang.MCMCAlgorithm;
 import blang.MCMCFactory;
 import blang.annotations.DefineFactor;
@@ -18,7 +16,6 @@ import briefj.run.Mains;
 import briefj.run.Results;
 import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.factors.UnrootedTreeLikelihood;
-import conifer.io.CopyNumberTreeObservation;
 import conifer.models.MultiCategorySubstitutionModel;
 
 public class CNPhyloModel implements Runnable, Processor {
