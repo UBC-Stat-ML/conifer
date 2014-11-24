@@ -102,6 +102,12 @@ public class EigenCTMC implements CTMC
    
     double [] result = null;
     final int dim = marginal.getColumnDimension();
+    
+//   DoubleMatrix exponentiatedTransposeJBLAS = new DoubleMatrix(exponentiatedTranspose.getArray());
+//   Eigen eigenDecompJBLAS = new Eigen();
+//   ComplexDoubleMatrix [] eigenVectorAndEigenValue = Eigen.eigenvectors(exponentiatedTransposeJBLAS);
+//   ComplexDoubleMatrix eigenVector = eigenVectorAndEigenValue[0];
+    
     EigenvalueDecomposition eigenDecomp = new EigenvalueDecomposition(exponentiatedTranspose);
     // Find an eigen value equal to one (up to numerical precision)
     // result will hold the corresponding eigenvalue
