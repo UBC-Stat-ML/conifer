@@ -43,6 +43,8 @@ public class CNParser {
 		List<CNPair> currentPairs = null;
 
 		String clusterID = "";
+		String prevClusterID = "";
+		String prevSpeciesName = "";
 		String speciesName = null;
 
 		for (String line : BriefIO.readLines(file)) {
@@ -80,7 +82,7 @@ public class CNParser {
 					currentPairs.add(currentPair);
 				} else {
 					// new species, put the last one, and renew
-					cnSpecies.add(new CNSpecies(currentPairs, clusterID, speciesName));
+					cnSpecies.add(new CNSpecies(currentPairs, prevClusterID, prevSpeciesName));
 
 					// add the new item
 					currentTaxonName = speciesName;
@@ -88,6 +90,8 @@ public class CNParser {
 					currentPairs.add(currentPair);
 				}
 			}
+			prevClusterID = clusterID;
+			prevSpeciesName = speciesName;
 			lineNumber++;
 		}
 		
