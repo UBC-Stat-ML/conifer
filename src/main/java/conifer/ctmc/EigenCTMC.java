@@ -1,33 +1,15 @@
 package conifer.ctmc;
-import org.ejml.data.DenseMatrix64F;
-import org.ejml.data.Eigenpair;
-import org.ejml.factory.DecompositionFactory;
-import org.ejml.factory.EigenDecomposition;
-import org.ejml.ops.EigenOps;
 import org.ejml.simple.SimpleMatrix;
+import org.jblas.DoubleMatrix;
+import org.jblas.MatrixFunctions;
 
 import tutorialj.Tutorial;
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
 import bayonet.distributions.Multinomial;
 import bayonet.math.EJMLUtils;
 import bayonet.math.NumericalUtils;
-import bayonet.math.EJMLUtils.SimpleEigenDecomposition;
-
-
-import java.io.*;
-import java.util.*;
-
-import org.jblas.ComplexDoubleMatrix;
-import org.jblas.DoubleMatrix;
-import org.jblas.MatrixFunctions;
-import org.junit.Assert;
-import org.junit.Test;
-
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
-
-
 // Added by Tingting
-import org.jblas.Eigen;
 /**
  * A continuous time Markov chain. The main functionalities consists
  * in computing a marginal transition probability and a stationary distribution
@@ -61,6 +43,14 @@ public class EigenCTMC implements CTMC
      this.stationaryDistribution = computeStationary();
      this.rates = rates;
      }
+ 
+ public EigenCTMC(double[][] rates, double[] stationary)
+ {
+     RateMatrixUtils.checkValidRateMatrix(rates);
+     this.eigenDecomp = SimpleEigenDecomposition(rates); 
+     this.stationaryDistribution = stationary;
+     this.rates = rates;   
+ }
  
  public static SimpleEigenDecomposition SimpleEigenDecomposition(double [][] rates)
  {
@@ -150,6 +140,7 @@ public class EigenCTMC implements CTMC
     DoubleMatrix rateMtx = new DoubleMatrix(eigenDecomp.calculatedRateMtx.getArray());
     rateMtx.muli(branchLength);
     double [][] result = MatrixFunctions.expm(rateMtx).toArray2();
+    result = bayonet.math.NumericalUtils.smallNeg2Zero(result, 1e-8);
     NumericalUtils.checkIsTransitionMatrix(result);
    
     for (int row = 0; row < result.length; row++)
