@@ -118,7 +118,7 @@ public class UnrootedTreeLikelihood
 	
     TreeObservations treeObservations = new CopyNumberTreeObservation(data);
         
-	CopyNumberMatrix cnMatrix = CopyNumberMatrix.matrixOfSize(Indexers.copyNumberCTMCIndexer().objects().size() - 1);
+	CopyNumberMatrix cnMatrix = CopyNumberMatrix.matrixOfSize(3);
     CopyNumberMixture cnMixture = new CopyNumberMixture(cnMatrix);
 
     int nSites = treeObservations.nSites();    
@@ -238,7 +238,7 @@ public class UnrootedTreeLikelihood
   public TreeNode arbitraryNode()
   {
       if (tree.getTopology().containsVertex(TreeNode.withLabel("root")))
-          tree.getTreeNode("root");
+          return tree.getTreeNode("root");
       
       return TopologyUtils.arbitraryNode(tree);
   }
