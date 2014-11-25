@@ -18,7 +18,6 @@ import conifer.io.CopyNumberTreeObservation;
 import conifer.io.Indexers;
 import conifer.models.CNPair;
 import conifer.models.MultiCategorySubstitutionModel;
-import conifer.models.ParsimonyModel;
 
 /**
  * 
@@ -46,7 +45,6 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
     public Proposal propose(Random rand)
     {
         CopyNumberTreeObservation data = (CopyNumberTreeObservation) likelihood.observations;
-                
         List<Integer> visitOrder = visitSiteInRandomOrder(rand, data.nSites());
                 
         for(Integer i : visitOrder)
@@ -69,8 +67,9 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
             updateAllLeavesFixedSite(emissions, v, site);
             loglikelihood[v] = likelihood.logDensity();
         }
-
-        int mi = bayonet.distributions.Multinomial.sampleMultinomial(rand, loglikelihood);
+        double[] prob = bayonet.opt.DoubleArrays.pointwiseExp(loglikelihood);
+        bayonet.distributions.Multinomial.normalize(prob);
+        int mi = bayonet.distributions.Multinomial.sampleMultinomial(rand, prob);
         updateAllLeavesFixedSite(emissions, mi, site);
         
         return mi; 
@@ -79,13 +78,12 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
     // for a fixed parsimony state, that is a fixed value of M update all of the leaves with new Y vectors
     private void updateAllLeavesFixedSite(Map<String, CNPair> emissions, int minLeaf, int site)
     {
-//        double betaBinomialPrecision = .betaBinomialPrecision.getValue();
         CopyNumberTreeObservation data = (CopyNumberTreeObservation) likelihood.observations;
         Map<String, Integer> leafMap = data.getLeafOrder();
         for (String leaf : emissions.keySet())
         {
             double[] logLik = conditionalEmissionLogLikelihood(emissions.get(leaf), tree.betaBinomialprecision.getValue(), leafMap.get(leaf), minLeaf);
-            data.setSite(TreeNode.withLabel(leaf), site, logLik);
+            data.setSite(TreeNode.withLabel(leaf), site, bayonet.opt.DoubleArrays.pointwiseExp(logLik));
         }
     }
 
@@ -134,7 +132,7 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
 
     private double constructXi(int A, int a)
     {
-        return (A + DELTA) / (A + a + DELTA);
+        return (A + DELTA) / (A + a + DELTA + 1);
     }
 
     private class ProposalRealization implements Proposal
