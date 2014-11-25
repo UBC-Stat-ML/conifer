@@ -116,16 +116,17 @@ public class UnrootedTreeLikelihood
   {
 	Set<CNSpecies> data = CNParser.readCNPairs(cnFile);
 	
+	
     TreeObservations treeObservations = new CopyNumberTreeObservation(data);
         
-	CopyNumberMatrix cnMatrix = CopyNumberMatrix.matrixOfSize(3);
+	CopyNumberMatrix cnMatrix = CopyNumberMatrix.matrixOfSize(5);
     CopyNumberMixture cnMixture = new CopyNumberMixture(cnMatrix);
 
     int nSites = treeObservations.nSites();    
     MultiCategorySubstitutionModel<CopyNumberMixture> subModel 
     = new MultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, nSites);
            
-    UnrootedTree tree = defaultTree(CNParser.getNodeMap(data).keySet());  
+    UnrootedTree tree = defaultTree(((CopyNumberTreeObservation) treeObservations).getLeaves());  
     TreeNode root = TreeNode.withLabel("root");
     tree.addNode(root);
     tree.addEdge(root, tree.getInternalNode(), 1);
@@ -133,8 +134,7 @@ public class UnrootedTreeLikelihood
     PrintWriter treeWriter = BriefIO.output(Results.getFileInResultFolder("cntrees.newick"));
     treeWriter.write(UnrootedTreeUtils.toNewickWithRoot(tree, tree.getTreeNode("root")));
     treeWriter.flush(); 
-    
-    // this needs to be set to the correct values upon initialisation...i.e., the state space must be (2,0,0)! 
+
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
   }
   
