@@ -2,6 +2,7 @@ package conifer.io;
 
 import static blang.variables.RealVariable.real;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -70,20 +71,33 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	private LinkedHashMap<TreeNode, double[][]> currentCTMCState = Maps.newLinkedHashMap();
 
 	private final int nSites;
-
-	public CopyNumberTreeObservation(int nSites, Parsimony parsimony) {
-		this.nSites = nSites;
-		this.parsimony = parsimony; 
-	}
-
 	
-	public CopyNumberTreeObservation(Set<CNSpecies> cnSpecies) {
+	private final Set<TreeNode> leaves;
+	
+	public CopyNumberTreeObservation(Set<CNSpecies> cnSpecies) 
+	{
 		nSites = cnSpecies.iterator().next().getCnPairs().size();
 		setCNSpecies(cnSpecies);
 		this.parsimony = new Parsimony(ParsimonyVector.oneInit(nSites));
+		this.leaves = CNParser.getNodeMap(cnSpecies).keySet();
+		initalizeLeafStates();
 	}
 
-	@Override
+	public Set<TreeNode> getLeaves()
+	{
+	    return leaves;
+	}
+	
+	private void initalizeLeafStates()
+    {
+	    double uniform[][] = new double[nSites][Indexers.copyNumberCTMCIndexer().size()];
+	    for (int i = 0; i < nSites; i++)
+	        bayonet.opt.DoubleArrays.initialize(uniform[i], 1);
+	    for (TreeNode t : getLeaves())
+	        currentCTMCState.put(t, uniform);
+    }
+
+    @Override
 	public List<TreeNode> getObservedTreeNodes() {
 		List<TreeNode> result = Lists.newArrayList();
 		for (TreeNode key : currentCTMCState.keySet())
