@@ -80,7 +80,7 @@ public class MajorityRuleTree {
 		int cntBurnin = 0;
 		while (importer.hasTree() && cnt < maxTrees) {
 			RootedTree tree = (RootedTree) importer.importNextTree();
-			if (cntBurnin > burnIn) {
+			if (cntBurnin >= burnIn) {
 				treeList.add(tree);
 				cnt++;
 			}
