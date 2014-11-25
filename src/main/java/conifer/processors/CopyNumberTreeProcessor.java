@@ -3,6 +3,7 @@ package conifer.processors;
 import java.io.File;
 import java.util.List;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
 import bayonet.coda.CodaParser;
@@ -38,8 +39,16 @@ public class CopyNumberTreeProcessor implements NodeProcessor<CopyNumberTreeObse
         
         int[] M = parsimony.getM().getParsimony();
         int len = M.length;
+        
+        String[] toWrite = {"mcmcIter", Integer.toString(iteration)}; 
         for (int site = 0; site < len; site++)
-            samplesOutput.write(variableName, "mcmcIter", iteration, "site " + site, M[site]);
+        {
+          String statSplit = Integer.toString(M[site]);
+          String[] stat = {"site: " + (site + 1), statSplit};
+          toWrite = ArrayUtils.addAll(toWrite, stat);
+        }
+        
+        samplesOutput.write(variableName, (Object []) toWrite );
         
         if (CODA)
         {
