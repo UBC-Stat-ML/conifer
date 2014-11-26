@@ -40,7 +40,7 @@ public class TestExpFamPhyloModel extends MCMCRunner
 
   public static void main(String [] args)
   {
-    shouldUsePlots = true;
+//    shouldUsePlots = true;
     new TestExpFamPhyloModel().checkStationarity();
   }
   
