@@ -126,10 +126,13 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
     output.setOutputFolder(Results.getResultFolder());
   }
 
-  @Override
-  public void setReference(ExpFamParameters variable)
-  {
-    this.parameters = variable;
-  }
+    @Override
+    public void setReference(ExpFamParameters variable)
+    {
+        this.parameters = variable;
+    }
 
 }
+
+
+
