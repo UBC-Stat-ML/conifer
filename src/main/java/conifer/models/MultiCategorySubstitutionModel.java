@@ -562,7 +562,11 @@ public boolean isValid()
 {
     try
     {
-        RateMatrixUtils.checkValidRateMatrix(rateMatrixMixture.getRateMatrix(0).getProcess().getRateMatrix());
+        for (int i = 0; i < nCategories(); i++)
+        {
+            RateMatrixUtils.checkValidRateMatrix(rateMatrixMixture.getRateMatrix(i).getProcess().getRateMatrix());
+        }
+
         return true;
     }
     catch(RuntimeException e)
