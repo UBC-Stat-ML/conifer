@@ -1,5 +1,7 @@
 package conifer;
 
+import java.util.Map;
+
 /**
  * 
  * @author jewellsean
@@ -8,20 +10,22 @@ package conifer;
 public class ParsimonyVector
 {
     private int[] M; 
+    public Map<Integer, String> leafString;
     
-    public static ParsimonyVector oneInit(int nSites)
+    public static ParsimonyVector oneInit(int nSites, Map<Integer, String> leafString)
     {
         int[] M = new int[nSites];
         for (int i = 0; i < nSites; i++)
             M[i] = 1;
-        return new ParsimonyVector(M);
+        return new ParsimonyVector(M, leafString);
     }
             
     
     
-    public ParsimonyVector(int[] M)
+    public ParsimonyVector(int[] M, Map<Integer, String> leafString)
     {
         this.M = M; 
+        this.leafString = leafString;
     }
     
     public int getIndex(int i)
@@ -43,4 +47,10 @@ public class ParsimonyVector
     {
         this.M = M; 
     }
+    
+    public String getLeafString(Integer leaf)
+    {
+        return leafString.get(leaf);
+    }
+    
 }

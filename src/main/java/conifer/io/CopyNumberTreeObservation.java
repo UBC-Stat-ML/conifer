@@ -43,6 +43,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
     public final Parsimony parsimony;
     
     private Map<String, Integer> leafOrder = null;
+    private Map<Integer, String> leafString = null;
 	
 	public Map<String, Integer> getLeafOrder()
 	{
@@ -57,6 +58,23 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	    for (String s : emissions.keySet())
 	        leafOrder.put(s, i++);
 	    return leafOrder; 
+	}
+	
+	private Map<Integer, String> getLeafName()
+	{
+	    if (leafString != null)
+	        return leafString;
+	    
+	    Map<Integer, String> leafString = new HashMap<Integer, String>();
+	    for(String s : leafOrder.keySet())
+	        leafString.put(leafOrder.get(s), s);
+
+	    return leafString;
+	}
+	
+	public String getLeafString(Integer leaf)
+	{
+	    return getLeafName().get(leaf);
 	}
 	
 	public int getLeafOrder(String s)
@@ -78,9 +96,12 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	{
 		nSites = cnSpecies.iterator().next().getCnPairs().size();
 		setCNSpecies(cnSpecies);
-		this.parsimony = new Parsimony(ParsimonyVector.oneInit(nSites));
-		this.leaves = CNParser.getNodeMap(cnSpecies).keySet();
+		LinkedHashMap<TreeNode, List<CNPair>> leaves = CNParser.getNodeMap(cnSpecies);
+		leaves.put(TreeNode.withLabel("root"), null);
+		this.leaves = leaves.keySet();
+		this.parsimony = initalizeParsimony();
 		initalizeLeafStates();
+		
 	}
 
 	public Set<TreeNode> getLeaves()
@@ -88,15 +109,36 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	    return leaves;
 	}
 	
+	private Parsimony initalizeParsimony()
+	{
+	    this.leafOrder = getLeafOrder();
+	    this.leafString = getLeafName();
+	    return new Parsimony(ParsimonyVector.oneInit(nSites, leafString));
+	}
+	
 	private void initalizeLeafStates()
-    {
+	{
 	    double uniform[][] = new double[nSites][Indexers.copyNumberCTMCIndexer().size()];
 	    for (int i = 0; i < nSites; i++)
 	        bayonet.opt.DoubleArrays.initialize(uniform[i], 1);
 	    for (TreeNode t : getLeaves())
+	    {
+	        if (t.toString() == "root")
+	            currentCTMCState.put(t, rootLeaf());    
 	        currentCTMCState.put(t, uniform);
-    }
+	    }
+	}
 
+	private double[][] rootLeaf()
+	{
+	    double[] rootLeaf = new double[Indexers.copyNumberCTMCIndexer().size()];
+	    double[][] root = new double[nSites][Indexers.copyNumberCTMCIndexer().size()];
+	    rootLeaf[2] = 1;
+	    for (int i = 0; i < nSites; i++)
+	        root[i] = rootLeaf;
+	    return root;
+	}
+	
     @Override
 	public List<TreeNode> getObservedTreeNodes() {
 		List<TreeNode> result = Lists.newArrayList();

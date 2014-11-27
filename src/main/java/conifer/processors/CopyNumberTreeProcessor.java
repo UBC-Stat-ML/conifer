@@ -43,7 +43,7 @@ public class CopyNumberTreeProcessor implements NodeProcessor<CopyNumberTreeObse
         String[] toWrite = {"mcmcIter", Integer.toString(iteration)}; 
         for (int site = 0; site < len; site++)
         {
-          String statSplit = Integer.toString(M[site]);
+          String statSplit = parsimony.getM().getLeafString((M[site]));
           String[] stat = {"site: " + (site + 1), statSplit};
           toWrite = ArrayUtils.addAll(toWrite, stat);
         }
