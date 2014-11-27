@@ -35,7 +35,7 @@ public class CopyNumberMatrix implements CTMCParameters
 
     // Ordered as: mutation, increase, decrease
     @FactorArgument
-	public final ProbabilitySimplex P = ProbabilitySimplex.repNormalize(3, 1);   
+	public final RealVariable alpha = real(0.5);    
 
 
 	@Option(gloss="Dollo precision parameter")
@@ -82,11 +82,10 @@ public class CopyNumberMatrix implements CTMCParameters
 	@Override
 	public double[][] getRateMatrix()
 	{
-	    double[] probs = P.getVector();
-		double[][] rate = EJMLUtils.copyMatrixToArray(
-				mutationQ.scale(probs[0])
-				.plus(increaseQ.scale(probs[1]))
-				.plus(decreaseQ.scale(probs[2])).scale(DOLLO_EPSILON));
+	    double param = alpha.getValue(); 
+	    double[][] rate = EJMLUtils.copyMatrixToArray(
+				mutationQ.plus(increaseQ.scale(param))
+				.plus(decreaseQ.scale((1-param))).scale(DOLLO_EPSILON));
 		RateMatrixUtils.fillRateMatrixDiagonalEntries(rate);
 		return rate; 
 	}
