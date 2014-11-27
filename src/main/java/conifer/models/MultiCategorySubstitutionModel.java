@@ -37,6 +37,7 @@ import conifer.ctmc.EndPointSampler;
 import conifer.ctmc.Path;
 import conifer.ctmc.PathStatistics;
 import conifer.ctmc.RateMatrixToEmissionModel;
+import conifer.ctmc.RateMatrixUtils;
 import conifer.factors.NonClockTreePrior;
 import conifer.io.CNObservationFactory;
 import conifer.io.PhylogeneticObservationFactory;
@@ -555,5 +556,19 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
       return tree;
     }
   }
+
+@Override
+public boolean isValid()
+{
+    try
+    {
+        RateMatrixUtils.checkValidRateMatrix(rateMatrixMixture.getRateMatrix(0).getProcess().getRateMatrix());
+        return true;
+    }
+    catch(RuntimeException e)
+    {
+        return false;
+    }
+}
 
 }

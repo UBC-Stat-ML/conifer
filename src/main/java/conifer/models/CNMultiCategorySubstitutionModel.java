@@ -6,6 +6,7 @@ import blang.annotations.FactorArgument;
 import conifer.Parsimony;
 import conifer.TreeNode;
 import conifer.ctmc.CTMC;
+import conifer.ctmc.RateMatrixUtils;
 
 /**
  * 
@@ -43,6 +44,19 @@ public class CNMultiCategorySubstitutionModel<T extends RateMatrixMixture> exten
       context.getDiscreteFactorGraph().unaryTimesEqual(node, new SimpleMatrix(allStatios));
     }
     
+    @Override
+    public boolean isValid()
+    {
+        try
+        {
+            RateMatrixUtils.checkValidRateMatrix(rateMatrixMixture.getRateMatrix(0).getProcess().getRateMatrix());
+            return true;
+        }
+        catch(RuntimeException e)
+        {
+            return false;
+        }
+    }
     
     
 }

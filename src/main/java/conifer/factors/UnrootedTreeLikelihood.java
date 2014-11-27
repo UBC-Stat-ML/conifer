@@ -127,10 +127,7 @@ public class UnrootedTreeLikelihood
     = new MultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, nSites);
            
     UnrootedTree tree = defaultTree(((CopyNumberTreeObservation) treeObservations).getLeaves());  
-    TreeNode root = TreeNode.withLabel("root");
-    tree.addNode(root);
-    tree.addEdge(root, tree.getInternalNode(), 1);
-    
+        
     PrintWriter treeWriter = BriefIO.output(Results.getFileInResultFolder("cntrees.newick"));
     treeWriter.write(UnrootedTreeUtils.toNewickWithRoot(tree, tree.getTreeNode("root")));
     treeWriter.flush(); 
@@ -257,6 +254,8 @@ public class UnrootedTreeLikelihood
   @Override
   public double logDensity()
   {
+      if (!evolutionaryModel.isValid())
+          return Double.NEGATIVE_INFINITY;
     TreeNode arbitraryRoot = arbitraryNode();
     LikelihoodComputationContext context = new LikelihoodComputationContext(buildFactorGraphs(arbitraryRoot), arbitraryRoot);
     return evolutionaryModel.computeLogLikelihood(context);

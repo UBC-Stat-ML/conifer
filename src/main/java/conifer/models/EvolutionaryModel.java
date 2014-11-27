@@ -20,6 +20,7 @@ public interface EvolutionaryModel
   public void buildObservation(TreeNode leaf, LikelihoodFactoryContext context);
   public void buildTransition(TreeNode parent, TreeNode children, LikelihoodFactoryContext context);
   public void buildInitialDistribution(TreeNode node, LikelihoodFactoryContext context);
+  public boolean isValid();
   
   public double computeLogLikelihood(LikelihoodComputationContext context);
 
