@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import bayonet.distributions.Exponential;
+import bayonet.distributions.Exponential.RateParameterization;
+import bayonet.distributions.Uniform;
+import bayonet.distributions.Uniform.MinMaxParameterization;
 import blang.MCMCAlgorithm;
 import blang.MCMCFactory;
 import blang.annotations.DefineFactor;
@@ -15,8 +19,11 @@ import briefj.opt.OptionSet;
 import briefj.run.Mains;
 import briefj.run.Results;
 import conifer.ctmc.cnv.CopyNumberMixture;
+import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
+import conifer.moves.AllBranchesScaling;
+import conifer.moves.SPRMove;
 
 public class CNPhyloModel implements Runnable, Processor {
 	@Option(required = true, gloss = "file containing raw reads")
@@ -32,17 +39,16 @@ public class CNPhyloModel implements Runnable, Processor {
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> likelihood = UnrootedTreeLikelihood
 				.fromCNFile(inputFile);
 			
-//		@DefineFactor
-//		NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
-//
-//		@DefineFactor
-//		Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(
-//				treePrior.branchDistributionParameters.rate).withMean(10.0);
-
-		// emission process beta binomial precision parameters
-//		@DefineFactor
-//		Exponential<RateParameterization> priorGamma = Exponential.on(
-//		        ((CopyNumberTreeObservation) likelihood.observations).betaBinomialprecision);
+		@DefineFactor
+		NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
+		
+		@DefineFactor
+		Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(
+				treePrior.branchDistributionParameters.rate).withMean(10.0);
+		
+	     @DefineFactor
+	     Uniform<MinMaxParameterization> cnvParameter = Uniform.on(likelihood.evolutionaryModel.rateMatrixMixture.parameters.alpha).withBounds(0.25, 0.75); 
+	      
 	}
 
 	public Model model;
@@ -55,6 +61,8 @@ public class CNPhyloModel implements Runnable, Processor {
 
 		// init the model
 		factory.addProcessor(this);
+		factory.excludeNodeMove(SPRMove.class);
+		factory.excludeNodeMove(AllBranchesScaling.class);
 		model = new Model();
 		MCMCAlgorithm mcmc = factory.build(model, false);
 		File graph = Results.getFileInResultFolder("probability-graph.dot");	
@@ -79,6 +87,7 @@ public class CNPhyloModel implements Runnable, Processor {
 	public void process(ProcessorContext context) {
 		treeWriter.println(model.likelihood.tree.toNewick());
 		treeWriter.flush();
+		// add path here through multicat
 	}
 
 }
