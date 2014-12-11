@@ -114,6 +114,7 @@ public class SingleProteinModel implements Runnable, Processor
     RealVectorMHProposal.bandWidth = bandwidth;
     PhyloHMCMove.epsilon=epsilon;
     PhyloHMCMove.L = L;
+    PhyloHMCMove.sizeAdapt=sizeAdapt;
     factory.addProcessor(this);
     model = new Model();
     long startTime = System.currentTimeMillis();
