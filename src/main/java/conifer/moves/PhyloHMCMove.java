@@ -42,10 +42,12 @@ public class PhyloHMCMove extends NodeMove
   @ConnectedFactor UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
   @ConnectedFactor IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior;
   
-  @Option(gloss="provide epsilon")
+  @Option(gloss="provided epsilon")
   public static Double epsilon = null;
-  @Option(gloss="provide L")
+  @Option(gloss="provided L")
   public static Integer L = null;
+  @Option(gloss="provided size of adaptation")
+  public static Integer sizeAdapt = 500;
   
   public int nItersPerPathAuxVar = 1000;
 
@@ -84,7 +86,7 @@ public class PhyloHMCMove extends NodeMove
     }
     else
     {
-      AHMC ahmc = AHMC.initializeAHMCWithLBFGS(10000, 1000, objective, objective, initialPoint.length,1000);
+      AHMC ahmc = AHMC.initializeAHMCWithLBFGS(10000, 1000, objective, objective, initialPoint.length,sizeAdapt);
       newPoint = ahmc.sample(rand).data;
       epsilon = ahmc.getEpsilon();
       L = ahmc.getL();

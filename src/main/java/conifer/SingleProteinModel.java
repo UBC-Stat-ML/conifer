@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 
 //import com.sun.media.jai.codecimpl.util.ImagingException;
 
+
 import bayonet.distributions.Normal.MeanVarianceParameterization;
 import blang.ForwardSampler;
 import blang.MCMCAlgorithm;
@@ -69,6 +70,9 @@ public class SingleProteinModel implements Runnable, Processor
    
    @Option(gloss="L provided")
    public static Integer L = null;
+   
+   @Option(gloss="provided size of adaptation")
+   public static Integer sizeAdapt = 500;
   
   public class Model
   {
@@ -128,7 +132,7 @@ public class SingleProteinModel implements Runnable, Processor
     String whichSeedUsed = fileNameString.subStringBetween(fileName, "Seed", ".txt");
     logToFile("Total time in minutes: " + ((System.currentTimeMillis() - startTime)/60000.0));
     //File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed+ "epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
-    File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed +"epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
+    File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed +"epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L+"Adapt"+ PhyloHMCMove.sizeAdapt);
     newDirectory.mkdir();
     try
     {
