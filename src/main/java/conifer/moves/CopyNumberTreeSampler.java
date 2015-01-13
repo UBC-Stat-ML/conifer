@@ -132,7 +132,7 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
 
     private double constructXi(int A, int a)
     {
-        return (A + DELTA) / (A + a + DELTA + 1);
+        return (A + DELTA) / (A + a + DELTA);
     }
 
     private class ProposalRealization implements Proposal
