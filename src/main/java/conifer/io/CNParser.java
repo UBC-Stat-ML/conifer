@@ -37,7 +37,8 @@ public class CNParser {
 		String WHITE_SPACE = "(\\s+$|^\\s+)";
 
 		// CSVReader reader = new CSVReader(new FileReader(f));
-		int lineNumber = 0;
+		@SuppressWarnings("unused")
+        int lineNumber = 0;
 
 		String currentTaxonName = null;
 		List<CNPair> currentPairs = null;

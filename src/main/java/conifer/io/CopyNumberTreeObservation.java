@@ -4,12 +4,15 @@ import static blang.variables.RealVariable.real;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.media.j3d.Link;
 
 import blang.annotations.FactorArgument;
 import blang.annotations.Processors;
@@ -44,6 +47,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
     
     private Map<String, Integer> leafOrder = null;
     private Map<Integer, String> leafString = null;
+    private Map<String, Set<CNSpecies>> cnSpeciesClusters = new LinkedHashMap<String, Set<CNSpecies>>();
 	
     // raw count data E(v)
     private final Set<CNSpecies> cnSpecies = new LinkedHashSet<CNSpecies>();
@@ -62,7 +66,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	        return leafOrder;
 	    }
 	    
-	    Map<String, CNPair> emissions = getEmissionAtSite(0);
+	    Map<String, Set<CNPair>> emissions = getEmissionAtSite(0);
 	    leafOrder = new HashMap<String, Integer>();
 	    Integer i = 0; 
 	    for (String s : emissions.keySet())
@@ -101,7 +105,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		leaves.put(TreeNode.withLabel("root"), null);
 		this.leaves = leaves.keySet();
 		this.parsimony = initalizeParsimony();
-		initalizeLeafStates();
+		initalizeLeafStates();    
 		
 	}
 
@@ -206,17 +210,53 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		}
 	}
 
-	public Map<String, CNPair> getEmissionAtSite(int i)
-    {
-        Map<String, CNPair> emissions = new HashMap<String, CNPair>();
-        Iterator<CNSpecies> itPairs = cnSpecies.iterator();
-        
-        while(itPairs.hasNext())
-        {
-            CNSpecies pairs = itPairs.next();
-            emissions.put(pairs.getSpeciesName(), pairs.getCnPairs().get(i));
-        }
-        
-        return emissions; 
-    }
+	public Map<String, Set<CNPair>> getEmissionAtSite(int i)
+	{
+	    Map<String, Set<CNPair>> emissions = new HashMap<String, Set<CNPair>>();
+
+	    for (String cluster : cnSpeciesClusters.keySet())
+	    {
+	        Set<CNSpecies> clusterSpecies = cnSpeciesClusters.get(cluster);
+	        Set<CNPair> cnClusterPairs = new HashSet<CNPair>();
+	        Iterator<CNSpecies> itPairs = clusterSpecies.iterator();
+
+	        while(itPairs.hasNext())
+	        {
+	            CNSpecies pairs = itPairs.next();
+	            cnClusterPairs.add(pairs.getCnPairs().get(i));
+	        }
+	        emissions.put(cluster, cnClusterPairs);
+	    }
+
+	    return emissions; 
+	}
+	
+	public List<String> getClusters(Set<CNSpecies> data)
+	{
+	    List<String> clusters = new ArrayList<String>();
+	    for (CNSpecies cn : data)
+	        {
+	            if (!clusters.contains(cn.getClusterID()))
+	                clusters.add(cn.getClusterID());
+	        }
+	    return clusters; 
+	}
+	
+	private void populateClusterEmissions()
+	{
+	    Map<String, Set<CNSpecies>> cnSpeciesClusters = new LinkedHashMap<String, Set<CNSpecies>>();
+	    for (CNSpecies s : cnSpecies)
+	    {
+	        String cluster = s.getClusterID();
+	        Set<CNSpecies> clusterElements;
+	        if (cnSpeciesClusters.containsKey(cluster))
+	            clusterElements = cnSpeciesClusters.get(cluster);
+	        else
+	            clusterElements = new HashSet<CNSpecies>();
+	        clusterElements.add(s);
+	        cnSpeciesClusters.put(cluster, clusterElements);
+	    }
+	    
+	}
+	
 }

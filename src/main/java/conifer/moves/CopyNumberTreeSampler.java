@@ -2,9 +2,11 @@ package conifer.moves;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.MHProposalDistribution;
@@ -49,7 +51,7 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
                 
         for(Integer i : visitOrder)
         {
-            Map<String, CNPair> emissions = data.getEmissionAtSite(i.intValue());
+            Map<String, Set<CNPair>> emissions = data.getEmissionAtSite(i.intValue());
             int Mi = oneSiteGibbs(rand, emissions, i.intValue());
             tree.parsimony.getM().setIndex(i.intValue(), Mi);
         }
@@ -57,7 +59,7 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
     }
 
 
-    private int oneSiteGibbs(Random rand, Map<String, CNPair> emissions, int site)
+    private int oneSiteGibbs(Random rand, Map<String, Set<CNPair>> emissions, int site)
     {
         int noLeaves = emissions.keySet().size(); 
         double[] loglikelihood = new double[noLeaves];
@@ -76,7 +78,7 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
     }
 
     // for a fixed parsimony state, that is a fixed value of M update all of the leaves with new Y vectors
-    private void updateAllLeavesFixedSite(Map<String, CNPair> emissions, int minLeaf, int site)
+    private void updateAllLeavesFixedSite(Map<String, Set<CNPair>> emissions, int minLeaf, int site)
     {
         CopyNumberTreeObservation data = (CopyNumberTreeObservation) likelihood.observations;
         Map<String, Integer> leafMap = data.getLeafOrder();
@@ -90,7 +92,7 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
 
     // for a single leaf update the vector of emission probabilities 
     // imposes the conditions provided through M on Y vector
-    private double[] conditionalEmissionLogLikelihood(CNPair emissions, double betaBinomialPrecision, int leaf, int minLeaf)
+    private double[] conditionalEmissionLogLikelihood(Set<CNPair> emissions, double betaBinomialPrecision, int leaf, int minLeaf)
     {
         Indexer<String> indexer = Indexers.copyNumberCTMCIndexer();
         int noStates = indexer.objectsList().size();
@@ -102,7 +104,14 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
             int b = state[2];
             if(leaf > minLeaf || (b == 0 && leaf < minLeaf) || (b == 1) && leaf == minLeaf)
             {
-                logLik[i] = conditionalEmissionLogLikelihood(emissions.getN(), emissions.getrA(), constructXi(state[0], state[1]), betaBinomialPrecision);    
+                // loop over all elements in cluster 
+                Iterator<CNPair> clusterElements = emissions.iterator();
+                while(clusterElements.hasNext())
+                {
+                    CNPair currentElement = clusterElements.next();
+                    logLik[i] = conditionalEmissionLogLikelihood(currentElement.getN(), currentElement.getrA(), constructXi(state[0], state[1]), betaBinomialPrecision);
+                }
+                        
             }
         }
         return logLik;
