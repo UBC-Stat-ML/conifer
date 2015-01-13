@@ -45,7 +45,17 @@ public class CopyNumberTreeObservation implements TreeObservations {
     private Map<String, Integer> leafOrder = null;
     private Map<Integer, String> leafString = null;
 	
-	public Map<String, Integer> getLeafOrder()
+    // raw count data E(v)
+    private final Set<CNSpecies> cnSpecies = new LinkedHashSet<CNSpecies>();
+
+    // Y(v): v \in L
+    private LinkedHashMap<TreeNode, double[][]> currentCTMCState = Maps.newLinkedHashMap();
+
+    private final int nSites;
+    
+    private final Set<TreeNode> leaves;
+    
+    public Map<String, Integer> getLeafOrder()
 	{
 	    if (leafOrder != null)
 	    {
@@ -82,16 +92,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	    return getLeafOrder().get(s).intValue();
 	}
 	
-	// raw count data E(v)
-	private final Set<CNSpecies> cnSpecies = new LinkedHashSet<CNSpecies>();
 
-	// Y(v): v \in L
-	private LinkedHashMap<TreeNode, double[][]> currentCTMCState = Maps.newLinkedHashMap();
-
-	private final int nSites;
-	
-	private final Set<TreeNode> leaves;
-	
 	public CopyNumberTreeObservation(Set<CNSpecies> cnSpecies) 
 	{
 		nSites = cnSpecies.iterator().next().getCnPairs().size();
