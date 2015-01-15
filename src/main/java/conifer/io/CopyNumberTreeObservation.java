@@ -104,8 +104,8 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		LinkedHashMap<TreeNode, List<CNPair>> leaves = CNParser.getNodeMap(cnSpecies);
 		leaves.put(TreeNode.withLabel("root"), null);
 		this.leaves = leaves.keySet();
-		this.parsimony = initalizeParsimony();
 		populateClusterEmissions();
+		this.parsimony = initalizeParsimony();
 		initalizeLeafStates();    
 	}
 
