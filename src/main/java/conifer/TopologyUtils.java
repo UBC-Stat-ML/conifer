@@ -1,5 +1,6 @@
 package conifer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jgrapht.UndirectedGraph;
@@ -48,5 +49,21 @@ public class TopologyUtils
       result.add(TreeNode.withLabel("synthetic-" + i));
     return result;
   }
+  
+  
+	/**
+	 * Generate nTaxa number of taxa with prefix prefix, like prefix1, prefix2, ...
+	 * @param nTaxa
+	 * @param prefix
+	 * @return
+	 */
+	public static List<TreeNode> makeLeaves(int nTaxa, String prefix) 
+	{	
+		List<TreeNode> result = new ArrayList<TreeNode>();
+		for (int i = 0; i < nTaxa; i++) {
+			result.add(TreeNode.withLabel(prefix + i));
+		}
+		return result;
+	}
   
 }

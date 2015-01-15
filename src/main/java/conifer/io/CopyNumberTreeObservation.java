@@ -2,7 +2,7 @@ package conifer.io;
 
 import static blang.variables.RealVariable.real;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -11,10 +11,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import blang.annotations.FactorArgument;
 import blang.annotations.Processors;
 import blang.annotations.Samplers;
 import blang.variables.RealVariable;
+import briefj.Indexer;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -32,7 +35,7 @@ import conifer.processors.CopyNumberTreeProcessor;
 /**
  * Keeps the raw count data as CNSpacies,
  * 
- * @author Sohrab Salehi (sohrab.salehi@gmail.com)
+ * @author Sohrab Salehi (sohrabsalehi@gmail.com)
  * @author Sean Jewell (jewellsean@gmail.com)
  */
 public class CopyNumberTreeObservation implements TreeObservations {
@@ -45,6 +48,39 @@ public class CopyNumberTreeObservation implements TreeObservations {
     private Map<String, Integer> leafOrder = null;
     private Map<Integer, String> leafString = null;
 	
+	// raw count data E(v)
+	private final Set<CNSpecies> cnSpecies = new LinkedHashSet<CNSpecies>();
+
+	// Y(v): v \in L
+	private LinkedHashMap<TreeNode, double[][]> currentCTMCState = Maps.newLinkedHashMap();
+
+	private final int nSites;
+	
+	private final Set<TreeNode> leaves;
+	
+	
+	// Intended for simulation
+	public CopyNumberTreeObservation(int nSites, Set<TreeNode> leaves) {
+		this.nSites = nSites;		
+		this.leaves = leaves;
+		this.parsimony = initalizeParsimony();
+		initalizeLeafStates();
+		// TODO: do we need initilizeParsimony?
+		// TODO: do we need initializeLeafStates()?
+	}
+	
+	public CopyNumberTreeObservation(Set<CNSpecies> cnSpecies) 
+	{
+		nSites = cnSpecies.iterator().next().getCnPairs().size();
+		setCNSpecies(cnSpecies);
+		LinkedHashMap<TreeNode, List<CNPair>> leaves = CNParser.getNodeMap(cnSpecies);
+		leaves.put(TreeNode.withLabel("root"), null);
+		this.leaves = leaves.keySet();
+		this.parsimony = initalizeParsimony();
+		initalizeLeafStates();
+		
+	}
+
 	public Map<String, Integer> getLeafOrder()
 	{
 	    if (leafOrder != null)
@@ -82,28 +118,6 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	    return getLeafOrder().get(s).intValue();
 	}
 	
-	// raw count data E(v)
-	private final Set<CNSpecies> cnSpecies = new LinkedHashSet<CNSpecies>();
-
-	// Y(v): v \in L
-	private LinkedHashMap<TreeNode, double[][]> currentCTMCState = Maps.newLinkedHashMap();
-
-	private final int nSites;
-	
-	private final Set<TreeNode> leaves;
-	
-	public CopyNumberTreeObservation(Set<CNSpecies> cnSpecies) 
-	{
-		nSites = cnSpecies.iterator().next().getCnPairs().size();
-		setCNSpecies(cnSpecies);
-		LinkedHashMap<TreeNode, List<CNPair>> leaves = CNParser.getNodeMap(cnSpecies);
-		leaves.put(TreeNode.withLabel("root"), null);
-		this.leaves = leaves.keySet();
-		this.parsimony = initalizeParsimony();
-		initalizeLeafStates();
-		
-	}
-
 	public Set<TreeNode> getLeaves()
 	{
 	    return leaves;
@@ -218,4 +232,43 @@ public class CopyNumberTreeObservation implements TreeObservations {
         
         return emissions; 
     }
+	
+	
+	// Return the corresponding state
+	public String CNPairFromIndicatorArray(double[] indicatorArray) {
+		Indexer<CNPair> indexer = Indexers.CNPairIndexer();
+		return indexer.i2o(ArrayUtils.indexOf(indicatorArray, 1)) + "";
+	}
+	
+	
+	public String CNListFromCTMCStateSpace(double[][] ctmcStateSpace ) {
+		StringBuilder result = new StringBuilder();
+		for (int i = 0; i < nSites; i++) {
+			result.append(CNPairFromIndicatorArray(ctmcStateSpace[i]) + "  ");
+		}
+		return result.toString();
+	}
+
+	
+  @Override
+  public String toString()
+  {	
+    StringBuilder result = new StringBuilder();
+   
+    LinkedHashMap<TreeNode, List<CNPair>> emissions = CNParser.getNodeMap(cnSpecies);
+    
+    for (TreeNode node : leaves) {
+    	// CTMC state (copy numbers Y(v): v \in L)
+    	//result.append(node.toString() + "_[CTMC_STATE]: " + Arrays.deepToString(currentCTMCState.get(node)) + " \n");
+    	result.append(node.toString() + "_[CTMC_STATE]: " + CNListFromCTMCStateSpace(currentCTMCState.get(node)) + " \n");
+    	    	
+    	// Emission State (count data E(v))
+    	if (emissions.size() > 0)
+    		result.append(node.toString() + "_[EMISSION]: " + emissions.get(node).toString() + " ");    	
+    }
+    
+    return result.toString();
+  }
+	
+	
 }
