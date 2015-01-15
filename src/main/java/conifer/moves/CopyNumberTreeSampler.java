@@ -109,7 +109,7 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
                 while(clusterElements.hasNext())
                 {
                     CNPair currentElement = clusterElements.next();
-                    logLik[i] = conditionalEmissionLogLikelihood(currentElement.getN(), currentElement.getrA(), constructXi(state[0], state[1]), betaBinomialPrecision);
+                    logLik[i] += conditionalEmissionLogLikelihood(currentElement.getN(), currentElement.getrA(), constructXi(state[0], state[1]), betaBinomialPrecision);
                 }
                         
             }
