@@ -105,8 +105,8 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		leaves.put(TreeNode.withLabel("root"), null);
 		this.leaves = leaves.keySet();
 		this.parsimony = initalizeParsimony();
+		populateClusterEmissions();
 		initalizeLeafStates();    
-		
 	}
 
 	public Set<TreeNode> getLeaves()
@@ -244,7 +244,6 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	
 	private void populateClusterEmissions()
 	{
-	    Map<String, Set<CNSpecies>> cnSpeciesClusters = new LinkedHashMap<String, Set<CNSpecies>>();
 	    for (CNSpecies s : cnSpecies)
 	    {
 	        String cluster = s.getClusterID();
