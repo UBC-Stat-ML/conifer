@@ -3,6 +3,9 @@ package conifer;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import bayonet.distributions.Uniform;
@@ -20,6 +23,9 @@ import briefj.run.Mains;
 import briefj.run.Results;
 import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.factors.UnrootedTreeLikelihood;
+import conifer.io.CNParser;
+import conifer.io.CopyNumberTreeObservation;
+import conifer.models.CNPair;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.moves.SPRMove;
 import conifer.moves.SingleNNI;
@@ -48,8 +54,8 @@ public class CNPhyloSimulator implements Runnable, Processor {
 		@DefineFactor
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> likelihood = UnrootedTreeLikelihood.createEmptyCN(nSites, leaves);
 		
-	     @DefineFactor
-	     Uniform<MinMaxParameterization> cnvParameter = Uniform.on(likelihood.evolutionaryModel.rateMatrixMixture.parameters.alpha).withBounds(0.25, 0.75); 
+	    @DefineFactor
+	    Uniform<MinMaxParameterization> cnvParameter = Uniform.on(likelihood.evolutionaryModel.rateMatrixMixture.parameters.alpha).withBounds(0.25, 0.75); 
 	      
 	}
 
@@ -73,15 +79,86 @@ public class CNPhyloSimulator implements Runnable, Processor {
 		for (int i = 0; i < nDataSets; i++) {
 			f.simulate(mcmc.options.random);
 			
-			// write the CN-input file corresponding to the simulation
-			System.out.println(model.likelihood.observations.toString());
+			// TODO: Write the CN-input file corresponding to the simulation
+			
+			
 			// FastaUtils.writeFasta(model.likelihood.observations, Results.getFileInResultFolder("SimulatedData.fasta"));
-
+			logObservations( (CopyNumberTreeObservation) model.likelihood.observations);
 			// TODO: get the rest of the simulation parameters, if any
 			for (Object var: mcmc.model.getLatentVariables()) {
 				System.out.println(mcmc.model.getName(var) + " : " + var.toString());
 			}
 		}
+	}
+	
+	
+	public void logObservations(CopyNumberTreeObservation observation) {
+		System.out.println(observation.toString());
+		
+		// Write CTMC State, that is the copy-numbers
+		writeCTMC(observation);
+		
+		// Write Emission State
+		writeEmission(observation);
+	}
+	
+	public void writeCTMC(CopyNumberTreeObservation observation) {
+		StringBuilder result = new StringBuilder();
+		
+		// Add the header
+		result.append("\"sample_id\",\"site_id\",\"ref_counts\",\"alt_counts\",\"cluster_id\"" + "\n");
+		
+		Set<TreeNode> leaves = observation.getLeaves();
+		
+		LinkedHashMap<TreeNode, List<CNPair>> cns = observation.getPrintFriendlyCTMCState();
+	    
+	    for (TreeNode node : leaves) {
+	    	List<CNPair> cnPairs = cns.get(node);
+	    	for (int i = 0; i < cnPairs.size(); i++) {
+	    		CNPair currPair = cnPairs.get(i);
+	    		result.append(node.toString() +  ", " + // add sample_id
+	    		    		  i + ", " + 				// site_id
+	    				      currPair.getRa() + ", " + // ref_CN
+	    		    		  currPair.getrA() + ", " + // alt_CN
+	    				      1 + "\n");						// some_cluster
+			}
+	    }
+	    
+	    // write the result to file
+	    PrintWriter theWriter = BriefIO.output(Results.getFileInResultFolder("simulatedCNData.csv"));
+		theWriter.println(result.toString());
+		theWriter.flush();
+	}
+	
+	// TODO: obviously, merge with above
+	public void writeEmission(CopyNumberTreeObservation observation) {
+		StringBuilder result = new StringBuilder();
+		
+		// Add the header
+		result.append("\"sample_id\",\"site_id\",\"ref_counts\",\"alt_counts\",\"cluster_id\"" + "\n");
+		
+		Set<TreeNode> leaves = observation.getLeaves();
+		
+		Map<TreeNode, List<CNPair>> cns = observation.getTreeNodeRepresentation();
+	    
+		if (cns.size() == 0) return;
+		
+	    for (TreeNode node : leaves) {
+	    	List<CNPair> cnPairs = cns.get(node);
+	    	for (int i = 0; i < cnPairs.size(); i++) {
+	    		CNPair currPair = cnPairs.get(i);
+	    		result.append(node.toString() +  ", " + // add sample_id
+	    		    		  i + ", " + 				// site_id
+	    				      currPair.getRa() + ", " + // ref_CN
+	    		    		  currPair.getrA() + ", " + // alt_CN
+	    				      1 + "\nSSSSS");						// some_cluster
+			}
+	    }
+	    
+	    // write the result to file
+	    PrintWriter theWriter = BriefIO.output(Results.getFileInResultFolder("simulatedEmissionData.csv"));
+		theWriter.println(result.toString());
+		theWriter.flush();
 	}
 	
 	public void writeTree(UnrootedTree tree) {
