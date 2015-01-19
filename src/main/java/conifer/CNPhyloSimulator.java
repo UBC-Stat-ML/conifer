@@ -1,0 +1,180 @@
+package conifer;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import bayonet.distributions.Uniform;
+import bayonet.distributions.Uniform.MinMaxParameterization;
+import blang.ForwardSampler;
+import blang.MCMCAlgorithm;
+import blang.MCMCFactory;
+import blang.annotations.DefineFactor;
+import blang.mcmc.Move;
+import blang.processing.Processor;
+import blang.processing.ProcessorContext;
+import briefj.BriefIO;
+import briefj.opt.OptionSet;
+import briefj.run.Mains;
+import briefj.run.Results;
+import conifer.ctmc.cnv.CopyNumberMixture;
+import conifer.factors.UnrootedTreeLikelihood;
+import conifer.io.CNParser;
+import conifer.io.CopyNumberTreeObservation;
+import conifer.models.CNPair;
+import conifer.models.MultiCategorySubstitutionModel;
+import conifer.moves.SPRMove;
+import conifer.moves.SingleNNI;
+
+
+/*
+ * TODO: fix the tree, only simulate copy number change and one eventual point-mutation,
+ * TODO: later, add the option to jump between trees
+ * 
+ */
+
+public class CNPhyloSimulator implements Runnable, Processor {
+	
+
+	@OptionSet(name = "factory")
+	public final MCMCFactory factory = new MCMCFactory();
+
+	
+	public class Model {
+
+		int nSites = 5;
+		int nTaxa = 5;
+		
+		Set<TreeNode> leaves = new HashSet<TreeNode>(TopologyUtils.makeLeaves(nTaxa, "t_"));
+		
+		@DefineFactor
+		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> likelihood = UnrootedTreeLikelihood.createEmptyCN(nSites, leaves);
+		
+	    @DefineFactor
+	    Uniform<MinMaxParameterization> cnvParameter = Uniform.on(likelihood.evolutionaryModel.rateMatrixMixture.parameters.alpha).withBounds(0.25, 0.75); 
+	      
+	}
+
+	public Model model;
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public void run() 
+	{
+		model = new Model();
+		MCMCAlgorithm mcmc = factory.build(model, false);
+		
+		// Fix topology
+		factory.excludeNodeMove((Class<? extends Move>) (Object) SingleNNI.class);
+		factory.excludeNodeMove(SPRMove.class);
+		
+		ForwardSampler f = new ForwardSampler(mcmc.model);
+		
+		// Simulate K data sets
+		int nDataSets = 1;
+		for (int i = 0; i < nDataSets; i++) {
+			f.simulate(mcmc.options.random);
+			
+			// TODO: Write the CN-input file corresponding to the simulation
+			
+			
+			// FastaUtils.writeFasta(model.likelihood.observations, Results.getFileInResultFolder("SimulatedData.fasta"));
+			logObservations( (CopyNumberTreeObservation) model.likelihood.observations);
+			// TODO: get the rest of the simulation parameters, if any
+			for (Object var: mcmc.model.getLatentVariables()) {
+				System.out.println(mcmc.model.getName(var) + " : " + var.toString());
+			}
+		}
+	}
+	
+	
+	public void logObservations(CopyNumberTreeObservation observation) {
+		System.out.println(observation.toString());
+		
+		// Write CTMC State, that is the copy-numbers
+		writeCTMC(observation);
+		
+		// Write Emission State
+		writeEmission(observation);
+	}
+	
+	public void writeCTMC(CopyNumberTreeObservation observation) {
+		StringBuilder result = new StringBuilder();
+		
+		// Add the header
+		result.append("\"sample_id\",\"site_id\",\"ref_counts\",\"alt_counts\",\"cluster_id\"" + "\n");
+		
+		Set<TreeNode> leaves = observation.getLeaves();
+		
+		LinkedHashMap<TreeNode, List<CNPair>> cns = observation.getPrintFriendlyCTMCState();
+	    
+	    for (TreeNode node : leaves) {
+	    	List<CNPair> cnPairs = cns.get(node);
+	    	for (int i = 0; i < cnPairs.size(); i++) {
+	    		CNPair currPair = cnPairs.get(i);
+	    		result.append(node.toString() +  ", " + // add sample_id
+	    		    		  i + ", " + 				// site_id
+	    				      currPair.getRa() + ", " + // ref_CN
+	    		    		  currPair.getrA() + ", " + // alt_CN
+	    				      1 + "\n");						// some_cluster
+			}
+	    }
+	    
+	    // write the result to file
+	    PrintWriter theWriter = BriefIO.output(Results.getFileInResultFolder("simulatedCNData.csv"));
+		theWriter.println(result.toString());
+		theWriter.flush();
+	}
+	
+	// TODO: obviously, merge with above
+	public void writeEmission(CopyNumberTreeObservation observation) {
+		StringBuilder result = new StringBuilder();
+		
+		// Add the header
+		result.append("\"sample_id\",\"site_id\",\"ref_counts\",\"alt_counts\",\"cluster_id\"" + "\n");
+		
+		Set<TreeNode> leaves = observation.getLeaves();
+		
+		Map<TreeNode, List<CNPair>> cns = observation.getTreeNodeRepresentation();
+	    
+		if (cns.size() == 0) return;
+		
+	    for (TreeNode node : leaves) {
+	    	List<CNPair> cnPairs = cns.get(node);
+	    	for (int i = 0; i < cnPairs.size(); i++) {
+	    		CNPair currPair = cnPairs.get(i);
+	    		result.append(node.toString() +  ", " + // add sample_id
+	    		    		  i + ", " + 				// site_id
+	    				      currPair.getRa() + ", " + // ref_CN
+	    		    		  currPair.getrA() + ", " + // alt_CN
+	    				      1 + "\nSSSSS");						// some_cluster
+			}
+	    }
+	    
+	    // write the result to file
+	    PrintWriter theWriter = BriefIO.output(Results.getFileInResultFolder("simulatedEmissionData.csv"));
+		theWriter.println(result.toString());
+		theWriter.flush();
+	}
+	
+	public void writeTree(UnrootedTree tree) {
+		PrintWriter theWriter = BriefIO.output(Results.getFileInResultFolder("SimulatedDataTree.newick"));
+		theWriter.println(tree.toNewick());
+		theWriter.flush();
+	}
+	
+	public static void main(String[] args) throws ClassNotFoundException, IOException {
+		Mains.instrumentedRun(args, new CNPhyloSimulator());
+	}
+
+
+	@Override
+	public void process(ProcessorContext context) {
+		// TODO Auto-generated method stub
+		
+	}
+}

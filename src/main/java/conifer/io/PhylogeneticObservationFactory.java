@@ -179,7 +179,7 @@ public class PhylogeneticObservationFactory
   }
  
   /**
-   * 
+   * TODO: this is a DNA specific implementation. Should be generic, using the current upac data
    * @return Inverse of getIndicators(), with string value of the indicator arrays as keys and the 
    * string chunk as values.
    *  
