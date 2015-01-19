@@ -98,8 +98,6 @@ public class CNPhyloSimulator implements Runnable, Processor {
 		// Write CTMC State, that is the copy-numbers
 		writeCTMC(observation);
 		
-		// Write Emission State
-		writeEmission(observation);
 	}
 	
 	public void writeCTMC(CopyNumberTreeObservation observation) {
@@ -118,9 +116,9 @@ public class CNPhyloSimulator implements Runnable, Processor {
 	    		CNPair currPair = cnPairs.get(i);
 	    		result.append(node.toString() +  ", " + // add sample_id
 	    		    		  i + ", " + 				// site_id
-	    				      currPair.getRa() + ", " + // ref_CN
-	    		    		  currPair.getrA() + ", " + // alt_CN
-	    				      1 + "\n");						// some_cluster
+	    				      currPair.getrA() + ", " + // ref_CN
+	    		    		  currPair.getRa() + ", " + // alt_CN
+	    				      1 + "\n");				// some_cluster
 			}
 	    }
 	    
@@ -129,38 +127,7 @@ public class CNPhyloSimulator implements Runnable, Processor {
 		theWriter.println(result.toString());
 		theWriter.flush();
 	}
-	
-	// TODO: obviously, merge with above
-	public void writeEmission(CopyNumberTreeObservation observation) {
-		StringBuilder result = new StringBuilder();
 		
-		// Add the header
-		result.append("\"sample_id\",\"site_id\",\"ref_counts\",\"alt_counts\",\"cluster_id\"" + "\n");
-		
-		Set<TreeNode> leaves = observation.getLeaves();
-		
-		Map<TreeNode, List<CNPair>> cns = observation.getTreeNodeRepresentation();
-	    
-		if (cns.size() == 0) return;
-		
-	    for (TreeNode node : leaves) {
-	    	List<CNPair> cnPairs = cns.get(node);
-	    	for (int i = 0; i < cnPairs.size(); i++) {
-	    		CNPair currPair = cnPairs.get(i);
-	    		result.append(node.toString() +  ", " + // add sample_id
-	    		    		  i + ", " + 				// site_id
-	    				      currPair.getRa() + ", " + // ref_CN
-	    		    		  currPair.getrA() + ", " + // alt_CN
-	    				      1 + "\nSSSSS");						// some_cluster
-			}
-	    }
-	    
-	    // write the result to file
-	    PrintWriter theWriter = BriefIO.output(Results.getFileInResultFolder("simulatedEmissionData.csv"));
-		theWriter.println(result.toString());
-		theWriter.flush();
-	}
-	
 	public void writeTree(UnrootedTree tree) {
 		PrintWriter theWriter = BriefIO.output(Results.getFileInResultFolder("SimulatedDataTree.newick"));
 		theWriter.println(tree.toNewick());

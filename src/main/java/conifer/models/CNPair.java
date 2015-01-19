@@ -25,12 +25,14 @@ public class CNPair {
 		this.ra = ra;
 	}
 
-	public int getRa() {
-		return ra;
-	}
-
+	// wild type
 	public int getrA() {
 		return rA;
+	}
+	
+	// mutatnt type
+	public int getRa() {
+		return ra;
 	}
 
 	public int getN() {

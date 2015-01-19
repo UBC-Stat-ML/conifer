@@ -267,7 +267,8 @@ public class CopyNumberTreeObservation implements TreeObservations {
 
 	// Return the corresponding state
 	public String CNPairFromIndicatorArray(double[] indicatorArray) {
-		Indexer<CNPair> indexer = Indexers.CNPairIndexer();
+		//Indexer<CNPair> indexer = Indexers.CNPairIndexer();
+		Indexer<String> indexer = Indexers.copyNumberCTMCIndexer();
 		return indexer.i2o(ArrayUtils.indexOf(indicatorArray, 1)) + "";
 	}
 
