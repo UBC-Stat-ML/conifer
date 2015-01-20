@@ -112,13 +112,13 @@ public class CNPhyloSimulator implements Runnable, Processor {
 	        List<CNPair> cnPairs = cns.get(node);
 	    	for (int i = 0; i < cnPairs.size(); i++) {
 	    		CNPair currPair = cnPairs.get(i);
-	    		result.append(node.toString() +  ", " + // add sample_id
-	    		    		  i + ", " + 				// site_id
+	    		result.append(node.toString() +  "," + // add sample_id
+	    		    		  i + "," + 				// site_id
 	    		    		  emissions.get(node).get(i).getrA() + "," + // emission rA
 	    		    		  emissions.get(node).get(i).getRa() + "," + // emission ra
 	    		    		  node.toString() + ","  +                // cluster == one per sample
-	    		    		  currPair.getrA() + ", " + // ref_CN
-	    		    		  currPair.getRa() + ", " + // alt_CN
+	    		    		  currPair.getrA() + "," + // ref_CN
+	    		    		  currPair.getRa() + "," + // alt_CN
 	    		    		  "\n");
 			}
 	        }
