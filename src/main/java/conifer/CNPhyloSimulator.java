@@ -116,7 +116,7 @@ public class CNPhyloSimulator implements Runnable, Processor {
 	    		    		  i + ", " + 				// site_id
 	    		    		  emissions.get(node).get(i).getrA() + "," + // emission rA
 	    		    		  emissions.get(node).get(i).getRa() + "," + // emission ra
-                              1 + ","  +                // some_cluster
+	    		    		  node.toString() + ","  +                // cluster == one per sample
 	    		    		  currPair.getrA() + ", " + // ref_CN
 	    		    		  currPair.getRa() + ", " + // alt_CN
 	    		    		  "\n");
