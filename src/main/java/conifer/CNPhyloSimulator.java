@@ -5,11 +5,8 @@ import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import bayonet.distributions.Uniform;
-import bayonet.distributions.Uniform.MinMaxParameterization;
 import blang.ForwardSampler;
 import blang.MCMCAlgorithm;
 import blang.MCMCFactory;
@@ -18,15 +15,15 @@ import blang.mcmc.Move;
 import blang.processing.Processor;
 import blang.processing.ProcessorContext;
 import briefj.BriefIO;
+import briefj.opt.Option;
 import briefj.opt.OptionSet;
 import briefj.run.Mains;
 import briefj.run.Results;
 import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.factors.UnrootedTreeLikelihood;
-import conifer.io.CNParser;
 import conifer.io.CopyNumberTreeObservation;
+import conifer.models.CNMultiCategorySubstitutionModel;
 import conifer.models.CNPair;
-import conifer.models.MultiCategorySubstitutionModel;
 import conifer.moves.SPRMove;
 import conifer.moves.SingleNNI;
 
@@ -42,20 +39,20 @@ public class CNPhyloSimulator implements Runnable, Processor {
 
 	@OptionSet(name = "factory")
 	public final MCMCFactory factory = new MCMCFactory();
-
+	@Option
+	public final int nSites = 100;
+    @Option
+	public final int nTaxa = 3;
+	
 	
 	public class Model {
-
-		int nSites = 5;
-		int nTaxa = 5;
+	
 		
 		Set<TreeNode> leaves = new HashSet<TreeNode>(TopologyUtils.makeLeaves(nTaxa, "t_"));
 		
 		@DefineFactor
-		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> likelihood = UnrootedTreeLikelihood.createEmptyCN(nSites, leaves);
-		
-	    @DefineFactor
-	    Uniform<MinMaxParameterization> cnvParameter = Uniform.on(likelihood.evolutionaryModel.rateMatrixMixture.parameters.alpha).withBounds(0.25, 0.75); 
+		public final UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>> likelihood = UnrootedTreeLikelihood.createEmptyCN(nSites, leaves);
+
 	      
 	}
 
@@ -78,10 +75,7 @@ public class CNPhyloSimulator implements Runnable, Processor {
 		int nDataSets = 1;
 		for (int i = 0; i < nDataSets; i++) {
 			f.simulate(mcmc.options.random);
-			
-			// TODO: Write the CN-input file corresponding to the simulation
-			
-			
+		
 			// FastaUtils.writeFasta(model.likelihood.observations, Results.getFileInResultFolder("SimulatedData.fasta"));
 			logObservations( (CopyNumberTreeObservation) model.likelihood.observations);
 			// TODO: get the rest of the simulation parameters, if any
@@ -104,22 +98,30 @@ public class CNPhyloSimulator implements Runnable, Processor {
 		StringBuilder result = new StringBuilder();
 		
 		// Add the header
-		result.append("\"sample_id\",\"site_id\",\"ref_counts\",\"alt_counts\",\"cluster_id\"" + "\n");
+		result.append("\"sample_id\",\"site_id\",\"ref_counts\",\"alt_counts\",\"cluster_id\",\"ref_CN\",\"alt_CN\"" + "\n");
 		
 		Set<TreeNode> leaves = observation.getLeaves();
 		
 		LinkedHashMap<TreeNode, List<CNPair>> cns = observation.getPrintFriendlyCTMCState();
-	    
+		LinkedHashMap<TreeNode, List<CNPair>> emissions = observation.getEmissions();
+		
 	    for (TreeNode node : leaves) {
-	    	List<CNPair> cnPairs = cns.get(node);
+	        // do not record root level
+	        if (node.toString() != "root")
+	        {
+	        List<CNPair> cnPairs = cns.get(node);
 	    	for (int i = 0; i < cnPairs.size(); i++) {
 	    		CNPair currPair = cnPairs.get(i);
 	    		result.append(node.toString() +  ", " + // add sample_id
 	    		    		  i + ", " + 				// site_id
-	    				      currPair.getrA() + ", " + // ref_CN
+	    		    		  emissions.get(node).get(i).getrA() + "," + // emission rA
+	    		    		  emissions.get(node).get(i).getRa() + "," + // emission ra
+                              1 + ","  +                // some_cluster
+	    		    		  currPair.getrA() + ", " + // ref_CN
 	    		    		  currPair.getRa() + ", " + // alt_CN
-	    				      1 + "\n");				// some_cluster
+	    		    		  "\n");
 			}
+	        }
 	    }
 	    
 	    // write the result to file

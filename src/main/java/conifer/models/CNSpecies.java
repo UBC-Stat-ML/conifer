@@ -1,5 +1,6 @@
 package conifer.models;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +23,14 @@ public class CNSpecies {
 		this.clusterID = clusterID;
 		this.speciesName = speciesName;
 	}
-
+    
+	public CNSpecies(CNPair cnPair, String clusterID, String speciesName) {
+        List<CNPair> cnPairs = new ArrayList<CNPair>();
+        cnPairs.add(cnPair);
+	    this.cnPairs = cnPairs;
+        this.clusterID = clusterID;
+        this.speciesName = speciesName;
+	}
 	
 	/**
 	 * @return the clusterID

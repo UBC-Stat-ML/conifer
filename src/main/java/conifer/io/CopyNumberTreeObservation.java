@@ -1,5 +1,7 @@
 package conifer.io;
 
+
+import static blang.variables.IntegerVariable.intVar;
 import static blang.variables.RealVariable.real;
 
 import java.util.ArrayList;
@@ -10,15 +12,20 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import bayonet.distributions.BetaBinomial;
+import bayonet.distributions.BetaBinomial.MeanPrecisionParameterization;
+import bayonet.distributions.Poisson;
 import blang.annotations.FactorArgument;
 import blang.annotations.Processors;
 import blang.annotations.Samplers;
 import blang.variables.RealVariable;
 import briefj.Indexer;
+import briefj.opt.Option;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -43,6 +50,9 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	
     @FactorArgument
     public final RealVariable betaBinomialprecision = real(1);
+    
+    @Option
+    public final int poiMean = 1000; 
     
     public final Parsimony parsimony;
     
@@ -177,13 +187,17 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	}
 
 	@Override
-	public void set(TreeNode leaf, Object data) {
-		double[][] cast = (double[][]) data;
+	public void set(TreeNode leaf, Object data){}
+	
+	public void set(Random rand, TreeNode leaf, double[][] cast) {
+		//double[][] cast = (double[][]) data;
 		if (cast.length != nSites)
 			throw new RuntimeException();
 		currentCTMCState.put(leaf, cast);
+		cnSpecies.add(CNListFromCTMCStateSpace(rand, cast, leaf));
 	}
 
+	
 	@Override
 	public void clear() {
 		getCnSpecies().clear();
@@ -279,7 +293,38 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		}
 		return result.toString();
 	}
-
+	
+	// Return the emission as CNSpecies 
+	public CNSpecies CNListFromCTMCStateSpace(Random rand, double[][] ctmcStateSpace, TreeNode node)
+	{
+	   List<CNPair> cnPairs = new ArrayList<CNPair>();
+	   Indexer<String> indexer = Indexers.copyNumberCTMCIndexer();
+	   for (int i = 0; i < nSites; i++)
+	       {
+	           String res = indexer.i2o(ArrayUtils.indexOf(ctmcStateSpace[i], 1));
+	           String[] splitString = res.split(","); 
+	           int[] emission = generateEmission(rand, Integer.parseInt(splitString[0]), Integer.parseInt(splitString[1]));
+	           cnPairs.add(new CNPair(emission[0], emission[1]));
+	       }
+	   return new CNSpecies(cnPairs, "N/A", node.toString()); 
+	}
+	
+	private int[] generateEmission(Random rand, int A, int a)
+	{
+	    int trials = Poisson.generate(rand, poiMean);
+	    double mean = CopyNumberTreeSampler.constructXi(A, a);
+	    BetaBinomial<MeanPrecisionParameterization> beta = BetaBinomial.on(intVar(1)).withMeanPrecision(mean, betaBinomialprecision.getValue(), trials);
+	    beta.generate(rand);
+	    int rA = beta.getRealization().getIntegerValue(); 
+	    int ra = trials - rA; 
+	    return new int[] {rA, ra};
+	}
+	
+	public LinkedHashMap<TreeNode, List<CNPair>> getEmissions()
+	{
+	    return CNParser.getNodeMap(cnSpecies);
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
@@ -306,8 +351,9 @@ public class CopyNumberTreeObservation implements TreeObservations {
 		return new LinkedHashMap<TreeNode, double[][]>(currentCTMCState);
 	}
 
+	// TODO: Not really a CNPair -- this losses information on the true state space
+	// this will be needed in order to determine ancestral state b
 	public List<CNPair> getCNListFromIndicatorMatrix(double[][] indicatorMatrix) {
-	  // (0, 2)
 	  List<CNPair> result = Lists.newArrayList();
 	  
 	  for (int i = 0; i < nSites; i++) {

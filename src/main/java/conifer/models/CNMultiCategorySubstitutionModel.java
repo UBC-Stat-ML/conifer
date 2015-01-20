@@ -1,21 +1,21 @@
 package conifer.models;
 
-import org.ejml.simple.SimpleMatrix;
+import java.util.Random;
 
-import blang.annotations.FactorArgument;
-import conifer.Parsimony;
+import bayonet.graphs.GraphUtils;
 import conifer.TreeNode;
-import conifer.ctmc.CTMC;
-import conifer.ctmc.RateMatrixUtils;
+import conifer.UnrootedTree;
+import conifer.io.CopyNumberTreeObservation;
+import conifer.io.TreeObservations;
 
 /**
- * 
+ * Neeed to override generative factors 
  * @author jewellsean
  *
  * @param <T>
  */
 
-@Deprecated
+
 public class CNMultiCategorySubstitutionModel<T extends RateMatrixMixture> extends
         MultiCategorySubstitutionModel<T>
 {
@@ -25,38 +25,20 @@ public class CNMultiCategorySubstitutionModel<T extends RateMatrixMixture> exten
         super(rateMatrixMixture, nSites); 
     }
 
-    // Specify normal rooting
+
     @Override
-    public void buildInitialDistribution(TreeNode node,
-        LikelihoodFactoryContext context)
+    public void generateObservationsInPlace(
+        Random rand, 
+        TreeObservations destination,
+        UnrootedTree tree, TreeNode root)
     {
-      if (node.toString() != "root")
-          throw new RuntimeException("Initial distribution must be built on the root node!");
-        
-      final int categoryIndex = context.getFactorGraphIndex();
-      double[][] ctmc = rateMatrixMixture.getRateMatrix(categoryIndex).getRateMatrix();
-      int nStates = ctmc[0].length; 
-      double [] stationary = new double[nStates];
-      stationary[2] = 1; 
-      double [][] allStatios = new double[nSites][stationary.length];
-      for (int siteIndex = 0; siteIndex < nSites; siteIndex++)
-        allStatios[siteIndex] = stationary;
-      context.getDiscreteFactorGraph().unaryTimesEqual(node, new SimpleMatrix(allStatios));
+      MultiCategoryInternalNodeSample reconstructions = samplePriorInternalNodes(rand, tree, root);
+      for (TreeNode leaf : GraphUtils.leaves(tree.getTopology()))
+        {
+          ((CopyNumberTreeObservation) destination).set(rand, leaf, reconstructions.internalIndicators.get(leaf));
+        }
     }
     
-    @Override
-    public boolean isValid()
-    {
-        try
-        {
-            RateMatrixUtils.checkValidRateMatrix(rateMatrixMixture.getRateMatrix(0).getProcess().getRateMatrix());
-            return true;
-        }
-        catch(RuntimeException e)
-        {
-            return false;
-        }
-    }
     
     
 }

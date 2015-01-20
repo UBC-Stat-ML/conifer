@@ -435,7 +435,7 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
      * reconstruction.get(n)[s][x] is equal to one if x is the
      * sample state at that node and site, and zero otherwise.
      */
-    private final Map<TreeNode, double[][]> internalIndicators;
+    final Map<TreeNode, double[][]> internalIndicators;
 
     public int getInternalState(TreeNode n, int site)
     {

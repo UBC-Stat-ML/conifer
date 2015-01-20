@@ -6,8 +6,6 @@ import java.io.PrintWriter;
 
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
-import bayonet.distributions.Uniform;
-import bayonet.distributions.Uniform.MinMaxParameterization;
 import blang.MCMCAlgorithm;
 import blang.MCMCFactory;
 import blang.annotations.DefineFactor;
@@ -21,7 +19,7 @@ import briefj.run.Results;
 import conifer.ctmc.cnv.CopyNumberMixture;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
-import conifer.models.MultiCategorySubstitutionModel;
+import conifer.models.CNMultiCategorySubstitutionModel;
 import conifer.moves.AllBranchesScaling;
 import conifer.moves.SPRMove;
 
@@ -38,7 +36,7 @@ public class CNPhyloModel implements Runnable, Processor
         File inputFile = new File(emissionData);
 
         @DefineFactor
-        public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> likelihood = UnrootedTreeLikelihood
+        public final UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>> likelihood = UnrootedTreeLikelihood
         .fromCNFile(inputFile);
 
         @DefineFactor

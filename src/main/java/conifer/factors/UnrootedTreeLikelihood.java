@@ -32,9 +32,9 @@ import conifer.io.CNParser;
 import conifer.io.CopyNumberTreeObservation;
 import conifer.io.FastaUtils;
 import conifer.io.FixedTreeObservations;
-import conifer.io.Indexers;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
+import conifer.models.CNMultiCategorySubstitutionModel;
 import conifer.models.CNSpecies;
 import conifer.models.DiscreteGammaMixture;
 import conifer.models.EvolutionaryModel;
@@ -115,7 +115,7 @@ public class UnrootedTreeLikelihood
    * 
    * 
    */
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) 
+  public static UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>> fromCNFile(File cnFile) 
   {
 	Set<CNSpecies> data = CNParser.readCNPairs(cnFile);
 		
@@ -125,8 +125,8 @@ public class UnrootedTreeLikelihood
     CopyNumberMixture cnMixture = new CopyNumberMixture(cnMatrix);
 
     int nSites = treeObservations.nSites();    
-    MultiCategorySubstitutionModel<CopyNumberMixture> subModel 
-    = new MultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, nSites);
+    CNMultiCategorySubstitutionModel<CopyNumberMixture> subModel 
+    = new CNMultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, nSites);
            
     UnrootedTree tree = defaultTree(((CopyNumberTreeObservation) treeObservations).getLeaves());  
         
@@ -134,7 +134,7 @@ public class UnrootedTreeLikelihood
     treeWriter.write(UnrootedTreeUtils.toNewickWithRoot(tree, tree.getTreeNode("root")));
     treeWriter.flush(); 
 
-    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
+    return new UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations); 
   }
   
   
@@ -144,7 +144,7 @@ public class UnrootedTreeLikelihood
    * @param leaves
    * @return
    */
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> createEmptyCN(int nSites, Set<TreeNode> leaves) 
+  public static UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>> createEmptyCN(int nSites, Set<TreeNode> leaves) 
   {
 	
 	// add the root
@@ -154,15 +154,15 @@ public class UnrootedTreeLikelihood
       
 	CopyNumberMatrix cnMatrix = CopyNumberMatrix.matrixOfSize(maxCopyNumber); 
     CopyNumberMixture cnMixture = new CopyNumberMixture(cnMatrix);
-    MultiCategorySubstitutionModel<CopyNumberMixture> subModel 
-    = new MultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, nSites);         
+    CNMultiCategorySubstitutionModel<CopyNumberMixture> subModel 
+    = new CNMultiCategorySubstitutionModel<CopyNumberMixture>(cnMixture, nSites);         
     UnrootedTree tree = defaultTree(leaves);
         
     PrintWriter treeWriter = BriefIO.output(Results.getFileInResultFolder("cntrees.newick"));
     treeWriter.write(UnrootedTreeUtils.toNewickWithRoot(tree, tree.getTreeNode("root")));
     treeWriter.flush(); 
 
-    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations);
+    return new UnrootedTreeLikelihood<CNMultiCategorySubstitutionModel<CopyNumberMixture>>(tree, subModel, treeObservations);
   }
   
   

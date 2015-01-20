@@ -28,12 +28,13 @@ import conifer.models.MultiCategorySubstitutionModel;
  */
 public class CopyNumberTreeSampler implements MHProposalDistribution
 {
-    @Option public final double DELTA = 0.1;
-    
+    // TODO: this needs to be moved out
+    @Option public static final double DELTA = 0.1;
+
     @SampledVariable CopyNumberTreeObservation tree; 
 
     @ConnectedFactor UnrootedTreeLikelihood<MultiCategorySubstitutionModel<CopyNumberMixture>> likelihood;
-    
+
     private List<Integer> visitSiteInRandomOrder(Random rand, int nSites)
     {
         List<Integer> visitOrder = new ArrayList<Integer>();
@@ -42,13 +43,13 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
         Collections.shuffle(visitOrder, rand);
         return visitOrder;
     }
-    
+
     @Override
     public Proposal propose(Random rand)
     {
         CopyNumberTreeObservation data = (CopyNumberTreeObservation) likelihood.observations;
         List<Integer> visitOrder = visitSiteInRandomOrder(rand, data.nSites());
-                
+
         for(Integer i : visitOrder)
         {
             Map<String, Set<CNPair>> emissions = data.getEmissionAtSite(i.intValue());
@@ -63,7 +64,7 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
     {
         int noLeaves = emissions.keySet().size(); 
         double[] loglikelihood = new double[noLeaves];
-        
+
         for (int v = 0; v < noLeaves; v++)
         {
             updateAllLeavesFixedSite(emissions, v, site);
@@ -73,7 +74,7 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
         bayonet.distributions.Multinomial.normalize(prob);
         int mi = bayonet.distributions.Multinomial.sampleMultinomial(rand, prob);
         updateAllLeavesFixedSite(emissions, mi, site);
-        
+
         return mi; 
     }
 
@@ -111,7 +112,7 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
                     CNPair currentElement = clusterElements.next();
                     logLik[i] += conditionalEmissionLogLikelihood(currentElement.getN(), currentElement.getrA(), constructXi(state[0], state[1]), betaBinomialPrecision);
                 }
-                        
+
             }
         }
         return logLik;
@@ -139,9 +140,20 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
         return bayonet.distributions.BetaBinomial.logDensity(rA, alpha, beta, trials);
     }
 
-    private double constructXi(int A, int a)
+    // TODO: needs to be moved out of this class
+    // TODO: validate reasonableness of this formualtion
+    public static double constructXi(int A, int a)
     {
-        return (A + DELTA) / (A + a + DELTA);
+        double xi; 
+        if (A == 0 && a == 0 )
+            xi = 0.5;
+        else if (A == 0)
+            xi = DELTA / (a + DELTA);
+        else if (a == 0)
+            xi = A / (A + DELTA);
+        else
+            xi = ((double) A) / (A + a);
+        return xi;
     }
 
     private class ProposalRealization implements Proposal
