@@ -5,6 +5,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import bayonet.distributions.Exponential.RateParameterization;
+import blang.ForwardSampler;
 import blang.MCMCAlgorithm;
 import blang.MCMCRunner;
 import blang.annotations.DefineFactor;
@@ -14,6 +15,7 @@ import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.DiscreteGammaMixture;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.moves.AllBranchesScaling;
+import conifer.moves.SPRMove;
 
 
 /**
@@ -38,6 +40,7 @@ public class TestSimplePhyloModel extends MCMCRunner
     this.factory.mcmcOptions.random = new Random(10001);
     this.factory.mcmcOptions.CODA = false;
     this.factory.setCheckAllNodesCoveredByMCMCMoves(false);
+    
     
 //    this.factory.excludeNodeMove(AllBranchesScaling.class);
 //    this.factory.excludeNodeMove(SPRMove.class);
