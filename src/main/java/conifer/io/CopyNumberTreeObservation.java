@@ -52,7 +52,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
     public final RealVariable betaBinomialprecision = real(1);
     
     @Option
-    public final int poiMean = 1000; 
+    public final int poiMean = 2000; 
     
     public final Parsimony parsimony;
     
@@ -74,7 +74,8 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	{
 	    if (leafOrder != null)
 	    {
-	        return leafOrder;
+	        if (!leafOrder.isEmpty())
+	            return leafOrder;
 	    }
 	    
 	    Map<String, Set<CNPair>> emissions = getEmissionAtSite(0);
@@ -127,6 +128,16 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	    initalizeLeafStates();
     }
 
+	public void init()
+	{
+	    setCNSpecies(cnSpecies);
+        LinkedHashMap<TreeNode, List<CNPair>> leaves = CNParser.getNodeMap(cnSpecies);
+        leaves.put(TreeNode.withLabel("root"), null);
+        populateClusterEmissions();
+        initalizeLeafStates();    
+	}
+	
+	
     public Set<TreeNode> getLeaves()
 	{
 	    return leaves;
@@ -306,7 +317,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	           int[] emission = generateEmission(rand, Integer.parseInt(splitString[0]), Integer.parseInt(splitString[1]));
 	           cnPairs.add(new CNPair(emission[0], emission[1]));
 	       }
-	   return new CNSpecies(cnPairs, "N/A", node.toString()); 
+	   return new CNSpecies(cnPairs, node.toString(), node.toString()); 
 	}
 	
 	private int[] generateEmission(Random rand, int A, int a)
