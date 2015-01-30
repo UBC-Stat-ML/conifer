@@ -40,7 +40,7 @@ public class CNPhyloSimulator implements Runnable, Processor {
 	@OptionSet(name = "factory")
 	public final MCMCFactory factory = new MCMCFactory();
 	@Option
-	public final int nSites = 100;
+	public final int nSites = 48;
     @Option
 	public final int nTaxa = 3;
 	
@@ -118,7 +118,7 @@ public class CNPhyloSimulator implements Runnable, Processor {
 	    		    		  emissions.get(node).get(i).getRa() + "," + // emission ra
 	    		    		  node.toString() + ","  +                // cluster == one per sample
 	    		    		  currPair.getrA() + "," + // ref_CN
-	    		    		  currPair.getRa() + "," + // alt_CN
+	    		    		  currPair.getRa() +  // alt_CN
 	    		    		  "\n");
 			}
 	        }
@@ -143,7 +143,5 @@ public class CNPhyloSimulator implements Runnable, Processor {
 
 	@Override
 	public void process(ProcessorContext context) {
-		// TODO Auto-generated method stub
-		
 	}
 }
