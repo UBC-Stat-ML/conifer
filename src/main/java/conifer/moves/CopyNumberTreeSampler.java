@@ -47,15 +47,19 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
     @Override
     public Proposal propose(Random rand)
     {
-        CopyNumberTreeObservation data = (CopyNumberTreeObservation) likelihood.observations;
-        List<Integer> visitOrder = visitSiteInRandomOrder(rand, data.nSites());
-
-        for(Integer i : visitOrder)
+        if (rand.nextInt(5) == 1)
         {
-            Map<String, Set<CNPair>> emissions = data.getEmissionAtSite(i.intValue());
-            int Mi = oneSiteGibbs(rand, emissions, i.intValue());
-            tree.parsimony.getM().setIndex(i.intValue(), Mi);
+            CopyNumberTreeObservation data = (CopyNumberTreeObservation) likelihood.observations;
+            List<Integer> visitOrder = visitSiteInRandomOrder(rand, data.nSites());
+
+            for(Integer i : visitOrder)
+            {
+                Map<String, Set<CNPair>> emissions = data.getEmissionAtSite(i.intValue());
+                int Mi = oneSiteGibbs(rand, emissions, i.intValue());
+                tree.parsimony.getM().setIndex(i.intValue(), Mi);
+            }
         }
+
         return new ProposalRealization();
     }
 
