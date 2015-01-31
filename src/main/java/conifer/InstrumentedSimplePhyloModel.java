@@ -101,7 +101,6 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 		treeWriter = BriefIO.output(Results.getFileInResultFolder("FES.trees.newick"));
 
 		factory.addProcessor(this);
-		factory.mcmcOptions.nMCMCSweeps = nMCMCSweeps;
 		factory.mcmcOptions.burnIn = burnIn;
 		factory.mcmcOptions.CODA = true;
 		factory.mcmcOptions.thinningPeriod = thinningPeriod;
