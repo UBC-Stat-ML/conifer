@@ -2,6 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: 'download-task'
+apply plugin: 'application'
 
 import de.undercouch.gradle.tasks.download.Download
 
@@ -123,3 +124,5 @@ buildscript {
 }
 
 compileJava.dependsOn(fetchDataFiles)
+
+mainClassName = "conifer.InstrumentedSimplePhyloModel"

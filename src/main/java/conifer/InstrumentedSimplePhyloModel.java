@@ -3,10 +3,7 @@ package conifer;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import conifer.ctmc.expfam.ExpFamMixture;
-import conifer.factors.NonClockTreePrior;
-import conifer.factors.UnrootedTreeLikelihood;
-import conifer.models.MultiCategorySubstitutionModel;
+
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
 import bayonet.distributions.Normal.MeanVarianceParameterization;
@@ -14,6 +11,7 @@ import blang.MCMCAlgorithm;
 import blang.MCMCFactory;
 import blang.annotations.DefineFactor;
 import blang.factors.IIDRealVectorGenerativeFactor;
+import blang.mcmc.Move;
 import blang.processing.Processor;
 import blang.processing.ProcessorContext;
 import briefj.BriefIO;
@@ -21,6 +19,16 @@ import briefj.opt.Option;
 import briefj.opt.OptionSet;
 import briefj.run.Mains;
 import briefj.run.Results;
+import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.factors.NonClockTreePrior;
+import conifer.factors.UnrootedTreeLikelihood;
+import conifer.models.MultiCategorySubstitutionModel;
+import conifer.moves.AllBranchesScaling;
+import conifer.moves.PhyloHMCMove;
+import conifer.moves.RealVectorMHProposal;
+import conifer.moves.SPRMove;
+import conifer.moves.SingleBranchScaling;
+import conifer.moves.SingleNNI;
 
 public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 	@Option
@@ -40,14 +48,27 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 	@Option
 	public int thinningPeriod = 10;
 
-
 	@OptionSet(name = "factory")
 	public final MCMCFactory factory = new MCMCFactory();
-
 
 	@Option
 	public int nSites = 500;
 
+	@OptionSet(name = "NodeMoves")
+	public final NodeMoves nd = new NodeMoves(); 
+	
+    public static class NodeMoves
+    {
+        @Option public boolean SPRMove = true; 
+        @Option public boolean SingleNNI = true;
+        @Option public boolean SingleBranchScaling = true;
+        @Option public boolean AllBranchesScaling = true;
+        @Option public boolean PhyloHMCMove = true;
+        @Option public boolean RealVectorMHProposal = true;         
+    }
+	
+	 
+	
 	public class Model
 	{
 		@DefineFactor(onObservations = true)
@@ -91,6 +112,19 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 		factory.mcmcOptions.CODA = true;
 		factory.mcmcOptions.thinningPeriod = thinningPeriod;
 
+		if(!nd.SPRMove)
+		    factory.excludeNodeMove(SPRMove.class); 
+        if(!nd.AllBranchesScaling)
+            factory.excludeNodeMove(AllBranchesScaling.class);
+        if(!nd.PhyloHMCMove)
+            factory.excludeNodeMove(PhyloHMCMove.class);        
+        if(!nd.RealVectorMHProposal)
+            factory.excludeNodeMove(RealVectorMHProposal.class); 		
+        if(!nd.SingleBranchScaling)
+            factory.excludeNodeMove(SingleBranchScaling.class);
+        if(!nd.SingleNNI)
+            factory.excludeNodeMove(SingleNNI.class);
+		
 		// init the model
 		model = new Model();
 		MCMCAlgorithm mcmc = factory.build(model, false);
