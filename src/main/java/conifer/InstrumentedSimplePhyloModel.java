@@ -51,9 +51,6 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 	@OptionSet(name = "factory")
 	public final MCMCFactory factory = new MCMCFactory();
 
-	@Option
-	public int nSites = 500;
-
 	@OptionSet(name = "NodeMoves")
 	public final NodeMoves nd = new NodeMoves(); 
 	
