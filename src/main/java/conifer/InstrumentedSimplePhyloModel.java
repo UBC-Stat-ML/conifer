@@ -40,10 +40,7 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 	new String("src/main/resources/conifer/sampleInput/FES_4.fasta");
 
 	@Option
-	public int nMCMCSweeps = 100;
-
-	@Option
-	public int burnIn = (int) Math.round(.1 * nMCMCSweeps);
+	public int burnIn = 1000;
 
 	@Option
 	public int thinningPeriod = 10;
