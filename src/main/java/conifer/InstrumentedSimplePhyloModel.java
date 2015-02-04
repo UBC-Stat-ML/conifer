@@ -122,6 +122,9 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 		model = new Model();
 		MCMCAlgorithm mcmc = factory.build(model, false);
 		
+        File graph = Results.getFileInResultFolder("probability-graph.dot");  
+        mcmc.model.printGraph(graph);
+		
 		mcmc.run();
 
 		// compute the tree
