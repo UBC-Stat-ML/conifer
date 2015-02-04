@@ -72,7 +72,7 @@ dependencies {
   compile group: 'ca.ubc.stat', name: 'tutorialj', version: '2.0.2'
   compile group: 'ca.ubc.stat', name: 'binc', version: '1.2.1'
   compile group: 'ca.ubc.stat', name: 'briefj', version: '2.4.1'
-  compile group: 'ca.ubc.stat', name: 'bayonet', version: '2.3.8'
+  compile group: 'ca.ubc.stat', name: 'bayonet', version: '2.3.10'
   compile group: 'ca.ubc', name: 'ahmc-java', version: '1.0.0'
   compile group: 'org.jgrapht', name: 'jgrapht-dist', version: '0.9.0'
   compile group: 'jebl', name: 'jebl', version: '2.0'
