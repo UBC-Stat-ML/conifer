@@ -39,7 +39,7 @@ public class CopyNumberMatrix implements CTMCParameters
 
 
 	@Option(gloss="Dollo precision parameter")
-	public final double DOLLO_EPSILON = 10^-40;  
+	public final double DOLLO_EPSILON = 10e-40;  
 	
 	
 	// Break the overall Q representation into a series of 3 matrices

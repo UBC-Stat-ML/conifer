@@ -40,9 +40,9 @@ public class CNPhyloSimulator implements Runnable, Processor {
 	@OptionSet(name = "factory")
 	public final MCMCFactory factory = new MCMCFactory();
 	@Option
-	public final int nSites = 48;
+	public final int nSites = 1000;
     @Option
-	public final int nTaxa = 3;
+	public final int nTaxa = 4;
 	
 	
 	public class Model {
