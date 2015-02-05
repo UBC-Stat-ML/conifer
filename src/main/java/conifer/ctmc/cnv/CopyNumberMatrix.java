@@ -121,20 +121,7 @@ public class CopyNumberMatrix implements CTMCParameters
 	{	
 		GenerateCNMatrices cn = new GenerateCNMatrices(size);
 		cn.ensureInitalize();
-		cn.saveMatricesAsJSON();
 		return new CopyNumberMatrix(cn.getIncreaseQ(), cn.getDecreaseQ(), cn.getMutationQ(), null);
-		/*
-		Set<String> labels = new HashSet<>();
-		labels.add("mutationQ"); 
-		labels.add("increaseQ");
-		labels.add("decreaseQ");
-
-		Map<String, String> resources = new HashMap<>();
-		for(String lbl : labels)
-			resources.put(lbl, GenerateCNMatrices.getPathForMatrix(lbl, size));
-
-		return fromResources(resources);
-		*/
 	}
 
 	public static void main(String args [])
