@@ -238,7 +238,7 @@ public class GenerateCNMatrices {
 	}
 
 	public static void main(String args[]) {
-		int size = 3;
+		int size = 5;
 
 		GenerateCNMatrices cn = new GenerateCNMatrices(size);
 		cn.ensureInitalize();
