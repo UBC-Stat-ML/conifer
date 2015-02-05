@@ -135,3 +135,6 @@ buildscript {
 }
 
 compileJava.dependsOn(fetchDataFiles)
+
+apply plugin: 'application'
+mainClassName = "conifer.InstrumentedSimplePhyloModel"
