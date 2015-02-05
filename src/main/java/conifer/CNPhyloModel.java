@@ -42,9 +42,9 @@ public class CNPhyloModel implements Runnable, Processor
         @DefineFactor
         NonClockTreePrior<RateParameterization> treePrior = NonClockTreePrior.on(likelihood.tree);
 
-        @DefineFactor
-        Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(
-                treePrior.branchDistributionParameters.rate).withMean(10.0);
+//        @DefineFactor
+//        Exponential<Exponential.MeanParameterization> branchLengthHyperPrior = Exponential.on(
+//                treePrior.branchDistributionParameters.rate).withMean(10.0);
 
 //        @DefineFactor
 //        Uniform<MinMaxParameterization> cnvParameter = Uniform.on(likelihood.evolutionaryModel.rateMatrixMixture.parameters.alpha).withBounds(0.25, 0.75); 
