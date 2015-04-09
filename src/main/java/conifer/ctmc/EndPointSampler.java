@@ -3,6 +3,7 @@ package conifer.ctmc;
 import java.util.List;
 import java.util.Random;
 
+import briefj.opt.Option;
 import org.ejml.simple.SimpleMatrix;
 import org.jblas.DoubleMatrix;
 
@@ -32,6 +33,8 @@ public class EndPointSampler
   private final List<DoubleMatrix> cache;
   private double [] sojournWorkArray = new double[10];
   private final double [] transitionWorkArray;
+
+  public static boolean cached;
   
   public EndPointSampler(CTMC ctmc)
   {
@@ -133,7 +136,7 @@ public class EndPointSampler
       final double logNum = 
         logConstant + 
         nTransition * logMuT + 
-        Math.log(getUniformizedTransitionPower(nTransition).get(startPoint, endPoint));
+        Math.log(getUniformizedTransitionPower(nTransition,cached).get(startPoint, endPoint));
       final double logDenom = SpecialFunctions.logFactorial(nTransition);
       final double current = Math.exp(logNum - logDenom);
       sum += current;
@@ -157,7 +160,7 @@ public class EndPointSampler
       for (int candidateState = 0; candidateState < transitionWorkArray.length; candidateState++)
         transitionWorkArray[candidateState] = 
           uniformizedTransition.get(currentPoint, candidateState) * 
-          getUniformizedTransitionPower(nTransitions - transitionIndex - 1).get(candidateState, endPoint);
+          getUniformizedTransitionPower(nTransitions - transitionIndex - 1,cached).get(candidateState, endPoint);
       Multinomial.normalize(transitionWorkArray);
       int nextState = Multinomial.sampleMultinomial(rand, transitionWorkArray);
       if (resultPath != null)
@@ -208,6 +211,23 @@ public class EndPointSampler
   {
     ensureCache(power);
     return cache.get(power);
+  }
+
+  private DoubleMatrix getUniformizedTransitionPower(int power, boolean cached)
+  {
+    if(cached){
+      return getUniformizedTransitionPower(power);
+    }else{
+      DoubleMatrix result = DoubleMatrix.eye(uniformizedTransition.columns);
+      for(int i=0; i< power; i++)
+      {
+        result = result.mmul(uniformizedTransition);
+
+      }
+      return result;
+
+    }
+
   }
 
   private List<DoubleMatrix> initCache()
