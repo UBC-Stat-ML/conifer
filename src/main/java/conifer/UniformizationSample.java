@@ -18,6 +18,8 @@ import briefj.BriefIO;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import conifer.processors.FileNameString;
+import org.apache.commons.io.FileUtils;
 import org.jblas.DoubleMatrix;
 
 
@@ -34,13 +36,13 @@ public class UniformizationSample implements Runnable
     public int rep = 1;
 
     @Option(gloss="Rate Matrix Method")
-    public RateMtxNames selectedRateMtx = RateMtxNames.PROTEINSIMPLEGTR;
+    public RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZEGTR;
 
     @Option(gloss = "True rate matrix generating data")
     public File rateMtxFile;
 
     @Option(gloss="Use cache or not")
-    public boolean cached=true;
+    public boolean cached;
 
     private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
 
@@ -61,7 +63,25 @@ public class UniformizationSample implements Runnable
                             .withTree(treeFile);
             Random rand = new Random(1);
             likelihood1.evolutionaryModel.samplePosteriorPaths(rand, likelihood1.observations, likelihood1.tree);
-            logToFile("Total time in minutes: " + ((System.currentTimeMillis() - startTime) / 60000.0));
+
+            String fileName = inputFile.getName();
+            FileNameString fileNameString = new FileNameString(fileName);
+            String curBr = fileNameString.subStringBetween(fileName, "br", "seed");
+            String curSeed = fileNameString.subStringBetween(fileName, "seed", "align");
+
+            logToFile("Total time in seconds: " + ((System.currentTimeMillis() - startTime) / 1000.0));
+            logToFile("branch length:"+ curBr);
+            logToFile("used seed:"+ curSeed);
+
+            File newDirectory = new File(Results.getResultFolder().getParent() + "br"+ curBr+ "seed" + curSeed);
+            newDirectory.mkdir();
+            try
+            {
+                FileUtils.copyDirectory(Results.getResultFolder(), newDirectory);
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
