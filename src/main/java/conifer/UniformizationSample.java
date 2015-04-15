@@ -72,7 +72,7 @@ public class UniformizationSample implements Runnable
             logToFile("Total time in seconds: " + ((System.currentTimeMillis() - startTime) / 1000.0));
             logToFile("branch length:"+ curBr);
             logToFile("used seed:"+ curSeed);
-            logToFile("cached" + cached);
+            logToFile("cached:" + cached);
 
             File newDirectory = new File(Results.getResultFolder().getParent() + "br"+ curBr+ "seed" + curSeed+
             "cached"+ cached);
