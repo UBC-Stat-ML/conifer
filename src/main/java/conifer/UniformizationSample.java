@@ -68,13 +68,14 @@ public class UniformizationSample implements Runnable
             FileNameString fileNameString = new FileNameString(fileName);
             String curBr = fileNameString.subStringBetween(fileName, "br", "seed");
             String curSeed = fileNameString.subStringBetween(fileName, "seed", "align");
+            String numSites = fileNameString.subStringBeforeString(fileName, "br");
 
             logToFile("Total time in seconds: " + ((System.currentTimeMillis() - startTime) / 1000.0));
             logToFile("branch length:"+ curBr);
             logToFile("used seed:"+ curSeed);
             logToFile("cached:" + cached);
 
-            File newDirectory = new File(Results.getResultFolder().getParent() + "br"+ curBr+ "seed" + curSeed+
+            File newDirectory = new File(Results.getResultFolder().getParent() +"numSites"+ numSites+ "br"+ curBr+ "seed" + curSeed+
             "cached"+ cached);
             newDirectory.mkdir();
             try
