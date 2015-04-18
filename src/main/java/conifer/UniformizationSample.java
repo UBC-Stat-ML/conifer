@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import conifer.processors.FileNameString;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.jblas.DoubleMatrix;
 
 
@@ -62,7 +63,11 @@ public class UniformizationSample implements Runnable
                             .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx))
                             .withTree(treeFile);
             Random rand = new Random(1);
+
+            StopWatch watch = new StopWatch();
+            watch.start();
             likelihood1.evolutionaryModel.samplePosteriorPaths(rand, likelihood1.observations, likelihood1.tree);
+            long operatingTime = watch.getTime();
 
             String fileName = inputFile.getName();
             FileNameString fileNameString = new FileNameString(fileName);
@@ -74,6 +79,7 @@ public class UniformizationSample implements Runnable
             logToFile("branch length:"+ curBr);
             logToFile("used seed:"+ curSeed);
             logToFile("cached:" + cached);
+            logToFile("operating time in seconds for sampling path:"+ operatingTime/1000.0);
 
             File newDirectory = new File(Results.getResultFolder().getParent() +"numSites"+ numSites+ "br"+ curBr+ "seed" + curSeed+
             "cached"+ cached);
