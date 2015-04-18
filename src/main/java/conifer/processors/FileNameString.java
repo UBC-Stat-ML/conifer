@@ -43,6 +43,15 @@ public class FileNameString
        int result = startIndex+delimiterBeforeWord.length(); 
        return (result);
     }
+
+    public String subStringBeforeString(String sentence, String splitWord){
+
+        String[] split = sentence.split(splitWord);
+        String firstSubString = split[0];
+        return firstSubString;
+
+    }
+
     
  
     public int subStringEndIndex(String sentence, String delimiterAfterWord) {
