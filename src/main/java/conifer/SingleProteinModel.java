@@ -54,7 +54,7 @@ public class SingleProteinModel implements Runnable, Processor
    public int nMCMCIterations = 100000;
 
    @Option(gloss="Number of iterations for thinning period")
-   public int thinningPeriod =100;
+   public static int thinningPeriod =100;
    
    @Option(gloss="ESS Experiment Number")
    public int rep = 1;
