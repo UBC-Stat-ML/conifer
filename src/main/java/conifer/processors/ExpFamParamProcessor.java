@@ -97,11 +97,15 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
         summaries.put("max", stats.getMax());
         summaries.put("median", stats.getPercentile(50));
         summaries.put("min", stats.getMin());
+        // These following two lines are added by Tingting
+        summaries.put("25th Quantile", stats.getPercentile(25));
+        summaries.put("75th Quantile", stats.getPercentile(75));
         for (String statKey : summaries.keySet())
         {
           double ess = summaries.get(statKey);
           double essPerSec = ess/time;
           output.printWrite(variableName  + "-ess", "iteration", context.getMcmcIteration(), "statistic", statKey, "ess", ess, "time", time, "essPerSec", essPerSec);
+
         }
       }
       catch (Exception e)

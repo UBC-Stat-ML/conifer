@@ -52,6 +52,9 @@ public class SingleProteinModel implements Runnable, Processor
    
    @Option(gloss="Number of MCMC iterations")
    public int nMCMCIterations = 100000;
+
+   @Option(gloss="Number of iterations for thinning period")
+   public int thinningPeriod =100;
    
    @Option(gloss="ESS Experiment Number")
    public int rep = 1;
@@ -73,8 +76,12 @@ public class SingleProteinModel implements Runnable, Processor
    
    @Option(gloss="provided size of adaptation")
    public static Integer sizeAdapt = 500;
-  
-  public class Model
+
+    @Option(gloss="provided number of HMC iterations per refreshmento Z")
+    public static int nItersPerPathAuxVar = 1000;
+
+
+    public class Model
   {
     @DefineFactor(onObservations = true)
     public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood1 = 
@@ -115,6 +122,7 @@ public class SingleProteinModel implements Runnable, Processor
     PhyloHMCMove.epsilon=epsilon;
     PhyloHMCMove.L = L;
     PhyloHMCMove.sizeAdapt=sizeAdapt;
+    PhyloHMCMove.nItersPerPathAuxVar=nItersPerPathAuxVar;
     factory.addProcessor(this);
     model = new Model();
     long startTime = System.currentTimeMillis();
@@ -124,7 +132,8 @@ public class SingleProteinModel implements Runnable, Processor
     }
     MCMCAlgorithm mcmc = factory.build(model, false);
     mcmc.options.random = new Random(rep);
-    mcmc.options.nMCMCSweeps = nMCMCIterations; 
+    mcmc.options.nMCMCSweeps = nMCMCIterations;
+    mcmc.options.thinningPeriod=thinningPeriod;
     mcmc.options.burnIn = (int) Math.round(.1 * factory.mcmcOptions.nMCMCSweeps);
     mcmc.run();
     String fileName = inputFile.getName();
