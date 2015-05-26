@@ -52,9 +52,7 @@ public class SingleProteinModel implements Runnable, Processor
    
    @Option(gloss="Number of MCMC iterations")
    public int nMCMCIterations = 100000;
-
-   @Option(gloss="Number of iterations for thinning period")
-   public static int thinningPeriod =100;
+    
    
    @Option(gloss="ESS Experiment Number")
    public int rep = 1;
@@ -133,7 +131,7 @@ public class SingleProteinModel implements Runnable, Processor
     MCMCAlgorithm mcmc = factory.build(model, false);
     mcmc.options.random = new Random(rep);
     mcmc.options.nMCMCSweeps = nMCMCIterations;
-    mcmc.options.thinningPeriod=thinningPeriod;
+    mcmc.options.thinningPeriod= 100;
     mcmc.options.burnIn = (int) Math.round(.1 * factory.mcmcOptions.nMCMCSweeps);
     mcmc.run();
     String fileName = inputFile.getName();
