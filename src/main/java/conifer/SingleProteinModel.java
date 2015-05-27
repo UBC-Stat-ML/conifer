@@ -75,7 +75,7 @@ public class SingleProteinModel implements Runnable, Processor
    @Option(gloss="provided size of adaptation")
    public static Integer sizeAdapt = 500;
 
-    @Option(gloss="provided number of HMC iterations per refreshmento Z")
+    @Option(gloss="provided number of HMC iterations per refreshment of Z")
     public static int nItersPerPathAuxVar = 1000;
 
 
@@ -140,7 +140,8 @@ public class SingleProteinModel implements Runnable, Processor
     String whichSeedUsed = fileNameString.subStringBetween(fileName, "Seed", ".txt");
     logToFile("Total time in minutes: " + ((System.currentTimeMillis() - startTime)/60000.0));
     //File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed+ "epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
-    File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed +"epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L+"Adapt"+ PhyloHMCMove.sizeAdapt);
+    File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed +"epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L+"Adapt"+ PhyloHMCMove.sizeAdapt+
+    "nItersPerPathAuxVar"+nItersPerPathAuxVar);
     newDirectory.mkdir();
     try
     {

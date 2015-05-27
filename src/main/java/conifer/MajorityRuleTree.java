@@ -2,10 +2,12 @@ package conifer;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,12 +21,16 @@ import briefj.BriefIO;
 import briefj.run.Results;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.io.FastaUtils;
+import conifer.io.NexusString;
+import jebl.evolution.align.SystemOut;
 import jebl.evolution.coalescent.ExponentialGrowth;
 import jebl.evolution.io.ImportException;
 import jebl.evolution.io.NewickExporter;
 import jebl.evolution.io.NewickImporter;
 import jebl.evolution.io.NexusExporter;
+import jebl.evolution.io.NexusImporter;
 import jebl.evolution.io.TreeExporter;
+import jebl.evolution.io.TreeImporter;
 import jebl.evolution.taxa.Taxon;
 import jebl.evolution.trees.ConsensusTreeBuilder;
 import jebl.evolution.trees.RootedTree;
@@ -55,6 +61,8 @@ public class MajorityRuleTree {
 				trees, .5, TreeBuilderFactory.ConsensusMethod.GREEDY);
 		Tree consensusTree = treeBuilder.build();
 
+		System.out.println(consensusTree.toString());
+		
 		// write the tree
 //		System.out.println("Working Directory = "
 //				+ System.getProperty("user.dir"));
@@ -97,6 +105,23 @@ public class MajorityRuleTree {
 				: new NexusExporter(writer));
 		treeWriter.exportTree(consensusTree);
 		writer.close();
+	
+		// support west-run oneliner trees
+		writer = new FileWriter(new File(outputFile.getParent() + "/westrun_consensus.txt"));
+		treeWriter = new NexusString(writer);
+		treeWriter.exportTree(consensusTree);
+		writer.close();
+	}
+	
+	public static void main(String[] args) throws IOException, ImportException {
+		File inputFile = new File("/Users/sohrab/project/conifer/results/all/2015-01-31-17-04-14-oclxsTnM.exec/FESConsensusTree.Nexus");
+		Reader r = new FileReader(inputFile);
+		NexusImporter tm = new NexusImporter(r);
+		Tree t = tm.importNextTree();
+		Writer w = new FileWriter(new File("/Users/sohrab/Desktop/oneliner.txt"));
+		NexusString ne = new NexusString(w);
+		ne.exportTree(t);
+		w.close();
 	}
 	
 	
