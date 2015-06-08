@@ -68,11 +68,19 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
     {
         int noLeaves = emissions.keySet().size(); 
         double[] loglikelihood = new double[noLeaves];
+        
+        CopyNumberTreeObservation data = (CopyNumberTreeObservation) likelihood.observations;
+        Map<Integer, String> leafMap = data.getLeafName();
 
         for (int v = 0; v < noLeaves; v++)
         {
             updateAllLeavesFixedSite(emissions, v, site);
+            
             loglikelihood[v] = likelihood.logDensity();
+            
+//            System.out.println("Leaf\t" + leafMap.get(v) + "\tlogLikelihood\t" + loglikelihood[v]);
+            
+            
         }
         double[] prob = bayonet.opt.DoubleArrays.pointwiseExp(loglikelihood);
         bayonet.distributions.Multinomial.normalize(prob);
@@ -102,7 +110,9 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
         Indexer<String> indexer = Indexers.copyNumberCTMCIndexer();
         int noStates = indexer.objectsList().size();
         double[] logLik = new double[noStates];
-
+        
+        
+        
         for (int i = 0; i < noStates; i++)
         {
             int[] state = parseState(indexer.i2o(i));
@@ -114,11 +124,26 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
                 while(clusterElements.hasNext())
                 {
                     CNPair currentElement = clusterElements.next();
-                    logLik[i] += conditionalEmissionLogLikelihood(currentElement.getN(), currentElement.getrA(), constructXi(state[0], state[1]), betaBinomialPrecision);
+                    logLik[i] += conditionalEmissionLogLikelihood(currentElement.getN(), currentElement.getrA(), constructXi(state[0], state[1]), 
+                            betaBinomialPrecision);
                 }
 
             }
+            else
+            {
+                logLik[i] = Double.NEGATIVE_INFINITY; 
+            }
         }
+        
+        
+        for (int i = 0; i < noStates; i++)
+        {
+            int[] state = parseState(indexer.i2o(i));
+            System.out.println("State\t" + indexer.i2o(i) + "\tlogLikelihood\t" + logLik[i] + "\t\txi\t" + constructXi(state[0], state[1]));
+        }
+        
+        System.out.println("----");
+        
         return logLik;
     }
 
@@ -150,9 +175,9 @@ public class CopyNumberTreeSampler implements MHProposalDistribution
     {
         double xi; 
         if (A == 0 && a == 0 )
-            xi = 0.5;
+            xi = 0.5; 
         else if (A == 0)
-            xi = DELTA / (a + DELTA);
+            xi = DELTA / (a + DELTA); 
         else if (a == 0)
             xi = A / (A + DELTA);
         else

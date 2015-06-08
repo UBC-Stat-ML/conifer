@@ -49,10 +49,10 @@ import conifer.processors.CopyNumberTreeProcessor;
 public class CopyNumberTreeObservation implements TreeObservations {
 	
     @FactorArgument
-    public final RealVariable betaBinomialprecision = real(1);
+    public final RealVariable betaBinomialprecision = real(100);
     
     @Option
-    public final int poiMean = 2000; 
+    public final int poiMean = 1000; 
     
     public final Parsimony parsimony;
     
@@ -86,7 +86,7 @@ public class CopyNumberTreeObservation implements TreeObservations {
 	    return leafOrder; 
 	}
 	
-	private Map<Integer, String> getLeafName()
+	public Map<Integer, String> getLeafName()
 	{
 	    if (leafString != null)
 	        return leafString;

@@ -81,7 +81,7 @@ public class UnrootedTreeLikelihood
   public final TreeObservations observations;
   
   
-  public final static int maxCopyNumber = 5;
+  public final static int maxCopyNumber = 2;
   
   
   public UnrootedTreeLikelihood(
