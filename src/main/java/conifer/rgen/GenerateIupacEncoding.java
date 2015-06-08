@@ -21,7 +21,7 @@ public class GenerateIupacEncoding extends RJavaBridge {
 		return new GenerateIupacEncoding(maxCopyNumber);
 	}
 
-	public String getResourceDir() { return "/Users/sohrab/project/conifercp/src/main/resources/"; }
+	public String getResourceDir() { return System.getProperty("user.dir") + "/src/main/resources/"; }
 
 	@Override public String rTemplateResourceURL() { return "/conifer/rgen/makeUPACCNCTMC.txt"; }
 	
