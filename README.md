@@ -2,7 +2,7 @@
 # conifer [![Build Status](https://travis-ci.org/alexandrebouchard/conifer.png?branch=master)](https://travis-ci.org/alexandrebouchard/conifer)
 
 
-Phylogenetics inference tools.
+Phylogenetics inference tools
 
 ### TODOs
 

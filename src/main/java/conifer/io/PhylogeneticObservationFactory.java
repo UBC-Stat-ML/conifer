@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.plaf.synth.SynthToggleButtonUI;
+
+import jebl.evolution.align.SystemOut;
 import briefj.BriefCollections;
 import briefj.BriefIO;
 import briefj.BriefLog;
@@ -13,6 +16,9 @@ import briefj.Indexer;
 
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+
+import conifer.factors.UnrootedTreeLikelihood;
+import conifer.rgen.GenerateIupacEncoding;
 
 
 /**
@@ -74,8 +80,13 @@ public class PhylogeneticObservationFactory
  
   public static PhylogeneticObservationFactory copyNumberCTMCFactory()
   {
-	  if(_copyNumberFactory == null)
-		  _copyNumberFactory = fromResource("/conifer/io/cn-ctmc-iupac-encoding.txt");
+	  if(_copyNumberFactory == null) {
+		  String fileName = "cn-ctmc-iupac-encoding-" + UnrootedTreeLikelihood.maxCopyNumber  + ".txt";
+		  GenerateIupacEncoding.withCopyNumber(UnrootedTreeLikelihood.maxCopyNumber).toUPAC(fileName);
+		  System.out.println(fileName);
+		  // make the file if it doesn't exist
+		  _copyNumberFactory = fromResource("/conifer/io/" + fileName);
+	  }
 	  return _copyNumberFactory;
   }
   
@@ -259,4 +270,9 @@ public class PhylogeneticObservationFactory
     return BriefCollections.pick(getIndicators().values()).length;
     //return BriefCollections.pick(getIndicators().values()).length()/factory.getChunkLength());
   }
+
+  public static void main(String[] args) {
+	  PhylogeneticObservationFactory.copyNumberCTMCFactory();
+  }
+
 }
