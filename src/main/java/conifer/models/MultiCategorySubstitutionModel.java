@@ -1,11 +1,14 @@
 package conifer.models;
 
 
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import briefj.BriefIO;
+import briefj.run.Results;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
 import org.jgrapht.UndirectedGraph;
@@ -69,7 +72,10 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
     this.rateMatrixMixture = rateMatrixMixture;
     this.nSites = nSites;
   }
-  
+
+  private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("cacheSize.details.txt"));
+
+
   /**
    * 
    * @param rand
@@ -114,7 +120,8 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
     
     // loop over edges, sites; sample paths using end-point conditioning
     List<EndPointSampler> endPointSamplers = endPointSamplers();
-    
+
+
     for (Pair<TreeNode,TreeNode> edge : tree.getRootedEdges(root))
     {
       final TreeNode 
@@ -131,6 +138,17 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
         endPointSamplers.get(category).sample(rand, topState, botState, branchLength, categorySpecificStats.get(internalSample.categoryIndicators[s]), curPath);
       }
     }
+
+    // find the maximum cache size of endPointSamplers among all sites
+    int maxCachedSize =0;
+    for (int c=0; c<endPointSamplers.size(); c++){
+      if(endPointSamplers.get(c).cacheSize()>maxCachedSize){
+        maxCachedSize=endPointSamplers.get(c).cacheSize();
+        System.out.println(endPointSamplers.get(c).cacheSize());
+      }
+    }
+    logToFile("Maximum Cached Size" +""+ maxCachedSize);
+
     return categorySpecificStats;
   }
   
@@ -170,8 +188,13 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
         result.get(category).incrementCount(topNode, botNode, nTransitions);
       }
     }
-    
+
     return result;
+  }
+
+  public void logToFile(String someline) {
+    this.detailWriter.println(someline);
+    this.detailWriter.flush();
   }
 
   /**
