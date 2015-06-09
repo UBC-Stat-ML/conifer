@@ -76,7 +76,7 @@ public class SingleProteinModel implements Runnable, Processor
    public static Integer sizeAdapt = 500;
 
     @Option(gloss="provided number of HMC iterations per refreshment of Z")
-    public static int nItersPerPathAuxVar = 1000;
+    public static int nItersPerPathAuxVar = 100;
 
 
     public class Model

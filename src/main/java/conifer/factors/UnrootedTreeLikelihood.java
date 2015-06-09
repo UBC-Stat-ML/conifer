@@ -92,6 +92,23 @@ public class UnrootedTreeLikelihood
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
   }
+
+  /**
+   * Creates a model with nSites sites, default values and fixed tree topology from reading a newick tree file
+   * @param nSites
+   * @param treeFile
+   * @param selectedRateMtx
+   * @return
+   */
+
+  public static  UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmptyWithFixedTree(int nSites, File treeFile, RateMtxNames selectedRateMtx)
+  {
+    UnrootedTree tree = UnrootedTree.fromNewick(treeFile);
+    SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
+    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0), RealVariable.real(1.0), baseRateMatrix, 1);
+    MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
+    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
+  }
   
   /**
    * Create a model from a FASTA file. Currently assumes nucleotides data and uses kimura 1980 as a default matrix, and a

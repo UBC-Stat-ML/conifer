@@ -16,6 +16,33 @@ import briefj.Indexer;
 public enum RateMtxNames
 {
 
+    DNAGTR{
+
+      @Override
+      public SerializedExpFamMixture getSerialized()
+      {
+        return SerializedExpFamMixture.dnaGTR();
+      }
+
+      public Indexer<String> getIndexer()
+      {
+        return dnaIndexer();
+      }
+
+      public PhylogeneticObservationFactory getFactory()
+      {
+        return nucleotidesFactory();
+      }
+
+      public SimpleRateMatrix getRateMtx()
+      {
+        Random rand = new Random(2);
+        return RateMatrices.randomGTR(rand, 4);
+      }
+
+    },
+
+
     KIMURA1980 {
       @Override
       public SerializedExpFamMixture getSerialized()

@@ -49,7 +49,7 @@ public class PhyloHMCMove extends NodeMove
   @Option(gloss="provided size of adaptation")
   public static Integer sizeAdapt = 500;
   
-  @Option(gloss="provided number of HMC iterations per refreshmento Z")
+  @Option(gloss="provided number of HMC iterations per refreshment of Z")
   public static int nItersPerPathAuxVar = 1000;
 
   private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("HMC.experiment.details.txt"));
