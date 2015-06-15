@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import conifer.ctmc.expfam.RateMtxNames;
 import org.apache.commons.io.FileUtils;
 
 import briefj.BriefIO;
@@ -61,10 +62,10 @@ public class FastaUtils
 	 * @param observations
 	 * @throws IOException 
 	 */
-	public static String writeFasta(TreeObservations observations, File outFile) throws IOException 
+	public static String writeFasta(TreeObservations observations, File outFile, RateMtxNames selectedRateMtx) throws IOException
 	{
 		// get the alphabet map
-		Map<String,String> a2s = PhylogeneticObservationFactory.nucleotidesFactory().getIndicator2ChunkMap();
+		Map<String,String> a2s = PhylogeneticObservationFactory.selectedFactory(selectedRateMtx).getIndicator2ChunkMap();
 
 		StringBuilder result = new StringBuilder();
 		for (TreeNode node : observations.getObservedTreeNodes()) {

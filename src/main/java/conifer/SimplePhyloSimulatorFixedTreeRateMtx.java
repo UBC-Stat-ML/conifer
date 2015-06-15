@@ -4,17 +4,25 @@ package conifer;
  * Created by crystal on 2015-06-07.
  * @author Tingting Zhao (zhaott0416@gmail.com)
  *
+ * The difference between this class and SimplePhyloSimulator is that in this class I can provide the weights
+ * for both univariate features and bivariate features in a json file in the format of a json map and we can
+ * generate the sequences under a provided fixed tree and fixed weights values corresponding to specific features
+ * in the json file so that we can generate data according to a specific rate matrix. We need to provide the json
+ * file as a command line option for weightFile
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bayonet.distributions.Normal;
+import conifer.ctmc.expfam.ExpFamParameters;
 import org.apache.commons.io.FileUtils;
 
 import bayonet.distributions.Exponential;
@@ -37,6 +45,7 @@ import briefj.run.Mains;
 import briefj.run.Results;
 
 import com.google.common.collect.Maps;
+
 
 import conifer.TestPhyloModel.Model;
 import conifer.ctmc.expfam.ExpFamMixture;
@@ -76,8 +85,15 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
     public int nTaxa = 5;
 
     @Option(gloss="select rate matrix model")
-    public RateMtxNames selectedRateMtx=RateMtxNames.DNAGTR;
+    public RateMtxNames selectedRateMtx=RateMtxNames.POLARITYSIZEGTR;
 
+    @Option(gloss="Weights values for the rate matrix")
+    public File weightFile= new File("/Users/crystal/Documents/codeExperiment/Revision/Experiment2/RealData/RealWeights.txt");
+
+    public FileInputStream in=null;
+
+    //public double [] weights;
+    public Map<String, Double> featureWeights = new HashMap<String, Double>();
 
     public List<TreeNode> makeLeaves(int nTaxa, String prefix)
     {
@@ -88,16 +104,61 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         return result;
     }
 
+    public FileInputStream setFileInputStream(File file){
+        try {
+            in = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return in;
+    }
 
+    /**
+     * This method will read the provided json map  "file" to create a HashMap with keys as the features
+     * to create the rate matrix and the values for the map are the weights values corresponding to the
+     * features.
+     * @param file
+     * @return
+     */
+
+    public Map<String, Double> setMapFeatureWeights(File file){
+
+        ObjectMapper mapper = new ObjectMapper();
+        FileInputStream curIn = setFileInputStream(file);
+
+        try {
+
+            TypeReference<HashMap<String,Double>> typeRef
+                    = new TypeReference<HashMap<String,Double>>(){};
+
+            featureWeights = mapper.readValue(curIn, typeRef);
+
+            //weights = mapper.readValue(curIn, double [].class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally{
+            if (curIn != null)
+                try {
+                    curIn.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+        }
+
+        return featureWeights;
+    }
 
     public class FixedTopologyAndBranchLengthModel implements SimplePhyloModelContainer
     {
+
         @DefineFactor(onObservations = true)
         public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood =
                 UnrootedTreeLikelihood.createEmptyWithFixedTree(nSites, treeFile, selectedRateMtx)
                         .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx));
 
-        @DefineFactor
+
+
+        @DefineFactor(onObservations = true)
         public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior =
                 IIDRealVectorGenerativeFactor
                         .iidNormalOn(likelihood.evolutionaryModel.rateMatrixMixture.parameters);
@@ -105,13 +166,22 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> getLikelihood() {
             return this.likelihood;
         }
+
+        /**
+         * this method will help us set the weight values when creating the rate matrix. It will set
+         * the values for specific features based on the hashmap featureWeights
+         * @param featureWeights
+         */
+        public void setVectorWeights(Map<String, Double> featureWeights) {
+            likelihood.evolutionaryModel.rateMatrixMixture.parameters.setVector(featureWeights);
+        }
     }
 
     // we can build different models here and instantiate them according to the input parameter
     // in the run block.
 
     // Note: only instantiate this in run to avoid problems with command line argument parsing
-    public SimplePhyloModelContainer model;
+    public FixedTopologyAndBranchLengthModel model;
 
     private PrintWriter treeWriter;
     private PrintWriter detailWriter;
@@ -130,7 +200,9 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         factory.mcmcOptions.CODA = true;
         factory.mcmcOptions.thinningPeriod = thinningPeriod;
 
+        setMapFeatureWeights(weightFile);
         model = new FixedTopologyAndBranchLengthModel();
+        model.setVectorWeights(featureWeights);
 
         MCMCAlgorithm mcmc = factory.build(model, false);
         System.out.println(mcmc.model);
@@ -193,12 +265,14 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
 
 
 
-    public static void makeSyntheticData(File treeFile) throws IOException {
+    public void makeSyntheticData(File treeFile) throws IOException {
         //List realizations = new ArrayList();
         SimplePhyloSimulatorFixedTreeRateMtx runner = new SimplePhyloSimulatorFixedTreeRateMtx();
         runner.detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
 
         runner.treeFile = treeFile;
+
+        runner.featureWeights= runner.setMapFeatureWeights(weightFile);
 
         MCMCAlgorithm algo = runner.getMCMCAlgorithm();
         ForwardSampler f = new ForwardSampler(algo.model);
@@ -212,7 +286,7 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
             //realizations.add(runner.model.getLikelihood().observations.toString());
             runner.writeTree(runner.model.getLikelihood().tree);
             // write the FASTA file corresponding to the simulation
-            FastaUtils.writeFasta(runner.model.getLikelihood().observations, Results.getFileInResultFolder("SimulatedData.fasta"));
+            FastaUtils.writeFasta(runner.model.getLikelihood().observations, Results.getFileInResultFolder("SimulatedData.fasta"), selectedRateMtx);
         }
 
         runner.detailWriter.write("Total BranchLength: " +

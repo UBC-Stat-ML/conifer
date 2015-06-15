@@ -67,7 +67,7 @@ public class TestPhyloModel implements Runnable, Processor
 	public int nSites = 500;
 	
 	@Option(gloss="provide rate matrix model")
-	public RateMtxNames selectedRateMtx;
+	public static RateMtxNames selectedRateMtx=RateMtxNames.DNAGTR;
 
 	public class Model
 	{
@@ -255,7 +255,7 @@ public class TestPhyloModel implements Runnable, Processor
 			//System.out.println(runner.model.likelihood.observations.toString());
 			try {
 				FastaUtils.writeFasta(runner.model.likelihood.observations, 
-						Results.getFileInResultFolder("SimulatedData.fasta"));
+						Results.getFileInResultFolder("SimulatedData.fasta"), selectedRateMtx);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

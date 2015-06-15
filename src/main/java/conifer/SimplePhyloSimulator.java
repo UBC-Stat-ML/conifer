@@ -49,7 +49,7 @@ import conifer.moves.SingleNNI;
  *
  */
 public class SimplePhyloSimulator implements Runnable, Processor {
-	@Option
+    @Option
 	public int nMCMCSweeps = 10000;
 
 	@Option
@@ -77,7 +77,7 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 	public boolean fixedBranchLength = false;
 	
 	@Option(gloss="select rate matrix model")
-	public RateMtxNames selectedRateMtx;
+	public static RateMtxNames selectedRateMtx=RateMtxNames.DNAGTR;
 	
 	
 	public List<TreeNode> makeLeaves(int nTaxa, String prefix) 
@@ -233,7 +233,7 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 
 		for (int i : numbersOfTaxa) {
 			for (ComparisonModes mode :  ComparisonModes.values()) {
-				makeSyntheticData(i, mode);
+				makeSyntheticData(i, mode, selectedRateMtx);
 				
 				// copy the results to another folder 
 				File newDirectory = new File(
@@ -248,7 +248,7 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 		}
 	}
 
-	public static void makeSyntheticData(int numberOfTaxa, ComparisonModes mode) throws IOException {
+	public static void makeSyntheticData(int numberOfTaxa, ComparisonModes mode, RateMtxNames selectedRateMtx) throws IOException {
 		//List realizations = new ArrayList();
 		SimplePhyloSimulator runner = new SimplePhyloSimulator();
 		runner.detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
@@ -285,7 +285,7 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 			//realizations.add(runner.model.getLikelihood().observations.toString());
 			runner.writeTree(runner.model.getLikelihood().tree);
 			// write the FASTA file corresponding to the simulation
-			FastaUtils.writeFasta(runner.model.getLikelihood().observations, Results.getFileInResultFolder("SimulatedData.fasta"));
+			FastaUtils.writeFasta(runner.model.getLikelihood().observations, Results.getFileInResultFolder("SimulatedData.fasta"), selectedRateMtx);
 		}
 		
 		runner.detailWriter.write("Total BranchLength: " +
