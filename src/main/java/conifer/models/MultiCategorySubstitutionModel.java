@@ -66,7 +66,8 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
   public final T rateMatrixMixture;
   
   public final int nSites;
-  
+
+  public static boolean recordCacheSize = false;
   public MultiCategorySubstitutionModel(T rateMatrixMixture, int nSites)
   {
     this.rateMatrixMixture = rateMatrixMixture;
@@ -139,15 +140,23 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
       }
     }
 
-    // find the maximum cache size of endPointSamplers among all sites
-//    int maxCachedSize =0;
-//    for (int c=0; c<endPointSamplers.size(); c++){
-//      if(endPointSamplers.get(c).cacheSize()>maxCachedSize){
-//        maxCachedSize=endPointSamplers.get(c).cacheSize();
-//        System.out.println(endPointSamplers.get(c).cacheSize());
-//      }
-//    }
-//    logToFile("Maximum Cached Size" +""+ maxCachedSize);
+    if(recordCacheSize){
+
+      // find the maximum cache size of endPointSamplers among all sites
+      int maxCachedSize =0;
+      for (int c=0; c<endPointSamplers.size(); c++){
+        if(endPointSamplers.get(c).cacheSize()>maxCachedSize){
+          maxCachedSize=endPointSamplers.get(c).cacheSize();
+          System.out.println(endPointSamplers.get(c).cacheSize());
+        }
+      }
+      logToFile("Maximum Cached Size" +""+ maxCachedSize);
+
+    }else{
+
+
+    }
+
 
     return categorySpecificStats;
   }
