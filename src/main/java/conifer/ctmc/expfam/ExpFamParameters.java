@@ -10,6 +10,7 @@ import com.google.common.collect.Lists;
 import conifer.ctmc.RateMatrixUtils;
 import conifer.moves.PhyloHMCMove;
 import conifer.moves.RealVectorMHProposal;
+import conifer.moves.RealVectorOverRelaxedSlice;
 import conifer.processors.ExpFamParamProcessor;
 import blang.annotations.Processors;
 import blang.annotations.Samplers;
@@ -22,7 +23,7 @@ import briefj.collections.Counter;
 @Samplers({
         RealVectorMHProposal.class,
         PhyloHMCMove.class,
-       // RealVariableOverRelaxedSlice.class
+        RealVectorOverRelaxedSlice.class
 })
 @Processors({IIDRealVectorGenerativeFactor.VectorNormProcessor.class, ExpFamParamProcessor.class})
 public class ExpFamParameters implements RealVectorInterface

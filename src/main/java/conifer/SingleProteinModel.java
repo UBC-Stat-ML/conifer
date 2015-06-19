@@ -78,8 +78,11 @@ public class SingleProteinModel implements Runnable, Processor
     @Option(gloss="Use cache or not")
     public boolean cached=true;
 
-    @Option(gloss="Record cache size or not")
+    @Option(gloss="record cache size or not")
     public boolean recordCacheSize=true;
+
+    @Option(gloss="use slice sampler")
+    public boolean sliceSampler = true;
 
     public class Model
     {
@@ -131,6 +134,11 @@ public class SingleProteinModel implements Runnable, Processor
         if(isExcluded)
         {
             factory.excludeNodeMove(PhyloHMCMove.class);
+        }
+
+        if(sliceSampler){
+            factory.excludeNodeMove(PhyloHMCMove.class);
+            factory.excludeNodeMove(RealVectorMHProposal.class);
         }
         MCMCAlgorithm mcmc = factory.build(model, false);
         mcmc.options.random = new Random(rep);
