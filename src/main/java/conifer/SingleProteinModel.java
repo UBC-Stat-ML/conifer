@@ -48,6 +48,9 @@ public class SingleProteinModel implements Runnable, Processor
     @Option(gloss="Indicator of whether to exclude HMC move")
     public boolean isExcluded=false;
 
+    @Option(gloss="Indicator of use slice sampler or not")
+    public boolean sliceSampler=false;
+
     @Option(gloss="Number of MCMC iterations")
     public int nMCMCIterations = 100000;
 
@@ -131,8 +134,24 @@ public class SingleProteinModel implements Runnable, Processor
         long startTime = System.currentTimeMillis();
         if(isExcluded)
         {
-            factory.excludeNodeMove(PhyloHMCMove.class);
-            factory.excludeNodeMove(RealVectorMHProposal.class);
+            if(sliceSampler){
+                throw new RuntimeException();
+            }else{
+                // the default setting for isExcluded should be false
+                factory.excludeNodeMove(PhyloHMCMove.class);
+            }
+
+        }
+        if(sliceSampler){
+            // when sliceSampler is true, we need to make sure isExcluded is false
+            if(isExcluded)
+                throw new RuntimeException();
+            else{
+                factory.excludeNodeMove(PhyloHMCMove.class);
+                factory.excludeNodeMove(RealVectorMHProposal.class);
+
+            }
+
         }
 
         MCMCAlgorithm mcmc = factory.build(model, false);
