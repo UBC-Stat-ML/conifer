@@ -33,8 +33,8 @@ public class RealVectorOverRelaxedSlice extends NodeMove
 
     @ConnectedFactor
     UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
-//    @ConnectedFactor
-//    IIDRealVectorGenerativeFactor<Normal.MeanVarianceParameterization> prior;
+    @ConnectedFactor
+    IIDRealVectorGenerativeFactor<Normal.MeanVarianceParameterization> prior;
 
     private double [] savedValue = null;
 
@@ -48,9 +48,9 @@ public class RealVectorOverRelaxedSlice extends NodeMove
     {
         if (savedValue != null)
             throw new RuntimeException();
-//        if (prior.marginalDistributionParameters.mean.getValue() != 0.0)
-//            throw new RuntimeException();
-//        final double variance = prior.marginalDistributionParameters.variance.getValue();
+        if (prior.marginalDistributionParameters.mean.getValue() != 0.0)
+            throw new RuntimeException();
+        final double variance = prior.marginalDistributionParameters.variance.getValue();
 
         double [] initialPoint = parameters.getVector();
 

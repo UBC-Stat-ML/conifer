@@ -52,7 +52,7 @@ public class SingleProteinModel implements Runnable, Processor
     public int nMCMCIterations = 100000;
 
     @Option(gloss="ESS Experiment Number")
-    public int rep = 1;
+    public int rep = 2;
 
     @Option(gloss="Rate Matrix Method")
     public RateMtxNames selectedRateMtx = RateMtxNames.PAIR;
@@ -81,8 +81,6 @@ public class SingleProteinModel implements Runnable, Processor
     @Option(gloss="record cache size or not")
     public boolean recordCacheSize=true;
 
-    @Option(gloss="use slice sampler")
-    public boolean sliceSampler = true;
 
     public class Model
     {
@@ -134,12 +132,9 @@ public class SingleProteinModel implements Runnable, Processor
         if(isExcluded)
         {
             factory.excludeNodeMove(PhyloHMCMove.class);
-        }
-
-        if(sliceSampler){
-            factory.excludeNodeMove(PhyloHMCMove.class);
             factory.excludeNodeMove(RealVectorMHProposal.class);
         }
+
         MCMCAlgorithm mcmc = factory.build(model, false);
         mcmc.options.random = new Random(rep);
         mcmc.options.nMCMCSweeps = nMCMCIterations;
