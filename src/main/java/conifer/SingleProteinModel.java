@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.util.Random;
 
 import conifer.ctmc.EndPointSampler;
+import conifer.moves.RealVectorOverRelaxedSlice;
 import org.apache.commons.io.FileUtils;
 
 import bayonet.distributions.Normal.MeanVarianceParameterization;
@@ -141,7 +142,12 @@ public class SingleProteinModel implements Runnable, Processor
                 factory.excludeNodeMove(PhyloHMCMove.class);
             }
 
+        }else{
+
+            factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
+
         }
+
         if(sliceSampler){
             // when sliceSampler is true, we need to make sure isExcluded is false
             if(isExcluded)
