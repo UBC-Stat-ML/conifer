@@ -144,7 +144,10 @@ public class SingleProteinModel implements Runnable, Processor
 
         }else{
 
-            factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
+            if(sliceSampler){}else{
+                factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
+
+            }
 
         }
 
