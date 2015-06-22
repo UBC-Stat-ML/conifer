@@ -52,10 +52,10 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
     // TODO: add stationary distribution estimates
     
     // print weights
-//    Counter<String> weights = model.getWeights();
-//    for (String key : weights.keySet())
-//      samplesOutput.write(key, "mcmcIter", context.getMcmcIteration(), key, weights.getCount(key));
-//
+    Counter<String> weights = model.getWeights();
+    for (String key : weights.keySet())
+      samplesOutput.write(key, "mcmcIter", context.getMcmcIteration(), key, weights.getCount(key));
+
 
     Counter<CTMCState> stationary = model.getStationaryDistribution();
     for (CTMCState state0 : stationary.keySet())
@@ -80,33 +80,33 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
         samplesOutput.flush();
         interval = interval * 2;
         current = 0;
-//        File
-//          indexFile = new File(samplesOutput.getOutputFolder(), "CODAindex.txt"),
-//          chainFile = new File(samplesOutput.getOutputFolder(), "CODAchain1.txt");
-//        CodaParser.CSVToCoda(indexFile, chainFile, samplesOutput.getOutputFolder());
-//        SimpleCodaPlots codaPlots = new SimpleCodaPlots(chainFile, indexFile);
-//        codaPlots.toPDF(new File(samplesOutput.getOutputFolder(), "codaPlots.pdf"));
-//
-//        EffectiveSize essCalculator = new EffectiveSize(chainFile, indexFile);
-//        List<Double> essValues = essCalculator.getESSValues();
-//        DescriptiveStatistics stats = new DescriptiveStatistics();
-//        for (double val : essValues) stats.addValue(val);
-//        double time = watch.getTime() / 1000.0;
-//        String variableName = context.getModel().getName(parameters);
-//        Map<String,Double> summaries = Maps.newHashMap();
-//        summaries.put("max", stats.getMax());
-//        summaries.put("median", stats.getPercentile(50));
-//        summaries.put("min", stats.getMin());
+        File
+          indexFile = new File(samplesOutput.getOutputFolder(), "CODAindex.txt"),
+          chainFile = new File(samplesOutput.getOutputFolder(), "CODAchain1.txt");
+        CodaParser.CSVToCoda(indexFile, chainFile, samplesOutput.getOutputFolder());
+        SimpleCodaPlots codaPlots = new SimpleCodaPlots(chainFile, indexFile);
+        codaPlots.toPDF(new File(samplesOutput.getOutputFolder(), "codaPlots.pdf"));
+
+        EffectiveSize essCalculator = new EffectiveSize(chainFile, indexFile);
+        List<Double> essValues = essCalculator.getESSValues();
+        DescriptiveStatistics stats = new DescriptiveStatistics();
+        for (double val : essValues) stats.addValue(val);
+        double time = watch.getTime() / 1000.0;
+        String variableName = context.getModel().getName(parameters);
+        Map<String,Double> summaries = Maps.newHashMap();
+        summaries.put("max", stats.getMax());
+        summaries.put("median", stats.getPercentile(50));
+        summaries.put("min", stats.getMin());
        //  These following two lines are added by Tingting
-//        summaries.put("25th Quantile", stats.getPercentile(25));
-//        summaries.put("75th Quantile", stats.getPercentile(75));
-//        for (String statKey : summaries.keySet())
-//        {
-//          double ess = summaries.get(statKey);
-//          double essPerSec = ess/time;
-//          output.printWrite(variableName  + "-ess", "iteration", context.getMcmcIteration(), "statistic", statKey, "ess", ess, "time", time, "essPerSec", essPerSec);
-//
-//        }
+        summaries.put("25th Quantile", stats.getPercentile(25));
+        summaries.put("75th Quantile", stats.getPercentile(75));
+        for (String statKey : summaries.keySet())
+        {
+          double ess = summaries.get(statKey);
+          double essPerSec = ess/time;
+          output.printWrite(variableName  + "-ess", "iteration", context.getMcmcIteration(), "statistic", statKey, "ess", ess, "time", time, "essPerSec", essPerSec);
+
+        }
       }
       catch (Exception e)
       {
