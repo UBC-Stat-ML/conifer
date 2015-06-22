@@ -52,26 +52,26 @@ public class ExpFamParamProcessor implements NodeProcessor<ExpFamParameters>
     // TODO: add stationary distribution estimates
     
     // print weights
-    //Counter<String> weights = model.getWeights();
-    //for (String key : weights.keySet())
-    //  samplesOutput.write(key, "mcmcIter", context.getMcmcIteration(), key, weights.getCount(key));
+    Counter<String> weights = model.getWeights();
+    for (String key : weights.keySet())
+      samplesOutput.write(key, "mcmcIter", context.getMcmcIteration(), key, weights.getCount(key));
        
 
-    Counter<CTMCState> stationary = model.getStationaryDistribution();
-    for (CTMCState state0 : stationary.keySet())
-      samplesOutput.write("stationary("+state0.toString()+")", "mcmcIter", context.getMcmcIteration(), state0, stationary.getCount(state0));
-       
-    
-    List<CTMCState> states = parameters.globalExponentialFamily.stateIndexer.objectsList();
-    for (CTMCState state0 : states)
-    {
-      Counter<CTMCState> rates = model.getRates(state0);
-      for (CTMCState state1 : rates.keySet())
-      {
-        String key = "q(" + state0 + "," + state1 + ")";
-        samplesOutput.write(key, "mcmcIter", context.getMcmcIteration(), key, rates.getCount(state1));
-      }
-    }
+//    Counter<CTMCState> stationary = model.getStationaryDistribution();
+//    for (CTMCState state0 : stationary.keySet())
+//      samplesOutput.write("stationary("+state0.toString()+")", "mcmcIter", context.getMcmcIteration(), state0, stationary.getCount(state0));
+//
+//
+//    List<CTMCState> states = parameters.globalExponentialFamily.stateIndexer.objectsList();
+//    for (CTMCState state0 : states)
+//    {
+//      Counter<CTMCState> rates = model.getRates(state0);
+//      for (CTMCState state1 : rates.keySet())
+//      {
+//        String key = "q(" + state0 + "," + state1 + ")";
+//        samplesOutput.write(key, "mcmcIter", context.getMcmcIteration(), key, rates.getCount(state1));
+//      }
+//    }
     
     current++;
     if (context.getOptions().CODA && ((progressInfo && current == interval) || context.isLastProcessCall()))
