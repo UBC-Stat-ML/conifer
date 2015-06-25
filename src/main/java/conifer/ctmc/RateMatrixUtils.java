@@ -1,7 +1,11 @@
 package conifer.ctmc;
 
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
 import bayonet.distributions.Multinomial;
 import bayonet.math.NumericalUtils;
+import org.jblas.DoubleMatrix;
+import org.jblas.MatrixFunctions;
 
 
 /**
@@ -104,4 +108,75 @@ public class RateMatrixUtils
     
     return result;
   }
+
+    // The following code is added by zhaott0416@gmail.com
+    // In order to use diagonalization for the matrix exponential algorithm
+    public static enum MatrixExponentialAlgorithm
+    {
+        DIAGONALIZATION {
+            @Override
+            public double[][] marginalTransitionMtx(double[][] rate, double t)
+            {
+                if (Math.abs(t) < 1e-10) // protect against numerical problems
+                    return Matrix.identity(rate.length, rate.length).getArray();
+
+                final Matrix M = new Matrix(rate).times(t);
+                double [][] p =  exp(M).getArray();
+                for (int i = 0; i < p.length; i++)
+                {
+                    NumericalUtils.checkIsProb(p[i]);
+                    Multinomial.normalize(p[i]);
+                }
+                return p;
+            }
+        },
+        BLAS {
+            @Override
+            public double[][] marginalTransitionMtx(double[][] rate, double t)
+            {
+                DoubleMatrix rateMtx = new DoubleMatrix(rate);
+                rateMtx.muli(t);
+                return MatrixFunctions.expm(rateMtx).toArray2();
+            }
+        };
+        public abstract double [][] marginalTransitionMtx(final double [][] rate, final double t);
+    }
+
+    public static MatrixExponentialAlgorithm defaultsMatrixExponentialAlgorithm = MatrixExponentialAlgorithm.BLAS;
+
+    public static double [][] marginalTransitionMtx(final double [][] rate, final double t, MatrixExponentialAlgorithm method)
+    {
+        return method.marginalTransitionMtx(rate, t);
+    }
+
+    public static double [][] marginalTransitionMtx(final double [][] rate, final double t){
+        return defaultsMatrixExponentialAlgorithm.marginalTransitionMtx(rate, t);
+    }
+
+
+    //ToDo: this should go to a MatrixUtils in bayonet
+    public static Matrix exp(final Matrix V, final Matrix Vinv, final Matrix D)
+    {
+        final int size = V.getColumnDimension();
+        final Matrix expD = new Matrix(size, size);
+        for (int i = 0; i < size; i++)
+            expD.set(i, i, Math.exp(D.get(i, i)));
+        Matrix result = V.times(expD).times(Vinv);
+        for (int row = 0; row < V.getRowDimension(); row++)
+        {
+            double sum = 0.0;
+            for (int col = 0; col < V.getColumnDimension(); col++)
+                sum += result.get(row, col);
+            NumericalUtils.checkIsClose(sum, 1.0);
+        }
+        return result;
+    }
+
+    public static Matrix exp(final Matrix M)
+    {
+        final EigenvalueDecomposition ed = new EigenvalueDecomposition(M);
+        final Matrix V = ed.getV();
+        return exp(V, V.inverse(), ed.getD());
+    }
+
 }

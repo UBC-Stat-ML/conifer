@@ -48,6 +48,7 @@ public class EigenCTMC implements CTMC
     private final RateMatrix rateMtx;
     private final double [] stationaryDistribution;
     private final double [][] rates;
+    public static boolean useDiag = true;
 
     /**
      * Note: if the RateMatrix is changed in place,
@@ -147,9 +148,14 @@ public class EigenCTMC implements CTMC
     public double [][] marginalTransitionProbability(double branchLength)
     {
 
-        DoubleMatrix rateMtxTmp = new DoubleMatrix(rates);
-        rateMtxTmp.muli(branchLength);
-        double [][] result = MatrixFunctions.expm(rateMtxTmp).toArray2();
+        double [][] result = new double [rates.length][rates.length];
+        if(useDiag){
+            result = RateMatrixUtils.marginalTransitionMtx(rates, branchLength, RateMatrixUtils.MatrixExponentialAlgorithm.DIAGONALIZATION);
+        }else{
+            // The default method of calculating matrix exponential is using MatrixFunctions.expm() in jblas
+            result = RateMatrixUtils.marginalTransitionMtx(rates, branchLength);
+        }
+
         NumericalUtils.checkIsTransitionMatrix(result);
 
         for (int row = 0; row < result.length; row++)

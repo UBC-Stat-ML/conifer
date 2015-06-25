@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Random;
 
+import conifer.ctmc.EigenCTMC;
 import conifer.ctmc.EndPointSampler;
 import conifer.moves.RealVectorOverRelaxedSlice;
 import org.apache.commons.io.FileUtils;
@@ -85,6 +86,8 @@ public class SingleProteinModel implements Runnable, Processor
     @Option(gloss="record cache size or not")
     public boolean recordCacheSize=true;
 
+    @Option(gloss ="Indicator of using Diagonalization of matrix exponential algorithm or not")
+    public boolean useDiag = true;
 
     public class Model
     {
@@ -130,6 +133,7 @@ public class SingleProteinModel implements Runnable, Processor
         PhyloHMCMove.nItersPerPathAuxVar=nItersPerPathAuxVar;
         EndPointSampler.cached=cached;
         MultiCategorySubstitutionModel.recordCacheSize=recordCacheSize;
+        EigenCTMC.useDiag = useDiag;
         factory.addProcessor(this);
         model = new Model();
         long startTime = System.currentTimeMillis();
