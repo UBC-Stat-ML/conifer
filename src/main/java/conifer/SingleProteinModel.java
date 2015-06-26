@@ -87,7 +87,10 @@ public class SingleProteinModel implements Runnable, Processor
     public boolean recordCacheSize=true;
 
     @Option(gloss ="Indicator of using Diagonalization of matrix exponential algorithm or not")
-    public boolean useDiag = true;
+    public boolean useDiag = false;
+
+    @Option(gloss="Indicator of using auxiliary variable Z or not when getting the expected statistics of holding time and number of transitions")
+    public boolean useAuxiliaryVariable = true;
 
     public class Model
     {
@@ -131,6 +134,7 @@ public class SingleProteinModel implements Runnable, Processor
         PhyloHMCMove.L = L;
         PhyloHMCMove.sizeAdapt=sizeAdapt;
         PhyloHMCMove.nItersPerPathAuxVar=nItersPerPathAuxVar;
+        PhyloHMCMove.useAuxiliaryVariable = useAuxiliaryVariable;
         EndPointSampler.cached=cached;
         MultiCategorySubstitutionModel.recordCacheSize=recordCacheSize;
         EigenCTMC.useDiag = useDiag;

@@ -142,15 +142,30 @@ public class RateMatrixUtils
         public abstract double [][] marginalTransitionMtx(final double [][] rate, final double t);
     }
 
-    public static MatrixExponentialAlgorithm defaultsMatrixExponentialAlgorithm = MatrixExponentialAlgorithm.BLAS;
+    public static MatrixExponentialAlgorithm defaultsMatrixExponentialAlgorithm(boolean useDiag){
+
+        MatrixExponentialAlgorithm result;
+        if(useDiag)
+            result = MatrixExponentialAlgorithm.DIAGONALIZATION;
+        else
+            result = MatrixExponentialAlgorithm.BLAS;
+
+        return result;
+    }
+
+    public static double [][] marginalTransitionMtx(final double [][] rate, final double t){
+
+        return MatrixExponentialAlgorithm.BLAS.marginalTransitionMtx(rate, t);
+    }
+
 
     public static double [][] marginalTransitionMtx(final double [][] rate, final double t, MatrixExponentialAlgorithm method)
     {
         return method.marginalTransitionMtx(rate, t);
     }
 
-    public static double [][] marginalTransitionMtx(final double [][] rate, final double t){
-        return defaultsMatrixExponentialAlgorithm.marginalTransitionMtx(rate, t);
+    public static double [][] marginalTransitionMtx(final double [][] rate, final double t, boolean useDiag){
+        return defaultsMatrixExponentialAlgorithm(useDiag).marginalTransitionMtx(rate, t);
     }
 
 
