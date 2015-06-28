@@ -405,7 +405,7 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
             for(Double br : allBr)
             {
                 double [][] rateMtxScaled= curRateMtx.clone();
-                double [][] expRateMtxScaled = RateMatrixUtils.marginalTransitionMtx(rateMtxScaled, br, RateMatrixUtils.MatrixExponentialAlgorithm.DIAGONALIZATION);
+                double [][] expRateMtxScaled = RateMatrixUtils.marginalTransitionMtx(rateMtxScaled, br);
                 rateMtxBrMap.put(br,expRateMtxScaled);
             }
 
@@ -496,8 +496,17 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
                         botNode = edge.getRight();
                 final double branchLength = tree.getBranchLength(topNode, botNode);
 
+                if(topNode.equals(root))
+                    result.nInit = new DoubleMatrix(totalMarginalCount.get(i).get(edge)).rowSums().toArray();
+
                 result.addMarginalizedPath(totalMarginalCount.get(i).get(edge),  rateMatrixMixture.getRateMatrix(i).getRateMatrix(), branchLength);
             }
+
+            //EigenCTMC ctmc = new EigenCTMC(rateMatrixMixture.getRateMatrix(i).getRateMatrix());
+            //double [] stationaryDist = ctmc.stationaryDistribution();
+            //result.nInit = new DoubleMatrix(stationaryDist).mul(nSites).toArray();
+            //result.nInit = result.holdTimes;
+
         }
 
         return result;

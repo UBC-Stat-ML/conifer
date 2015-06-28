@@ -9,9 +9,9 @@ import conifer.models.RateMatrixMixture;
 
 public class ExpectedStatistics<S>
 {
-    final double [] holdTimes;
-    final double [][] nTrans;
-    final double [] nInit;
+    public  double [] holdTimes;
+    public  double [][] nTrans;
+    public  double [] nInit;
 
     public final CTMCExpFam<S> model;
 
