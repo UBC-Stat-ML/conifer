@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jblas.DoubleMatrix;
 
@@ -68,21 +69,25 @@ public class PhyloHMCMove extends NodeMove
         if (prior.marginalDistributionParameters.mean.getValue() != 0.0)
             throw new RuntimeException();
         final double variance = prior.marginalDistributionParameters.variance.getValue();
-        CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective objective = null;
+        CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective auxObjective = null;
+        CTMCExpFam<CTMCState>.ExpectedReversibleObjectiveUpdateExpectedStat noAuxObjective =null;
         if(useAuxiliaryVariable){
 
             List<PathStatistics> pathStatistics = likelihood.evolutionaryModel.samplePosteriorPaths(rand, likelihood.observations, likelihood.tree);
 
             ExpectedStatistics<CTMCState> convertedStat = convert(pathStatistics, parameters, likelihood);
-            objective = parameters.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0/variance, convertedStat);
+            auxObjective = parameters.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0/variance, convertedStat);
 
         }else{
             ExpectedStatistics<CTMCState> expectedStatistics = likelihood.evolutionaryModel.getTotalExpectedStatistics(likelihood.observations, likelihood.tree, parameters.globalExponentialFamily);
-            objective = parameters.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0 / variance, expectedStatistics);
+            noAuxObjective = parameters.globalExponentialFamily.getExpectedReversibleObjectiveUpdateExpectedStat(1.0/variance, likelihood.observations,
+                    likelihood.tree, likelihood.evolutionaryModel, expectedStatistics, parameters);
         }
 
         double [] initialPoint = parameters.getVector();
-        double [] newPoint;
+        double [] newPoint= initialPoint;
+
+
 
         if (hyperParametersInitialized())
         {
@@ -91,18 +96,32 @@ public class PhyloHMCMove extends NodeMove
             // but may not be needed (already quite a bit of gains by doing large number of steps (L)
             // within the doIter() method below
             DataStruct hmcResult = null;
-            for (int i = 0; i < nItersPerPathAuxVar; i++)
-                hmcResult = HMC.doIter(rand, L, epsilon, i == 0 ? new DoubleMatrix(initialPoint) : hmcResult.next_q, objective, objective);
+            if(useAuxiliaryVariable){
+                for (int i = 0; i < nItersPerPathAuxVar; i++)
+                    hmcResult = HMC.doIter(rand, L, epsilon, i == 0 ? new DoubleMatrix(initialPoint) : hmcResult.next_q, auxObjective, auxObjective);
+            }else{
+                hmcResult = HMC.doIter(rand, L, epsilon, new DoubleMatrix(newPoint), noAuxObjective, noAuxObjective);
+            }
             newPoint = hmcResult.next_q.data;
         }
         else
         {
-            AHMC ahmc = AHMC.initializeAHMCWithLBFGS(10000, 1000, objective, objective, initialPoint.length,sizeAdapt);
+            StopWatch watch = new StopWatch();
+            watch.start();
+            AHMC ahmc = null;
+            if(useAuxiliaryVariable){
+                ahmc = AHMC.initializeAHMCWithLBFGS(10000, 1000, auxObjective, auxObjective, initialPoint.length,sizeAdapt);
+
+            }else{
+                ahmc = AHMC.initializeAHMCWithLBFGS(10000, 1000, noAuxObjective, noAuxObjective, initialPoint.length, sizeAdapt);
+            }
+
             newPoint = ahmc.sample(rand).data;
             epsilon = ahmc.getEpsilon();
             L = ahmc.getL();
+            logToFile("time to get epsilon and L in AHMC:" + watch.getTime()/1000);
             logToFile("optimal epsilon" +""+ epsilon);
-            logToFile("optimal L" + ""+ L);
+            logToFile("optimal L" + "" + L);
         }
 
         parameters.setVector(newPoint);
