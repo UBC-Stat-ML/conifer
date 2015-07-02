@@ -113,7 +113,8 @@ public class PhyloHMCMove extends NodeMove
                 ahmc = AHMC.initializeAHMCWithLBFGS(10000, 1000, auxObjective, auxObjective, initialPoint.length,sizeAdapt);
 
             }else{
-                ahmc = AHMC.initializeAHMCWithLBFGS(10000, 1000, noAuxObjective, noAuxObjective, initialPoint.length, sizeAdapt);
+               // ahmc = AHMC.initializeAHMCWithLBFGS(10000, 1000, noAuxObjective, noAuxObjective, initialPoint.length);
+                ahmc = new AHMC(10000, 1000, noAuxObjective, noAuxObjective, initialPoint);
             }
 
             newPoint = ahmc.sample(rand).data;
