@@ -183,8 +183,9 @@ public class SingleProteinModel implements Runnable, Processor
         String whichSeedUsed = fileNameString.subStringBetween(fileName, "Seed", ".txt");
         logToFile("Total time in minutes: " + ((System.currentTimeMillis() - startTime)/60000.0));
         //File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed+ "epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
+        logToFile("Samplers:"+ mcmc.toString());
         File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + "slice"+sliceSampler+bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed +"epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L+"Adapt"+ PhyloHMCMove.sizeAdapt+
-                "nItersPerPathAuxVar"+nItersPerPathAuxVar+"useAux"+ useAuxiliaryVariable+"recordCache"+ recordCacheSize);
+                "nItersPerPathAuxVar"+nItersPerPathAuxVar+"useAux"+ useAuxiliaryVariable+"recordCache"+ recordCacheSize+"nIter"+nMCMCIterations);
         newDirectory.mkdir();
         try
         {
