@@ -6,6 +6,7 @@ import java.util.Random;
 
 import conifer.ctmc.EigenCTMC;
 import conifer.ctmc.EndPointSampler;
+import conifer.moves.RealVectorAdaptiveMHProposal;
 import conifer.moves.RealVectorOverRelaxedSlice;
 import org.apache.commons.io.FileUtils;
 
@@ -33,6 +34,7 @@ import briefj.run.Results;
 import blang.processing.ProcessorContext;
 import briefj.BriefIO;
 import briefj.OutputManager;
+import org.jblas.DoubleMatrix;
 
 import java.io.IOException;
 
@@ -92,6 +94,9 @@ public class SingleProteinModel implements Runnable, Processor
     @Option(gloss="Indicator of using auxiliary variable Z or not when getting the expected statistics of holding time and number of transitions")
     public boolean useAuxiliaryVariable = true;
 
+    @Option(gloss="Indicator of using adaptive MCMC or not")
+    public boolean isAdaptiveMCMC = false;
+
     public class Model
     {
         @DefineFactor(onObservations = true)
@@ -141,35 +146,45 @@ public class SingleProteinModel implements Runnable, Processor
         factory.addProcessor(this);
         model = new Model();
         long startTime = System.currentTimeMillis();
-        if(isExcluded)
-        {
-            if(sliceSampler){
-                throw new RuntimeException();
-            }else{
-                // the default setting for isExcluded should be false
-                factory.excludeNodeMove(PhyloHMCMove.class);
+        if(isAdaptiveMCMC){
+            factory.excludeNodeMove(PhyloHMCMove.class);
+            factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
+            factory.excludeNodeMove(RealVectorMHProposal.class);
+
+        }else {
+            if (isExcluded) {
+                if (sliceSampler) {
+                    throw new RuntimeException();
+                } else {
+                    // the default setting for isExcluded should be false
+                    factory.excludeNodeMove(PhyloHMCMove.class);
+                }
+
+            } else {
+
+                if (sliceSampler) {
+                } else {
+                    factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
+
+                }
+
             }
 
-        }else{
+            if (sliceSampler) {
+                // when sliceSampler is true, we need to make sure isExcluded is false
+                if (isExcluded)
+                    throw new RuntimeException();
+                else {
+                    factory.excludeNodeMove(PhyloHMCMove.class);
+                    factory.excludeNodeMove(RealVectorMHProposal.class);
 
-            if(sliceSampler){}else{
-                factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
+                }
 
             }
-
         }
 
-        if(sliceSampler){
-            // when sliceSampler is true, we need to make sure isExcluded is false
-            if(isExcluded)
-                throw new RuntimeException();
-            else{
-                factory.excludeNodeMove(PhyloHMCMove.class);
-                factory.excludeNodeMove(RealVectorMHProposal.class);
-
-            }
-
-        }
+        RealVectorAdaptiveMHProposal.meanVector = model.likelihood1.evolutionaryModel.rateMatrixMixture.parameters.getVector();
+        RealVectorAdaptiveMHProposal.sampleCov = DoubleMatrix.eye(model.likelihood1.evolutionaryModel.rateMatrixMixture.parameters.getDim()).toArray2();
 
         MCMCAlgorithm mcmc = factory.build(model, false);
         mcmc.options.random = new Random(rep);
@@ -185,7 +200,7 @@ public class SingleProteinModel implements Runnable, Processor
         //File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed+ "epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
         logToFile("Samplers:"+ mcmc.toString());
         File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + "slice"+sliceSampler+bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed +"epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L+"Adapt"+ PhyloHMCMove.sizeAdapt+
-                "nItersPerPathAuxVar"+nItersPerPathAuxVar+"useAux"+ useAuxiliaryVariable+"recordCache"+ recordCacheSize+"nIter"+nMCMCIterations);
+                "nItersPerPathAuxVar"+nItersPerPathAuxVar+"useAux"+ useAuxiliaryVariable+"recordCache"+ recordCacheSize+"nIter"+nMCMCIterations+"isAdaptive"+ isAdaptiveMCMC);
         newDirectory.mkdir();
         try
         {
