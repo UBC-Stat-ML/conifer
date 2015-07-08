@@ -9,7 +9,6 @@
 "latent": "A" 
 },
 "features": {
- "statio(A)":      1 
 } 
 },
 {
@@ -195,7 +194,6 @@
 "latent": "R" 
 },
 "features": {
- "AR":      1 
 } 
 },
 {
