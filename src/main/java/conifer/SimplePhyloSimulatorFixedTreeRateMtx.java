@@ -12,17 +12,15 @@ package conifer;
  */
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import bayonet.distributions.Normal;
 import conifer.ctmc.expfam.ExpFamParameters;
+import conifer.moves.PhyloHMCMove;
+import conifer.processors.FileNameString;
 import org.apache.commons.io.FileUtils;
 
 import bayonet.distributions.Exponential;
@@ -76,7 +74,7 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
     public final MCMCFactory factory = new MCMCFactory();
 
     @Option
-    public int nSites = 500;
+    public int nSites = 5000;
 
     @Option(gloss="File of the tree topology")
     public File treeFile;
@@ -84,15 +82,21 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
     @Option
     public int nTaxa = 5;
 
+    @Option(gloss="specify whether the rate matrix is generated from fixed weights or randomly generated weights")
+    public boolean fixedRateMtx=false;
+
     @Option(gloss="select rate matrix model")
     public RateMtxNames selectedRateMtx=RateMtxNames.POLARITYSIZEGTR;
 
     @Option(gloss="Weights values for the rate matrix")
-    public File weightFile= new File("/Users/crystal/Documents/codeExperiment/Revision/Experiment2/RealData/RealWeights.txt");
+    public File weightFile= new File("/Users/crystal/Documents/codeExperiment/Revision/Experiment3/AminoAcidData/RealWeights.json");
+
+    @Option(gloss="random seeds in mcmc")
+    public int seed;
+
 
     public FileInputStream in=null;
 
-    //public double [] weights;
     public Map<String, Double> featureWeights = new HashMap<String, Double>();
 
     public List<TreeNode> makeLeaves(int nTaxa, String prefix)
@@ -148,20 +152,14 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         return featureWeights;
     }
 
-    public class FixedTopologyAndBranchLengthModel implements SimplePhyloModelContainer
+    private class FixedTopologyAndBranchLengthWeightModel implements SimplePhyloModelContainer
     {
-
+        // In this class, we do not specify whether we will provide the weights or generate them randomly
+        // we will use two separate classes
         @DefineFactor(onObservations = true)
         public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood =
                 UnrootedTreeLikelihood.createEmptyWithFixedTree(nSites, treeFile, selectedRateMtx)
                         .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx));
-
-
-
-        @DefineFactor(onObservations = true)
-        public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior =
-                IIDRealVectorGenerativeFactor
-                        .iidNormalOn(likelihood.evolutionaryModel.rateMatrixMixture.parameters);
 
         public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> getLikelihood() {
             return this.likelihood;
@@ -175,13 +173,32 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         public void setVectorWeights(Map<String, Double> featureWeights) {
             likelihood.evolutionaryModel.rateMatrixMixture.parameters.setVector(featureWeights);
         }
+
+
     }
+
+
+
+    private class FixedTopologyAndBranchLengthRandomhWeightModel  extends FixedTopologyAndBranchLengthWeightModel
+    {
+
+        @DefineFactor
+        public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior =
+                IIDRealVectorGenerativeFactor
+                        .iidNormalOn(likelihood.evolutionaryModel.rateMatrixMixture.parameters);
+
+
+
+    }
+
+
 
     // we can build different models here and instantiate them according to the input parameter
     // in the run block.
 
     // Note: only instantiate this in run to avoid problems with command line argument parsing
-    public FixedTopologyAndBranchLengthModel model;
+
+    private FixedTopologyAndBranchLengthWeightModel model;
 
     private PrintWriter treeWriter;
     private PrintWriter detailWriter;
@@ -198,14 +215,17 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         factory.mcmcOptions.nMCMCSweeps = nMCMCSweeps;
         factory.mcmcOptions.burnIn = burnIn;
         factory.mcmcOptions.CODA = true;
+        factory.mcmcOptions.random = new Random(seed);
         factory.mcmcOptions.thinningPeriod = thinningPeriod;
 
-        setMapFeatureWeights(weightFile);
-        model = new FixedTopologyAndBranchLengthModel();
-        model.setVectorWeights(featureWeights);
+        if(fixedRateMtx){
+            model = new FixedTopologyAndBranchLengthWeightModel();
+            model.setVectorWeights(featureWeights);
+        }else{
+            model = new FixedTopologyAndBranchLengthRandomhWeightModel();
+        }
 
         MCMCAlgorithm mcmc = factory.build(model, false);
-        System.out.println(mcmc.model);
 
         long startTime = System.currentTimeMillis();
         String excluding = "GTR-Excluding all but SPR move";
@@ -228,11 +248,15 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         }
 
         // copy the results to another folder
-        File newDirectory = new File(
-                Results.getResultFolder().getParent() + "/experiment." +
-                        Results.getResultFolder().getName() + "." +
-                        treeFile + "_"  +
-                        System.currentTimeMillis());
+        String br = getBranchLength(treeFile, "tips");
+
+        File newDirectory = new File(Results.getResultFolder().getParent() + selectedRateMtx+"br"+br+"numberSites"+nSites);
+
+//        File newDirectory = new File(
+//                Results.getResultFolder().getParent() + "/experiment." +
+//                        Results.getResultFolder().getName() + "." +
+//                        treeFile + "_"  +
+//                        System.currentTimeMillis());
         newDirectory.mkdir();
         try {
             FileUtils.copyDirectory(Results.getResultFolder(), newDirectory);
@@ -259,11 +283,26 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         factory.mcmcOptions.nMCMCSweeps = nMCMCSweeps;
         factory.mcmcOptions.burnIn = burnIn;
         factory.mcmcOptions.thinningPeriod = thinningPeriod;
-        model = new FixedTopologyAndBranchLengthModel();
+
+        if(fixedRateMtx){
+            model = new FixedTopologyAndBranchLengthWeightModel();
+            model.likelihood.evolutionaryModel.rateMatrixMixture.parameters.setVector(featureWeights);
+
+        } else{
+            model = new FixedTopologyAndBranchLengthRandomhWeightModel();
+
+        }
         return factory.build(model, false);
     }
 
 
+    public String getBranchLength(File treeFile, String splitString){
+        String fileName = treeFile.getName();
+        FileNameString fileNameString = new FileNameString(fileName);
+        String br = fileNameString.subStringBeforeString(fileName, splitString);
+
+        return br;
+    }
 
     public void makeSyntheticData(File treeFile) throws IOException {
         //List realizations = new ArrayList();
@@ -272,7 +311,12 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
 
         runner.treeFile = treeFile;
 
-        runner.featureWeights= runner.setMapFeatureWeights(weightFile);
+        if(fixedRateMtx){
+            runner.featureWeights= runner.setMapFeatureWeights(weightFile);
+        }else{
+
+        }
+
 
         MCMCAlgorithm algo = runner.getMCMCAlgorithm();
         ForwardSampler f = new ForwardSampler(algo.model);
@@ -286,8 +330,11 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
             //realizations.add(runner.model.getLikelihood().observations.toString());
             runner.writeTree(runner.model.getLikelihood().tree);
             // write the FASTA file corresponding to the simulation
-            FastaUtils.writeFasta(runner.model.getLikelihood().observations, Results.getFileInResultFolder("SimulatedData.fasta"), selectedRateMtx);
+            String br = getBranchLength(treeFile, "tips");
+            String fastaName = selectedRateMtx+"numSites"+nSites+"br"+ br+".txt";
+            FastaUtils.writeFasta(runner.model.getLikelihood().observations, Results.getFileInResultFolder(fastaName), selectedRateMtx);
         }
+        runner.detailWriter.write(Arrays.deepToString(runner.model.getLikelihood().evolutionaryModel.rateMatrixMixture.getRateMatrix(0).getRateMatrix()));
 
         runner.detailWriter.write("Total BranchLength: " +
                 UnrootedTreeUtils.totalTreeLength((runner.model.getLikelihood().tree)) + "\n");
@@ -307,24 +354,6 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         theWriter.flush();
     }
 
-    public static void collectValues(MCMCAlgorithm mcmc, Map<Object,List<Double>> values) {
-
-//		for (Object var: mcmc.model.getLatentVariables()) {
-//			System.out.println(var.toString());
-//			System.out.println(mcmc.model.getName(var));
-//		}
-
-        for (RealValued realValuedVariable : mcmc.model.getLatentVariables(RealValued.class))
-            BriefMaps.getOrPutList(values,
-                    mcmc.model.getName(realValuedVariable)).add(realValuedVariable.getValue());
-		/*
-		for (Processor processor : mcmc.processors)
-			processor.process(new ProcessorContext(mcmc.options.nMCMCSweeps - 1, mcmc.model, mcmc.options));
-
-		for (RealValued realValuedProcessor : ReflexionUtils.sublistOfGivenType(mcmc.processors, RealValued.class))
-			BriefMaps.getOrPutList(values, realValuedProcessor).add(realValuedProcessor.getValue());
-		 */
-    }
 
     @Override
     public void process(ProcessorContext context)
