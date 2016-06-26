@@ -4,13 +4,17 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.util.Random;
 
+import bayonet.distributions.Exponential;
+import bayonet.distributions.Gamma;
 import conifer.ctmc.EigenCTMC;
 import conifer.ctmc.EndPointSampler;
+import conifer.ctmc.expfam.CTMCExpFam;
 import conifer.moves.RealVectorAdaptiveMHProposal;
 import conifer.moves.RealVectorOverRelaxedSlice;
 import org.apache.commons.io.FileUtils;
 
 import bayonet.distributions.Normal.MeanVarianceParameterization;
+import bayonet.distributions.Gamma.RateShapeParameterization;
 import blang.ForwardSampler;
 import blang.MCMCAlgorithm;
 import blang.MCMCFactory;
@@ -112,11 +116,15 @@ public class SingleProteinModel implements Runnable, Processor
                         .iidNormalOn(likelihood1.evolutionaryModel.rateMatrixMixture.parameters);
     }
 
+    //make kappa parameter in CTMCExpFam as a factor and has a gamma prior
+    //@DefineFactor
+    //Gamma<Gamma.RateShapeParameterization> kappaPrior = Gamma.on(CTMCExpFam.).withRateShape(1.0, 1.0);
+
     private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
 
 // The topology of the tree is fixed so that I don't put a prior on the tree topology
-// @DefineFactor
-// NonClockTreePrior<RateParameterization> treePrior1 = 
+ @DefineFactor
+// NonClockTreePrior<Exponential.RateParameterization> treePrior1 =
 //  NonClockTreePrior
 // .on(likelihood1.tree);
 

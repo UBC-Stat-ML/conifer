@@ -113,6 +113,7 @@ public class PhyloHMCMove extends NodeMove
                 ahmc = AHMC.initializeAHMCWithLBFGS(10000, 1000, auxObjective, auxObjective, initialPoint.length,sizeAdapt);
 
             }else{
+               // we do not recommend without use of auxiliary variable since it can be super slow and cause problems when initializing AHMC
                // ahmc = AHMC.initializeAHMCWithLBFGS(10000, 1000, noAuxObjective, noAuxObjective, initialPoint.length);
                 ahmc = new AHMC(10000, 1000, noAuxObjective, noAuxObjective, initialPoint);
             }

@@ -1,6 +1,6 @@
 package conifer.ctmc;
 
-import java.util.Arrays;
+import java.util.*;
 
 import org.ejml.data.DenseMatrix64F;
 import org.ejml.simple.SimpleMatrix;
@@ -64,5 +64,6 @@ public class PathStatistics
       return "initialCounts: " + Arrays.toString(initialCounts) + "\n" +
       		"transitionsAndSojourns:\n" + EJMLUtils.toString( new SimpleMatrix(counts));
     }
-    
+
+
   }
