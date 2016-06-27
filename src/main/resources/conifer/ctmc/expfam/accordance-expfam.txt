@@ -1,0 +1,2491 @@
+{
+	"nCategories" : 1,
+	"orderedLatents" : ["A", "R", "N", "D", "C", "Q", "E", "G", "H", "L", "I", "K", "M", "F", "P", "S", "T", "W", "Y", "V"],
+	"fullSupport" : true,
+	"unaryFeatures" : 
+	[
+	 {
+	  "state": {"categoryIndex" : 0 ,"latent" : "A"},
+	  "features": {"statio(A)": 1.0 }
+	  },
+	  {
+	  "state": {"categoryIndex" : 0 , "latent" : "R"},
+	  "features":{ "statio(R)" : 1.0} 
+	  },
+	  {
+	  "state": {"categoryIndex" : 0 , "latent": "N"},
+	  "features": {"statio(N)" : 1.0 }
+	  },
+	  {
+	  "state": {"categoryIndex" : 0 , "latent" : "D"},
+	  "features": {"statio(D)" : 1.0 }
+	  },
+	  {
+	  "state": {"categoryIndex" : 0 , "latent" : "C"},
+	  "features": {"statio(C)" : 1.0 }
+	  },
+	  {
+	  "state": {"categoryIndex" : 0 , "latent" : "Q"},
+	  "features": {"statio(Q)" : 1.0}	 
+	  },
+	  {
+	   "state":{ "categoryIndex" : 0 , "latent" : "E"},
+	   "features": {"statio(E)" : 1.0 }
+	   },
+	   {
+	   "state":{ "categoryIndex" : 0 , "latent" : "G"},
+	   "features":{ "statio(G)" : 1.0 }
+	   },
+	   {
+	   "state": {"categoryIndex" : 0 , "latent" : "H"},
+	   "features": {"statio(H)": 1.0} 
+	   },
+	   {
+	   "state": {"categoryIndex" : 0 , "latent" : "L"},
+	   "features": {"statio(L)" : 1.0 }
+	   },
+	   {
+	   "state": {"categoryIndex" : 0 , "latent" : "I"},
+	   "features": {"statio(I)" : 1.0}
+	   },
+	   {
+	   "state": {"categoryIndex" : 0 , "latent" : "K"},
+	   "features": {"statio(K)" : 1.0 }
+	   },
+	   {
+	   "state": {"categoryIndex" : 0 , "latent" : "M"},
+	   "features": {"statio(M)" : 1.0 }
+	   },
+	   {
+	   "state": {"categoryIndex" : 0 , "latent" : "F"},
+	   "features": {"statio(F)" : 1.0 }
+	   },
+	   {
+	   "state": {"categoryIndex" : 0 , "latent" : "P"},
+	   "features": {"statio(P)" : 1.0 }
+	   },
+	   {
+	   "state": {"categoryIndex" : 0,  "latent" : "S"},
+       "features": {"statio(S)" : 1.0}
+       },
+       {
+       "state": {"categoryIndex" : 0 , "latent" : "T"},
+       "features": {"statio(T)" : 1.0 }
+       },
+       {
+        "state": {"categoryIndex" : 0 , "latent" : "W"},
+        "features": {"statio(W)" : 1.0 }
+        },
+        {
+        "state": {"categoryIndex" : 0 , "latent" : "Y"},
+        "features": {"statio(Y)" : 1.0 }
+        },
+        {
+        "state": {"categoryIndex" : 0 , "latent" : "V"},
+        "features": {"statio(V)" : 1.0 }
+        } 
+     ],
+	"binaryFeatures" :
+ [
+	 {
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": {"categoryIndex": 0, "latent": "R" },
+	"features": {"BasicNon": 1,"neupos": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex":0,"latent": "A" },
+	"state1": {"categoryIndex": 0,"latent": "N" },
+	"features": { "NonPolar": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": { "categoryIndex": 0, "latent": "D" },
+	"features": { "AcidicNon":1, "negneu": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": { "categoryIndex": 0, "latent": "C" },
+	"features": { "NonNon": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": {"categoryIndex": 0,"latent": "Q" },
+	"features": { "AcidicNon": 1, "negneu": 1 } 
+	},
+	{
+	 "state0": {"categoryIndex": 0,"latent": "A" },
+	"state1": {"categoryIndex": 0, "latent": "E" },
+	"features": {"NonPolar": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": {"categoryIndex": 0, "latent": "A" },
+	"state1": {"categoryIndex": 0, "latent": "G" },
+	"features": { "NonNon": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": {"categoryIndex": 0, "latent": "H" },
+	"features": {"BasicNon": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": { "categoryIndex": 0, "latent": "L" },
+	"features": { "NonNon": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0,"latent": "A" },
+	"state1": {"categoryIndex": 0, "latent": "I" },
+	"features": {"NonNon": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": { "categoryIndex": 0, "latent": "K" },
+	"features": { "BasicNon": 1, "neupos": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": { "categoryIndex": 0, "latent": "M" },
+	"features": { "NonNon": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": {"categoryIndex": 0, "latent": "A" },
+	"state1": {"categoryIndex": 0, "latent": "F" },
+	"features": { "NonNon": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": {"categoryIndex": 0, "latent": "A" },
+	"state1": { "categoryIndex": 0,"latent": "P" },
+	"features": {"NonNon": 1, "neuneu":  1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": { "categoryIndex": 0, "latent": "S" },
+	"features": {"NonPolar": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": {"categoryIndex": 0, "latent": "T" },
+	"features": { "NonPolar": 1, "neuneu": 1} 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": { "categoryIndex": 0, "latent": "W" },
+	"features": { "NonNon": 1, "neuneu": 1 } 
+	},
+	{
+	"state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": { "categoryIndex": 0, "latent": "Y" },
+	"features": { "NonPolar": 1, "neuneu": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "A" },
+	"state1": {"categoryIndex": 0, "latent": "V" },
+	"features": {"NonNon": 1, "neuneu": 1} 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "R" },
+	"state1": {"categoryIndex": 0, "latent": "N" },
+	"features": { "BasicPolar": 1, "neupos": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "R" },
+	"state1": {"categoryIndex": 0, "latent": "D" },
+	"features": { "AcidicBasic": 1, "negpos":  1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "R" },
+	"state1": { "categoryIndex": 0, "latent": "C" },
+	"features": {"BasicNon": 1, "neupos": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "R" },
+	"state1": { "categoryIndex": 0, "latent": "Q" },
+	"features": { "AcidicBasic": 1, "negpos": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "R" },
+	"state1": { "categoryIndex": 0, "latent": "E" },
+	"features": { "BasicPolar": 1, "neupos":      1 } 
+	},
+	{
+	 "state0": {"categoryIndex": 0, "latent": "R" },
+	"state1": {"categoryIndex": 0, "latent": "G" },
+	"features": {"BasicNon": 1, "neupos":      1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "R" },
+	"state1": { "categoryIndex": 0, "latent": "H" },
+	"features": { "BasicBasic": 1, "neupos": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex":  0, "latent": "R" },
+	"state1": { "categoryIndex": 0, "latent": "L" },
+	"features": { "BasicNon": 1, "neupos": 1 } 
+	},
+	{
+	 "state0": {"categoryIndex": 0, "latent": "R" },
+	"state1": {"categoryIndex": 0, "latent": "I" },
+	"features": { "BasicNon": 1, "neupos": 1 } 
+	},
+	{
+	 "state0": { "categoryIndex": 0, "latent": "R" },
+	"state1": { "categoryIndex": 0, "latent": "K" },
+	"features": { "BasicBasic": 1, "pospos": 1 } 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "R" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "R" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "R" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "R" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "R" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "R" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "R" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "R" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"features": {
+	 "AcidicPolar":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"features": {
+	 "AcidicPolar":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"features": {
+	 "PolarPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "PolarPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "PolarPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "PolarPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "N" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"features": {
+	 "AcidicAcidic":      1,
+	"negneg":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"features": {
+	 "AcidicPolar":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"features": {
+	 "AcidicBasic":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"features": {
+	 "AcidicBasic":      1,
+	"negpos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "AcidicPolar":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "AcidicPolar":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "AcidicPolar":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "D" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "C" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"features": {
+	 "AcidicPolar":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"features": {
+	 "AcidicBasic":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"features": {
+	 "AcidicBasic":      1,
+	"negpos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "AcidicPolar":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "AcidicPolar":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "AcidicPolar":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Q" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "AcidicNon":      1,
+	"negneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "PolarPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "PolarPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "PolarPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "E" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "G" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"features": {
+	 "BasicBasic":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "H" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "L" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "I" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "BasicPolar":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "K" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "BasicNon":      1,
+	"neupos":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "M" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "F" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "P" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"features": {
+	 "PolarPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "PolarPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "S" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "PolarPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "T" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "W" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonNon":      1,
+	"neuneu":      1 
+	} 
+	},
+	{
+	 "state0": {
+	 "categoryIndex":      0,
+	"latent": "Y" 
+	},
+	"state1": {
+	 "categoryIndex":      0,
+	"latent": "V" 
+	},
+	"features": {
+	 "NonPolar":      1,
+	"neuneu":      1 
+	} 
+	} 
+	]
+
+}
