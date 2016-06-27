@@ -49,6 +49,19 @@ task fetchDataFiles(type: Download) {
   dest destDir
 }
 
+task fetchExpFamConfig(type: Download) {
+  src([
+          'https://raw.githubusercontent.com/zhaottcrystal/conifer/master/src/main/resources/conifer/ctmc/expfam/accordance-expfam.txt'
+  ])
+
+  def destDir = new File('src/main/resources/conifer/ctmc/expfam/')
+  if (!destDir.isDirectory()) {
+    destDir.mkdirs()
+  }
+
+  dest destDir
+}
+
 repositories {
   mavenCentral()
   jcenter()
