@@ -3,7 +3,6 @@ package conifer;
 import java.io.File;
 import java.io.PrintWriter;
 
-import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
 import bayonet.distributions.Normal.MeanVarianceParameterization;
 import blang.MCMCRunner;
@@ -19,7 +18,7 @@ import conifer.models.MultiCategorySubstitutionModel;
 
 
 
-public class SimpleProteinModel extends MCMCRunner
+public class ProteinModelUsingMultipleTreesEg extends MCMCRunner
 {
   File inputFile1 
     = new File("/Users/crystal/Dropbox/protein/javaProteinTry/alignment1.fasta");
@@ -66,7 +65,7 @@ public class SimpleProteinModel extends MCMCRunner
   
   public static void main(String [] args)
   {
-    SimpleProteinModel runner = new SimpleProteinModel();
+    ProteinModelUsingMultipleTreesEg runner = new ProteinModelUsingMultipleTreesEg();
     runner.factory.mcmcOptions.nMCMCSweeps = 3000;
     runner.run();
     
