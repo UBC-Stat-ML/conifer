@@ -60,13 +60,7 @@ public class PhylogeneticObservationFactory
       _proteinFactory = fromResource("/conifer/io/protein-iupac-encoding.txt");
     return _proteinFactory;
    }
-  
-  public static PhylogeneticObservationFactory proteinPairFactory()
-  {
-    if(_proteinPairFactory == null)
-      _proteinPairFactory = fromResource("/conifer/io/proteinPair-iupac-encoding.txt");
-    return _proteinPairFactory;
-   }
+
   
   public static PhylogeneticObservationFactory selectedFactory(final RateMtxNames selectedRateMtx)
   {

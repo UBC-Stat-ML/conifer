@@ -252,11 +252,6 @@ public class SerializedExpFamMixture
         return fromResource("/conifer/ctmc/expfam/accordance-expfam.txt");
     }
 
-    public static SerializedExpFamMixture pair()
-    {
-        return fromResource("/conifer/ctmc/expfam/pair-expfam.txt");
-    }
-
     public static SerializedExpFamMixture polarity()
     {
         return fromResource("/conifer/ctmc/expfam/polarity-expfam.txt");
