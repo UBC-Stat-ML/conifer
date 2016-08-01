@@ -34,10 +34,10 @@ import conifer.ctmc.RateMatrixUtils;
 public class CTMCExpFam<S>
 {
     public final Indexer<S> stateIndexer;
-    final int [][] supports; // S index -> list of S indices
-    private final SparseVector [][] bivariateFeatures; // S index -> index in support
-    private final SparseVector [] univariateFeatures;
-    final int nStates;
+    public final int [][] supports; // S index -> list of S indices
+    public final SparseVector [][] bivariateFeatures; // S index -> index in support
+    public final SparseVector [] univariateFeatures;
+    public final int nStates;
     private int nFeatures;
     public final Indexer<Object> featuresIndexer = new Indexer<Object>();
     public final  boolean  isNormalized;
@@ -155,14 +155,14 @@ public class CTMCExpFam<S>
         //@FactorArgument
         //public double kappa=1;
 
-        private final double [] holdTimes;
+        public final double [] holdTimes;
 
-        private final double [] nInit;
-        private final double nInitStar;
+        public final double [] nInit;
+        public final double nInitStar;
 
-        private final double [][] nTrans; // S index -> index in support
-        private final double [] nTransStar;
-        private final double nTransStarStar;
+        public final double [][] nTrans; // S index -> index in support
+        public final double [] nTransStar;
+        public final double nTransStarStar;
 
         private final double [] fixedDerivative;
 

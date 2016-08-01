@@ -19,19 +19,23 @@ import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.variables.RealVectorInterface;
 import briefj.Indexer;
 import briefj.collections.Counter;
+import conifer.rejfreemodels.phylo.PhyloLocalRFMove;
+import conifer.rejfreeprocessors.MomentRayProcessor;
+import conifer.rejfreeprocessors.SaveSamplesProcessor;
 
 
 @Samplers({
         RealVectorMHProposal.class,
         PhyloHMCMove.class,
         RealVectorOverRelaxedSlice.class,
-        RealVectorAdaptiveMHProposal.class
+        RealVectorAdaptiveMHProposal.class,
+        PhyloLocalRFMove.class
 })
 @Processors({IIDRealVectorGenerativeFactor.VectorNormProcessor.class, ExpFamParamProcessor.class})
 public class ExpFamParameters implements RealVectorInterface
 {
     public final CTMCExpFam<CTMCState> globalExponentialFamily;
-    private Counter<Object> weights;
+    public Counter<Object> weights;
     private final CTMCStateSpace stateSpace;
 
     private CTMCExpFam<CTMCState>.LearnedReversibleModel _cachedModel = null;
