@@ -36,11 +36,14 @@ public class SimplePhyloModel extends MCMCRunner
 	@Option(gloss="provide rate matrix model")
 	public RateMtxNames selectedRateMtx;
 
+	@Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+	public boolean isNormalized = true;
+
 	@DefineFactor(onObservations = true)
 	public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
 	UnrootedTreeLikelihood
 	.fromFastaFile(inputFile, selectedRateMtx)
-	.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx))
+	.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized))
 	.withTree(new File("src/main/resources/conifer/sampleInput/FES.ape.4.nwk"));
 
 	@DefineFactor

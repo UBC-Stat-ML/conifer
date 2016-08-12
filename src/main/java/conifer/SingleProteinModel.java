@@ -66,7 +66,7 @@ public class SingleProteinModel implements Runnable, Processor
     public int rep = 2;
 
     @Option(gloss="Rate Matrix Method")
-    public RateMtxNames selectedRateMtx = RateMtxNames.PAIR;
+    public RateMtxNames selectedRateMtx = RateMtxNames.POLARITYSIZEGTR;
 
     @OptionSet(name = "factory")
     public final MCMCFactory factory = new MCMCFactory();
@@ -101,13 +101,16 @@ public class SingleProteinModel implements Runnable, Processor
     @Option(gloss="Indicator of using adaptive MCMC or not")
     public boolean isAdaptiveMCMC = false;
 
+    @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+    public boolean isNormalized = true;
+
     public class Model
     {
         @DefineFactor(onObservations = true)
         public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood1 =
                 UnrootedTreeLikelihood
                         .fromFastaFile(inputFile, selectedRateMtx)
-                        .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx))
+                        .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized))
                         .withTree(treeFile);
 
         @DefineFactor

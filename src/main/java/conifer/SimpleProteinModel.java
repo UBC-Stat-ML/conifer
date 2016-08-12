@@ -42,7 +42,8 @@ public class SimpleProteinModel implements Runnable, Processor
   @Option(gloss="File of the tree topology")
   public static File treeFile2 = new File("/Users/crystal/Dropbox/protein/javaProteinTry/tree2.nwk");
 
-
+  @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+  public boolean isNormalized = true;
 
   @Option()
   public static RateMtxNames selectedRateMtx=RateMtxNames.POLARITYSIZE;
@@ -57,7 +58,7 @@ public class SimpleProteinModel implements Runnable, Processor
     public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood1 = 
     UnrootedTreeLikelihood
     .fromFastaFile(inputFile1, selectedRateMtx)
-    .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx))
+    .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized))
     .withTree(treeFile1);
 
     @DefineFactor(onObservations = true)

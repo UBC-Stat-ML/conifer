@@ -629,8 +629,10 @@ public class CTMCExpFam<S>
 
         private double normalization(double [] x)
         {
-            if (!isNormalized)
-                throw new RuntimeException();
+            //if (!isNormalized)
+            //    throw new RuntimeException();
+            if(!isNormalized)
+                System.out.println("Un-normalized rate matrix is used");
             LearnedReversibleModel w = new LearnedReversibleModel(x, false);
             double betainv = 0;
             for (int startState=0; startState < nStates; startState++)

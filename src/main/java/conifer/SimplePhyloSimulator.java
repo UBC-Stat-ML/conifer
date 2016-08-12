@@ -78,7 +78,9 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 	
 	@Option(gloss="select rate matrix model")
 	public static RateMtxNames selectedRateMtx=RateMtxNames.DNAGTR;
-	
+
+	@Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+	public boolean isNormalized = true;
 	
 	public List<TreeNode> makeLeaves(int nTaxa, String prefix) 
 	{	
@@ -94,7 +96,7 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 		@DefineFactor(onObservations = true)
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
 		UnrootedTreeLikelihood.createEmpty(nSites, makeLeaves(nTaxa, "t"), selectedRateMtx)		
-		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx));
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized));
 
 		@DefineFactor
 		NonClockTreePrior<RateParameterization> treePrior = 
@@ -123,7 +125,7 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 		@DefineFactor(onObservations = true)
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
 		UnrootedTreeLikelihood.createEmpty(nSites, makeLeaves(nSites, "t"), selectedRateMtx)		
-		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx));
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized));
 
 		@DefineFactor
 		NonClockTreePrior<RateParameterization> treePrior = 

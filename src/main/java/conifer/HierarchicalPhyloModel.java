@@ -29,6 +29,9 @@ public class HierarchicalPhyloModel extends MCMCRunner {
 	File inputFileFES
 	= new File(
 			"src/main/resources/conifer/sampleInput/FES_4.fasta");
+
+	@Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+	public boolean isNormalized = true;
 	
 	@Option()
   public static RateMtxNames selectedRateMtx=RateMtxNames.KIMURA1980;
@@ -36,7 +39,7 @@ public class HierarchicalPhyloModel extends MCMCRunner {
 	@DefineFactor(onObservations = true)
 	public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihoodUTY = UnrootedTreeLikelihood
 	.fromFastaFile(inputFileUTY, selectedRateMtx)
-	.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx))
+	.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized))
 	.withTree(new File("src/main/resources/conifer/sampleInput/UTY.ape.4.nwk"));
 
 	@DefineFactor(onObservations = true)

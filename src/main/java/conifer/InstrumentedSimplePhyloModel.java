@@ -64,7 +64,10 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 	public RateMtxNames selectedRateMtx;
 
 	@OptionSet(name = "NodeMoves")
-	public final NodeMoves nd = new NodeMoves(); 
+	public final NodeMoves nd = new NodeMoves();
+
+	@Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+	public boolean isNormalized = true;
 	
     public static class NodeMoves
     {
@@ -84,7 +87,7 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
 		UnrootedTreeLikelihood
 		.fromFastaFile(new File(alignmentFilePath), selectedRateMtx.KIMURA1980)
-		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx))
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx,isNormalized))
 		.withTree(new File(initialTreeFilePath));
 
 		@DefineFactor

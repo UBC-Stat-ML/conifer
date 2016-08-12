@@ -94,6 +94,9 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
     @Option(gloss="random seeds in mcmc")
     public int seed;
 
+    @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+    public boolean isNormalized = true;
+
 
     public FileInputStream in=null;
 
@@ -159,7 +162,7 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         @DefineFactor(onObservations = true)
         public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood =
                 UnrootedTreeLikelihood.createEmptyWithFixedTree(nSites, treeFile, selectedRateMtx)
-                        .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx));
+                        .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized));
 
         public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> getLikelihood() {
             return this.likelihood;
@@ -174,6 +177,10 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
             likelihood.evolutionaryModel.rateMatrixMixture.parameters.setVector(featureWeights);
         }
 
+        public double [][] getRateMatrix(int categoryIndex){
+
+            return likelihood.evolutionaryModel.rateMatrixMixture.getRateMatrix(categoryIndex).getRateMatrix();
+        }
 
     }
 
@@ -221,6 +228,8 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
         if(fixedRateMtx){
             model = new FixedTopologyAndBranchLengthWeightModel();
             model.setVectorWeights(featureWeights);
+            logToFile("Provided Rate Matrix given weights:\n"+ Arrays.deepToString(model.getRateMatrix(0)));
+
         }else{
             model = new FixedTopologyAndBranchLengthRandomhWeightModel();
         }
@@ -247,10 +256,8 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
             e.printStackTrace();
         }
 
-        // copy the results to another folder
-        String br = getBranchLength(treeFile, "tips");
 
-        File newDirectory = new File(Results.getResultFolder().getParent() + selectedRateMtx+"br"+br+"numberSites"+nSites);
+        File newDirectory = new File(Results.getResultFolder().getParent() + selectedRateMtx+"numberSites"+nSites);
 
 //        File newDirectory = new File(
 //                Results.getResultFolder().getParent() + "/experiment." +
@@ -296,13 +303,7 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
     }
 
 
-    public String getBranchLength(File treeFile, String splitString){
-        String fileName = treeFile.getName();
-        FileNameString fileNameString = new FileNameString(fileName);
-        String br = fileNameString.subStringBeforeString(fileName, splitString);
 
-        return br;
-    }
 
     public void makeSyntheticData(File treeFile) throws IOException {
         //List realizations = new ArrayList();
@@ -330,8 +331,7 @@ public class SimplePhyloSimulatorFixedTreeRateMtx implements Runnable, Processor
             //realizations.add(runner.model.getLikelihood().observations.toString());
             runner.writeTree(runner.model.getLikelihood().tree);
             // write the FASTA file corresponding to the simulation
-            String br = getBranchLength(treeFile, "tips");
-            String fastaName = selectedRateMtx+"numSites"+nSites+"br"+ br+".txt";
+            String fastaName = selectedRateMtx+"numSites"+nSites+".txt";
             FastaUtils.writeFasta(runner.model.getLikelihood().observations, Results.getFileInResultFolder(fastaName), selectedRateMtx);
         }
         runner.detailWriter.write(Arrays.deepToString(runner.model.getLikelihood().evolutionaryModel.rateMatrixMixture.getRateMatrix(0).getRateMatrix()));

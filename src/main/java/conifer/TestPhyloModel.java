@@ -69,6 +69,9 @@ public class TestPhyloModel implements Runnable, Processor
 	@Option(gloss="provide rate matrix model")
 	public static RateMtxNames selectedRateMtx=RateMtxNames.DNAGTR;
 
+	@Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+	public boolean isNormalized = true;
+
 	public class Model
 	{
 		List<TreeNode> leaves = Arrays.asList(
@@ -81,7 +84,7 @@ public class TestPhyloModel implements Runnable, Processor
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
 		UnrootedTreeLikelihood//.createEmpty(nSites, leaves)
 		.fromFastaFile(new File(alignmentFilePath), selectedRateMtx)
-		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx))
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx,true))
 		.withTree(new File(initialTreeFilePath));
 
 		@DefineFactor

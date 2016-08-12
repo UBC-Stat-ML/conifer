@@ -44,9 +44,9 @@ public class ExpFamMixture implements RateMatrixMixture
     return result;
   }
   
-  public static ExpFamMixture fromSerialized(SerializedExpFamMixture serialized, Indexer<String> observationIndexer)
+  public static ExpFamMixture fromSerialized(SerializedExpFamMixture serialized, Indexer<String> observationIndexer, boolean isNormalized)
   {
-    CTMCExpFam<CTMCState> globalExponentialFamily = new CTMCExpFam<CTMCState>(serialized.getSupport(), serialized.getCTMCStateIndexer(), true);
+    CTMCExpFam<CTMCState> globalExponentialFamily = new CTMCExpFam<CTMCState>(serialized.getSupport(), serialized.getCTMCStateIndexer(), isNormalized);
     globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singletonList(serialized.getBivariateFeatureExtractor()));
     globalExponentialFamily.extractUnivariateFeatures(Collections.singletonList(serialized.getUnivariateFeatureExtractor()));
     nFeatures = globalExponentialFamily.nFeatures();
@@ -61,9 +61,9 @@ public class ExpFamMixture implements RateMatrixMixture
     return mixture;
   }
   
-  public static ExpFamMixture rateMtxModel(RateMtxNames selectedRateMtx)
+  public static ExpFamMixture rateMtxModel(RateMtxNames selectedRateMtx, boolean isNormalized)
   {
-   return fromSerialized(SerializedExpFamMixture.rateMtxModel(selectedRateMtx), Indexers.modelIndexer(selectedRateMtx));
+   return fromSerialized(SerializedExpFamMixture.rateMtxModel(selectedRateMtx), Indexers.modelIndexer(selectedRateMtx), isNormalized);
      }
   
 

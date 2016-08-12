@@ -45,6 +45,9 @@ public class UniformizationSample implements Runnable
     @Option(gloss="Use cache or not")
     public boolean cached;
 
+    @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+    public boolean isNormalized = true;
+
     private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
 
 
@@ -60,7 +63,7 @@ public class UniformizationSample implements Runnable
                     UnrootedTreeLikelihood
                             .fromFastaFile(inputFile, selectedRateMtx)
                             .withSingleRateMatrix(array)
-                            .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx))
+                            .withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized))
                             .withTree(treeFile);
             Random rand = new Random(1);
 
