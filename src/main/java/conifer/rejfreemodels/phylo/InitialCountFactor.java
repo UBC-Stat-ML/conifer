@@ -3,6 +3,7 @@ package conifer.rejfreemodels.phylo;
 import bayonet.math.SparseVector;
 import blang.annotations.FactorArgument;
 import blang.annotations.FactorComponent;
+import blang.factors.FactorList;
 import blang.variables.RealVariable;
 import conifer.ctmc.expfam.CTMCExpFam;
 import conifer.ctmc.expfam.CTMCState;
@@ -25,9 +26,11 @@ public class InitialCountFactor implements CollisionFactor {
     @FactorComponent
     public final ExpFamParameters parameters;
 
-    @FactorArgument(makeStochastic = true)
+    //@FactorArgument(makeStochastic = true)
     public final List<RealVariable> weights;
 
+    @FactorComponent
+    public final FactorList<RealVariable> variables;
 
     public CTMCExpFam<CTMCState> ctmcExpFam;
 
@@ -37,13 +40,14 @@ public class InitialCountFactor implements CollisionFactor {
 
 
     public InitialCountFactor(ExpFamParameters parameters, CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective Objective,
-                                 CTMCExpFam<CTMCState> ctmcExpFam, int state0, List<RealVariable> weights){
+                                 CTMCExpFam<CTMCState> ctmcExpFam, int state0, List<RealVariable> weights, FactorList<RealVariable> variables){
         this.parameters = parameters;
         this.ctmcExpFam = ctmcExpFam;
         this.auxObjective = Objective;
         this.ctmcExpFam = ctmcExpFam;
         this.state0 = state0;
         this.weights = weights;
+        this.variables = variables;
     }
 
 //    public List<RealVariable> getWeights(){
@@ -110,7 +114,7 @@ public class InitialCountFactor implements CollisionFactor {
 
     @Override
     public RealVariable getVariable(int gradientCoordinate) {
-        return  RealVariable.real(parameters.getVector()[gradientCoordinate]);
+        return  variables.list.get(gradientCoordinate);
     }
 
     @Override

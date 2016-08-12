@@ -3,6 +3,7 @@ package conifer.rejfreemodels.phylo;
 import bayonet.math.SparseVector;
 import blang.annotations.FactorArgument;
 import blang.annotations.FactorComponent;
+import blang.factors.FactorList;
 import blang.variables.RealVariable;
 import conifer.ctmc.expfam.CTMCExpFam;
 import conifer.ctmc.expfam.CTMCState;
@@ -25,18 +26,23 @@ public class SojournTimeFactor implements CollisionFactor{
     @FactorComponent
     public final ExpFamParameters parameters;
 
-    @FactorArgument(makeStochastic = true)
+    //@FactorArgument(makeStochastic = true)
     public final List<RealVariable> weights;
 
     public CTMCExpFam<CTMCState> ctmcExpFam;
 
     public CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective auxObjective;
 
+    @FactorComponent
+    public final FactorList<RealVariable> variables;
+
     public int state0;
     public int state1;
+    public int state1IdxOfBivariateFeatures;
 
     public SojournTimeFactor(ExpFamParameters parameters, CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective Objective,
-                             CTMCExpFam<CTMCState> ctmcExpFam, int state0, int state1, List<RealVariable> weights){
+                             CTMCExpFam<CTMCState> ctmcExpFam, int state0, int state1, List<RealVariable> weights,
+                             FactorList<RealVariable> variables, int state1IdxOfBivariateFeatures){
         this.parameters = parameters;
         this.ctmcExpFam = ctmcExpFam;
         this.auxObjective = Objective;
@@ -44,6 +50,9 @@ public class SojournTimeFactor implements CollisionFactor{
         this.state0 = state0;
         this.state1 = state1;
         this.weights= weights;
+        this.variables = variables;
+        this.state1IdxOfBivariateFeatures=state1IdxOfBivariateFeatures;
+
     }
 
     public List<RealVariable> getWeights(){
@@ -93,7 +102,7 @@ public class SojournTimeFactor implements CollisionFactor{
         SparseVector[][] bivariateFeatures = ctmcExpFam.bivariateFeatures;
 
         if(checkState1InSupportOfState0()){
-            result = bivariateFeatures[state0][state1].dotProduct(v.toArray());
+            result = bivariateFeatures[state0][state1IdxOfBivariateFeatures].dotProduct(v.toArray());
         }else{
             result =0;
         }
@@ -141,14 +150,14 @@ public class SojournTimeFactor implements CollisionFactor{
         }
         //check state1 is in support of state0
         if(checkState1InSupportOfState0()){
-            bivariateFeatures[state0][state1].linearIncrement(logDensity(), result);
+            bivariateFeatures[state0][state1IdxOfBivariateFeatures].linearIncrement(logDensity(), result);
         }
         return new DoubleMatrix(result);
     }
 
     @Override
     public RealVariable getVariable(int gradientCoordinate) {
-        return RealVariable.real(parameters.getVector()[gradientCoordinate]);
+        return  variables.list.get(gradientCoordinate);
     }
 
     @Override

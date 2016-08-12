@@ -45,8 +45,6 @@ public class PhyloLocalRFMove extends NodeMove {
 
     public LocalRFRunnerOptions localRFRunnerOption = new LocalRFRunnerOptions();
 
-    private long stanRuntimeMillis = -1;
-
     public  LocalRFSampler sampler;
 
     public ExpectedCompleteReversibleModel modelSpec;
@@ -64,7 +62,6 @@ public class PhyloLocalRFMove extends NodeMove {
         CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective objective = parameters.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0 / variance, convertedStat);
         modelSpec = new ExpectedCompleteReversibleModel(parameters, objective, parameters.globalExponentialFamily);
 
-        localRFRunnerOption.maxRunningTimeMilli = stanRuntimeMillis;
         localRFRunnerOption.maxSteps = Integer.MAX_VALUE;
         localRFRunnerOption.maxTrajectoryLength = Double.POSITIVE_INFINITY;
         LocalRFRunner rfRunner = new LocalRFRunner(localRFRunnerOption);

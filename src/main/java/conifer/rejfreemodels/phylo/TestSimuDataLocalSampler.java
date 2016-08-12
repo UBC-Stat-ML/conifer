@@ -29,7 +29,6 @@ import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.moves.PhyloHMCMove;
 import conifer.moves.RealVectorMHProposal;
-import org.apache.commons.math3.analysis.function.Exp;
 
 
 /**
@@ -70,6 +69,9 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     @Option(gloss = "If the local Rejection Free Sampler should be used")
     public boolean useLocalRF = true;
 
+    @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+    public boolean isNormalized = false;
+
 
     @OptionSet(name = "rfoptions")
     public RFSamplerOptions rfOptions = new RFSamplerOptions();
@@ -80,7 +82,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     public class Model {
         @DefineFactor(onObservations = true)
         public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood =
-                UnrootedTreeLikelihood.fromFastaFile(sequencesFile, RateMtxNames.DNAGTR).withExpFamMixture(ExpFamMixture.rateMtxModel(RateMtxNames.DNAGTR)).withTree(treeFile);
+                UnrootedTreeLikelihood.fromFastaFile(sequencesFile, RateMtxNames.DNAGTR).withExpFamMixture(ExpFamMixture.rateMtxModel(RateMtxNames.DNAGTR, isNormalized)).withTree(treeFile);
 
         @DefineFactor
         public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> priorOnParams =

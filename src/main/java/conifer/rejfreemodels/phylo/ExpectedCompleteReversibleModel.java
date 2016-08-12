@@ -27,8 +27,10 @@ public class ExpectedCompleteReversibleModel {
     @FactorComponent
     public final ExpFamParameters parameters;
 
-    @FactorArgument(makeStochastic = true)
     public final List<RealVariable> weights;
+
+    @FactorComponent
+    public final FactorList<RealVariable> variables;
 
     public CTMCExpFam<CTMCState> ctmcExpFam;
 
@@ -40,6 +42,7 @@ public class ExpectedCompleteReversibleModel {
         this.ctmcExpFam = ctmcExpFam;
         this.auxObjective = objective;
         this.weights = getWeights();
+        this.variables = FactorList.ofArguments(weights, true);
         this.localFactors = localFactors();
     }
 
@@ -70,7 +73,7 @@ public class ExpectedCompleteReversibleModel {
 
         //add initial count factors first
         for(int state=0; state< parameters.globalExponentialFamily.nStates; state++){
-            CollisionFactor f = new InitialCountFactor(parameters,auxObjective,ctmcExpFam, state, weights);
+            CollisionFactor f = new InitialCountFactor(parameters,auxObjective,ctmcExpFam, state, weights, variables);
             result.add(f);
         }
 
@@ -78,7 +81,7 @@ public class ExpectedCompleteReversibleModel {
         for(int state =0; state< parameters.globalExponentialFamily.nStates;state++){
             final int [] curSupports = ctmcExpFam.supports[state];
             for(int endIdx =0; endIdx < curSupports.length; endIdx++){
-                CollisionFactor f = new SojournTimeFactor(parameters, auxObjective, ctmcExpFam, state, curSupports[endIdx],weights);
+                CollisionFactor f = new SojournTimeFactor(parameters, auxObjective, ctmcExpFam, state, curSupports[endIdx],weights, variables, endIdx);
                 result.add(f);
             }
         }
@@ -86,7 +89,7 @@ public class ExpectedCompleteReversibleModel {
         for(int state=0; state < parameters.globalExponentialFamily.nStates;state++){
             final int [] curSupports = ctmcExpFam.supports[state];
             for(int endIdx =0; endIdx < curSupports.length; endIdx++){
-                CollisionFactor f = new TransitionCountFactor(parameters, auxObjective, ctmcExpFam, state, curSupports[endIdx],weights);
+                CollisionFactor f = new TransitionCountFactor(parameters, auxObjective, ctmcExpFam, state, curSupports[endIdx],weights, variables, endIdx);
                 result.add(f);
             }
 

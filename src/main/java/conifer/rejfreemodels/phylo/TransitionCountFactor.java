@@ -3,6 +3,7 @@ package conifer.rejfreemodels.phylo;
 import bayonet.math.SparseVector;
 import blang.annotations.FactorArgument;
 import blang.annotations.FactorComponent;
+import blang.factors.FactorList;
 import blang.variables.RealVariable;
 import conifer.ctmc.expfam.CTMCExpFam;
 import conifer.ctmc.expfam.CTMCState;
@@ -24,8 +25,11 @@ public class TransitionCountFactor implements CollisionFactor {
     @FactorComponent
     public final ExpFamParameters parameters;
 
-   @FactorArgument(makeStochastic = true)
-   public final List<RealVariable> weights;
+    //@FactorArgument(makeStochastic = true)
+    public final List<RealVariable> weights;
+
+    @FactorComponent
+    public final FactorList<RealVariable> variables;
 
 
     public CTMCExpFam<CTMCState> ctmcExpFam;
@@ -34,10 +38,12 @@ public class TransitionCountFactor implements CollisionFactor {
 
     public int state0;
     public int state1;
+    public int state1IdxOfBivariateFeatures;
 
 
     public TransitionCountFactor(ExpFamParameters parameters, CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective Objective,
-                             CTMCExpFam<CTMCState> ctmcExpFam, int state0, int state1,List<RealVariable> weights){
+                             CTMCExpFam<CTMCState> ctmcExpFam, int state0, int state1,List<RealVariable> weights,
+                                 FactorList<RealVariable>variables, int state1IdxOfBivariateFeatures){
         this.parameters = parameters;
         this.ctmcExpFam = ctmcExpFam;
         this.auxObjective = Objective;
@@ -45,6 +51,8 @@ public class TransitionCountFactor implements CollisionFactor {
         this.state0 = state0;
         this.state1 = state1;
         this.weights = getWeights();
+        this.variables = variables;
+        this.state1IdxOfBivariateFeatures= state1IdxOfBivariateFeatures;
 
     }
 
@@ -81,8 +89,8 @@ public class TransitionCountFactor implements CollisionFactor {
         final double c = StaticUtils.generateUnitRateExponential(context.random);
 
         if(checkState1InSupportOfState0()){
-            denominator = Math.abs(univariateFeatures[state1].dotProduct(v.toArray()) +
-                    bivariateFeatures[state0][state1].dotProduct(v.toArray())+ maxOmega)*getTransitionCount();
+            denominator = Math.abs(-univariateFeatures[state1].dotProduct(v.toArray()) +
+                    -bivariateFeatures[state0][state1IdxOfBivariateFeatures].dotProduct(v.toArray())+ maxOmega)*getTransitionCount();
 
         }else{
             denominator = Math.abs(univariateFeatures[state1].dotProduct(v.toArray())+maxOmega)*getTransitionCount();
@@ -109,14 +117,14 @@ public class TransitionCountFactor implements CollisionFactor {
         }
         //check state1 is in support of state0
         if(checkState1InSupportOfState0()){
-            bivariateFeatures[state0][state1].linearIncrement(getTransitionCount(), result);
+            bivariateFeatures[state0][state1IdxOfBivariateFeatures].linearIncrement(getTransitionCount(), result);
         }
         return new DoubleMatrix(result);
     }
 
     @Override
     public RealVariable getVariable(int gradientCoordinate) {
-        return  RealVariable.real(parameters.getVector()[gradientCoordinate]);
+        return   variables.list.get(gradientCoordinate);
     }
 
     @Override
@@ -158,7 +166,7 @@ public class TransitionCountFactor implements CollisionFactor {
 
     private double getTransitionCount(){
 
-        return auxObjective.nTrans[state0][state1];
+        return auxObjective.nTrans[state0][state1IdxOfBivariateFeatures];
     }
 
     public boolean checkState1InSupportOfState0(){

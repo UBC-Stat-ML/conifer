@@ -70,10 +70,13 @@ public class TestRealData implements Runnable, Processor {
     @OptionSet(name = "factory")
     public final MCMCFactory factory = new MCMCFactory();
 
+    @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+    public boolean isNormalized = true;
+
     public class Model {
         @DefineFactor(onObservations = true)
         public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood =
-                UnrootedTreeLikelihood.fromFastaFile(sequencesFile, RateMtxNames.DNAGTR).withExpFamMixture(ExpFamMixture.rateMtxModel(RateMtxNames.DNAGTR)).withTree(treeFile);
+                UnrootedTreeLikelihood.fromFastaFile(sequencesFile, RateMtxNames.DNAGTR).withExpFamMixture(ExpFamMixture.rateMtxModel(RateMtxNames.DNAGTR, isNormalized)).withTree(treeFile);
 
         @DefineFactor
         public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> priorOnParams =
