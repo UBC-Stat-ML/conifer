@@ -72,6 +72,9 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
     public boolean isNormalized = false;
 
+//    @Option(gloss="Number of MCMC iterations")
+//    public int nMCMCIterations = 10;
+
 
     @OptionSet(name = "rfoptions")
     public RFSamplerOptions rfOptions = new RFSamplerOptions();
@@ -126,6 +129,9 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
         int nMovesRequested = (useGlobalRF ? 1 : 0) + (useHMC ? 1 : 0) + (useMH ? 1 : 0) + (useLocalRF ? 1 : 0) ;
 
         MCMCAlgorithm mcmc = factory.build(model, false);
+        //mcmc.options.nMCMCSweeps = nMCMCIterations;
+        //mcmc.options.burnIn=0;
+        //mcmc.options.thinningPeriod=1;
         if (mcmc.sampler.moves.size() != nMovesRequested)
             throw new RuntimeException("" + mcmc.sampler.moves.size() + "!=" + nMovesRequested);
 

@@ -14,6 +14,7 @@ import conifer.rejfreeutil.StaticUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jblas.DoubleMatrix;
+import org.jblas.util.Random;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,13 +87,62 @@ public class InitialCountFactor implements CollisionFactor {
         //check if denominator is very close to zero; if so, result is positive infinity
         if (denominator < 2 * Double.MIN_VALUE){
             result = Double.POSITIVE_INFINITY;
+            return Pair.of(result, false);
         }else{
             result = c/(denominator*getInitialCount());
+
+            double ratio = getTrueIntensity(context, result)/getIntensityUpperBound(context,result);
+            Random rand = new Random();
+            double V = rand.nextDouble();
+            if(V > ratio){
+                return Pair.of(result, false);
+            }else{
+                return Pair.of(result, true);
+            }
         }
 
-        return Pair.of(result, false);
+
     }
 
+
+    public double getTrueIntensity(CollisionContext context, double tau){
+        SparseVector [] univariateFeatures = ctmcExpFam.univariateFeatures;
+        double []  v = context.velocity.toArray();
+
+        double part1 = univariateFeatures[state0].dotProduct(v);
+        double numerator = 0;
+        double denominator=0;
+
+        double [] weightForPi;
+        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(parameters.weights);
+        weightForPi = ctmcModel.weights;
+
+        for(int i=0; i < ctmcExpFam.nStates; i++){
+            numerator = numerator + Math.exp(univariateFeatures[i].dotProduct(v)*tau + univariateFeatures[i].dotProduct(weightForPi))*univariateFeatures[i].dotProduct(v);
+        }
+
+        for(int i=0; i < ctmcExpFam.nStates; i++){
+            denominator = denominator + Math.exp(univariateFeatures[i].dotProduct(v)*tau + univariateFeatures[i].dotProduct(weightForPi));
+        }
+
+        double result;
+        result = -getInitialCount()*(part1-numerator/denominator);
+        result = Math.max(0, result);
+        return result;
+    }
+
+
+
+    public double getIntensityUpperBound(CollisionContext context, double tau){
+
+        SparseVector [] univariateFeatures = ctmcExpFam.univariateFeatures;
+        final DoubleMatrix v = context.velocity;
+        double maxOmega = getOmegaMax(context);
+        double result;
+        result = getInitialCount()*(maxOmega-univariateFeatures[state0].dotProduct(v.toArray()));
+        result = Math.max(0, result);
+        return result;
+    }
     /**
      * @return The gradient of the log-likelihood (NOT the energy, to be
      * in agreement with the inherited Factor)

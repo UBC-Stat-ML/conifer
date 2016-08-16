@@ -63,11 +63,21 @@ public class PhyloLocalRFMove extends NodeMove {
         modelSpec = new ExpectedCompleteReversibleModel(parameters, objective, parameters.globalExponentialFamily);
 
         localRFRunnerOption.maxSteps = Integer.MAX_VALUE;
-        localRFRunnerOption.maxTrajectoryLength = Double.POSITIVE_INFINITY;
+        localRFRunnerOption.maxTrajectoryLength = 0.1;
         LocalRFRunner rfRunner = new LocalRFRunner(localRFRunnerOption);
+
 
         rfRunner.init(modelSpec);
         rfRunner.addMomentRayProcessor();
         rfRunner.run();
+
+        int nVariables = rfRunner.model.getLatentVariables().size();
+        double [] newPoints = new double[nVariables];
+        for(int i=0; i < nVariables; i++){
+            newPoints[i] = modelSpec.variables.list.get(i).getValue();
+        }
+
+        parameters.setVector(newPoints);
+
     }
 }

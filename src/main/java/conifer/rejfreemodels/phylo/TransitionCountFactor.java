@@ -14,6 +14,8 @@ import conifer.rejfreeutil.StaticUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jblas.DoubleMatrix;
+import org.jblas.util.Random;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,8 +98,69 @@ public class TransitionCountFactor implements CollisionFactor {
             denominator = Math.abs(univariateFeatures[state1].dotProduct(v.toArray())+maxOmega)*getTransitionCount();
         }
         result = c / denominator;
-        return Pair.of(result, false);
+        double ratio = getTrueIntensity(context, result)/getIntensityUpperBound(context,result);
+        Random rand = new Random();
+        double V = rand.nextDouble();
+
+        if(V > ratio){
+
+            return Pair.of(result, false);
+
+        }else{
+
+            return Pair.of(result, true);
+        }
+
     }
+
+
+
+
+
+    public double getTrueIntensity(CollisionContext context, double tau){
+        double result;
+        SparseVector [][] bivariateFeatures = ctmcExpFam.bivariateFeatures;
+        SparseVector [] univariateFeatures = ctmcExpFam.univariateFeatures;
+        double [] v = context.velocity.toArray();
+
+        double part1 = bivariateFeatures[state0][state1IdxOfBivariateFeatures].dotProduct(v);
+        double part2 = univariateFeatures[state1].dotProduct(v);
+
+        double [] weightForPi;
+        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(parameters.weights);
+        weightForPi = ctmcModel.weights;
+
+        double numerator = 0;
+        double denominator = 0;
+
+        for(int i = 0; i< ctmcExpFam.nStates; i++){
+
+            numerator = numerator +
+                    Math.exp(univariateFeatures[i].dotProduct(weightForPi))* Math.exp(univariateFeatures[i].dotProduct(v)*tau)* univariateFeatures[i].dotProduct(v);
+        }
+
+        for(int i = 0; i < ctmcExpFam.nStates; i++){
+
+            denominator = denominator + Math.exp(univariateFeatures[i].dotProduct(weightForPi))* Math.exp(univariateFeatures[i].dotProduct(v)*tau);
+        }
+
+        result = -getTransitionCount()*(part1+part2-numerator/denominator);
+        return Math.max(0, result);
+    }
+
+
+    public double getIntensityUpperBound(CollisionContext context, double tau){
+        double result = 0;
+
+        SparseVector [][] bivariateFeatures = ctmcExpFam.bivariateFeatures;
+        SparseVector [] univariateFeatures = ctmcExpFam.univariateFeatures;
+        double [] v = context.velocity.toArray();
+        double part1 = univariateFeatures[state1].dotProduct(v)+bivariateFeatures[state0][state1IdxOfBivariateFeatures].dotProduct(v);
+        result = getTransitionCount() * Math.abs(getOmegaMax(context)- part1);
+        result = Math.max(0, result);
+        return result;
+    }
+
 
     /**
      * @return The gradient of the log-likelihood (NOT the energy, to be

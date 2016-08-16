@@ -13,7 +13,9 @@ import conifer.local.CollisionFactor;
 import conifer.rejfreeutil.StaticUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.math3.stat.StatUtils;
 import org.jblas.DoubleMatrix;
+import org.jblas.util.Random;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,9 +92,20 @@ public class SojournTimeFactor implements CollisionFactor{
         double part2 = Math.log(c/(auxObjective.holdTimes[state0]*getRateMtxElement()));
         double result = Double.POSITIVE_INFINITY;
         double candidate = part1 * part2;
-        if(candidate>0)
+        if(candidate>0) {
             result = candidate;
-        return Pair.of(result, false);
+            double ratio = getTrueIntensity(context, result)/getIntensityUpperBound(context,result);
+            Random rand = new Random();
+            double V = rand.nextDouble();
+            if(V > ratio){
+                return Pair.of(result, false);
+            }else{
+                return Pair.of(result, true);
+            }
+        }else{
+
+            return Pair.of(result, false);
+        }
 
     }
 
@@ -106,6 +119,68 @@ public class SojournTimeFactor implements CollisionFactor{
         }else{
             result =0;
         }
+        return result;
+    }
+
+    public double getUnivariateFeatureNormalization(){
+
+        SparseVector []  univariateFeatures = ctmcExpFam.univariateFeatures;
+        int nStates = ctmcExpFam.nStates;
+        double [] pi = new double[nStates];
+
+        double [] weightForPi;
+        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(parameters.weights);
+        weightForPi = ctmcModel.weights;
+        for (int i = 0; i < nStates; i++)
+            pi[i] = univariateFeatures[i].dotProduct(weightForPi);
+
+        double normalization;
+        // get the sum of all elements in pi
+        normalization = StatUtils.sum(pi);
+        return normalization;
+    }
+
+    public double getTrueIntensity(CollisionContext context, double tau){
+
+        double part1 = getSojournTime()* getRateMtxElement()* getUnivariateFeatureNormalization();
+        SparseVector []  univariateFeatures = ctmcExpFam.univariateFeatures;
+        SparseVector[][] bivariateFeatures = ctmcExpFam.bivariateFeatures;
+        double [] v= context.velocity.toArray();
+        double part2 = (univariateFeatures[state1].dotProduct(v)+bivariateFeatures[state0][state1IdxOfBivariateFeatures].dotProduct(v));
+        double part3 = Math.exp(part2*tau);
+
+        double [] weightForPi;
+        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(parameters.weights);
+        weightForPi = ctmcModel.weights;
+
+        double denominator1 = 0;
+        for(int i=0; i<ctmcExpFam.nStates;i++){
+            denominator1 = denominator1 + Math.exp(univariateFeatures[i].dotProduct(weightForPi)+univariateFeatures[i].dotProduct(v)*tau);
+        }
+
+        double part4 = part2/denominator1;
+
+        double denominator2 = denominator1*denominator1;
+        double numerator2 =0;
+        for(int i=0; i<ctmcExpFam.nStates;i++){
+            numerator2 = numerator2 + Math.exp(univariateFeatures[i].dotProduct(weightForPi)+univariateFeatures[i].dotProduct(v)*tau)*univariateFeatures[i].dotProduct(v);
+        }
+
+        double part5 = numerator2/denominator2;
+        double result = 0;
+        result = part1 * part3 * (part4 -part5);
+        result = Math.max(0, result);
+
+        return result;
+    }
+
+    public double getIntensityUpperBound(CollisionContext context, double tau){
+        double result = 0;
+        SparseVector[][] bivariateFeatures = ctmcExpFam.bivariateFeatures;
+        double [] v = context.velocity.toArray();
+        double part1 = 2*getOmegaMax(context) + bivariateFeatures[state0][state1IdxOfBivariateFeatures].dotProduct(v);
+        result = getSojournTime()*getRateMtxElement()*Math.exp(part1*tau)*part1;
+        result = Math.max(0, result);
         return result;
     }
 
