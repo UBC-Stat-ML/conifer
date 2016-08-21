@@ -6,7 +6,7 @@
 	[
 		{
 			"state" : { "categoryIndex" : 0, "latent" : "A" },
-			"features" : { }
+			"features" : { "statio(A)" : 1.0}
 		},
 		{
 			"state" : { "categoryIndex" : 0, "latent" : "C" },
