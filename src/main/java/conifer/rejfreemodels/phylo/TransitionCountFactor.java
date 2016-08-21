@@ -1,5 +1,6 @@
 package conifer.rejfreemodels.phylo;
 
+import bayonet.math.EJMLUtils;
 import bayonet.math.SparseVector;
 import blang.annotations.FactorArgument;
 import blang.annotations.FactorComponent;
@@ -27,9 +28,6 @@ public class TransitionCountFactor implements CollisionFactor {
     @FactorComponent
     public final ExpFamParameters parameters;
 
-    //@FactorArgument(makeStochastic = true)
-    public final List<RealVariable> weights;
-
     @FactorComponent
     public final FactorList<RealVariable> variables;
 
@@ -44,7 +42,7 @@ public class TransitionCountFactor implements CollisionFactor {
 
 
     public TransitionCountFactor(ExpFamParameters parameters, CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective Objective,
-                             CTMCExpFam<CTMCState> ctmcExpFam, int state0, int state1,List<RealVariable> weights,
+                             CTMCExpFam<CTMCState> ctmcExpFam, int state0, int state1,
                                  FactorList<RealVariable>variables, int state1IdxOfBivariateFeatures){
         this.parameters = parameters;
         this.ctmcExpFam = ctmcExpFam;
@@ -52,24 +50,12 @@ public class TransitionCountFactor implements CollisionFactor {
         this.ctmcExpFam = ctmcExpFam;
         this.state0 = state0;
         this.state1 = state1;
-        this.weights = getWeights();
         this.variables = variables;
         this.state1IdxOfBivariateFeatures= state1IdxOfBivariateFeatures;
 
     }
 
-    public List<RealVariable> getWeights(){
-        return transformWeightIntoReal(parameters);
-    }
 
-    public List<RealVariable> transformWeightIntoReal(ExpFamParameters parameters){
-
-        List<RealVariable> result = new ArrayList<>();
-        for(int i=0; i<parameters.getVector().length;i++){
-            result.add(RealVariable.real(parameters.getVector()[i]));
-        }
-        return result;
-    }
 
     /**
      * Computer a lower bound for the next collision time.
@@ -91,29 +77,83 @@ public class TransitionCountFactor implements CollisionFactor {
         final double c = StaticUtils.generateUnitRateExponential(context.random);
 
         if(checkState1InSupportOfState0()){
-            denominator = Math.abs(-univariateFeatures[state1].dotProduct(v.toArray()) +
+            denominator = (-univariateFeatures[state1].dotProduct(v.toArray())
                     -bivariateFeatures[state0][state1IdxOfBivariateFeatures].dotProduct(v.toArray())+ maxOmega)*getTransitionCount();
 
         }else{
-            denominator = Math.abs(univariateFeatures[state1].dotProduct(v.toArray())+maxOmega)*getTransitionCount();
+            denominator = (-univariateFeatures[state1].dotProduct(v.toArray())+maxOmega)*getTransitionCount();
         }
         result = c / denominator;
-        double ratio = getTrueIntensity(context, result)/getIntensityUpperBound(context,result);
-        Random rand = new Random();
-        double V = rand.nextDouble();
+        if(result>0){
+            double trueIntensity = getTrueIntensity(context, result);
+            double ub = getIntensityUpperBound(context,result);
+            double trueIntensityFromDotProduct = getTrueIntensityUsingDotProduct(context, result);
 
-        if(V > ratio){
+            if(Math.abs(trueIntensity-trueIntensityFromDotProduct)>1e-6)
+                throw new RuntimeException("the two intensities obtained from two different methods are different");
 
-            return Pair.of(result, false);
+            double ratio = trueIntensity/ ub;
+            Random rand = new Random();
+            double V = rand.nextDouble();
+
+            if (V > ratio) {
+
+                return Pair.of(result, false);
+
+            } else {
+
+                return Pair.of(result, true);
+            }
 
         }else{
 
-            return Pair.of(result, true);
+            return Pair.of(Double.POSITIVE_INFINITY, true);
         }
+
 
     }
 
 
+    public double getTrueIntensityUsingDotProduct(CollisionContext context, double tau){
+
+        double result=0;
+        DoubleMatrix v = context.velocity;
+        DoubleMatrix gradient = gradientAtNextPosition(context, tau);// since gradient is of logDensity, we should get it with respect to potential energy
+        result = gradient.dot(v)*(-1);
+        result = Math.max(0, result);
+        return result;
+    }
+
+
+    public DoubleMatrix gradientAtNextPosition(CollisionContext context, double tau){
+
+        double [] result = new double [nVariables()];
+        SparseVector[][] bivariateFeatures = ctmcExpFam.bivariateFeatures; // S index -> index in support
+        SparseVector []  univariateFeatures = ctmcExpFam.univariateFeatures;
+        univariateFeatures[state1].linearIncrement( getTransitionCount(),result);
+
+        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(getNextPosition(context,tau));
+
+        for(int state=0; state< ctmcExpFam.nStates; state++){
+            univariateFeatures[state].linearIncrement(getTransitionCount()*(-1)*ctmcModel.pi[state], result);
+        }
+        //check state1 is in support of state0
+        if(checkState1InSupportOfState0()){
+            bivariateFeatures[state0][state1IdxOfBivariateFeatures].linearIncrement(getTransitionCount(), result);
+        }
+        return new DoubleMatrix(result);
+
+    }
+
+    public double [] getNextPosition(CollisionContext context, double tau){
+
+        double [] v = context.velocity.toArray();
+        double [] delta = new DoubleMatrix(v).mul(tau).toArray();
+        DoubleMatrix prevPosition = new DoubleMatrix(getPosition());
+        DoubleMatrix deltaDist = new DoubleMatrix(delta);
+        DoubleMatrix nextPosition = prevPosition.add(deltaDist);
+        return nextPosition.toArray();
+    }
 
 
 
@@ -126,25 +166,52 @@ public class TransitionCountFactor implements CollisionFactor {
         double part1 = bivariateFeatures[state0][state1IdxOfBivariateFeatures].dotProduct(v);
         double part2 = univariateFeatures[state1].dotProduct(v);
 
-        double [] weightForPi;
-        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(parameters.weights);
-        weightForPi = ctmcModel.weights;
+        double [] weightForPi = getPosition();
+
+//        double [] delta = new DoubleMatrix(v).mul(tau).toArray();
+//
+//        DoubleMatrix prevPosition = new DoubleMatrix(weightForPi);
+//        DoubleMatrix deltaDist = new DoubleMatrix(delta);
+//        DoubleMatrix nextPosition = prevPosition.add(deltaDist);
+//
+//        double [] nextPositionArray = nextPosition.toArray();
+//
+//        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(nextPositionArray);
+//        double part3 = 0;
+//        double term3;
+//        for(int i=0; i< ctmcExpFam.nStates; i++){
+//            term3 = ctmcModel.pi[i]*univariateFeatures[i].dotProduct(v);
+//
+//            part3 = part3+ term3;
+//        }
+//
+//        double result1 = -getTransitionCount()*(part1+part2-part3);
 
         double numerator = 0;
         double denominator = 0;
 
+        double term1=0;
+        double term2=0;
+
         for(int i = 0; i< ctmcExpFam.nStates; i++){
 
-            numerator = numerator +
-                    Math.exp(univariateFeatures[i].dotProduct(weightForPi))* Math.exp(univariateFeatures[i].dotProduct(v)*tau)* univariateFeatures[i].dotProduct(v);
-        }
+            term1 = Math.exp(univariateFeatures[i].dotProduct(weightForPi)+univariateFeatures[i].dotProduct(v)*tau)* univariateFeatures[i].dotProduct(v);
+
+            numerator = numerator + term1;
+                        }
 
         for(int i = 0; i < ctmcExpFam.nStates; i++){
 
-            denominator = denominator + Math.exp(univariateFeatures[i].dotProduct(weightForPi))* Math.exp(univariateFeatures[i].dotProduct(v)*tau);
+            term2 = Math.exp(univariateFeatures[i].dotProduct(weightForPi)+univariateFeatures[i].dotProduct(v)*tau);
+
+            denominator = denominator +  term2;
         }
 
         result = -getTransitionCount()*(part1+part2-numerator/denominator);
+
+//        if(Math.abs(result-result1)>1e-6)
+//            throw new RuntimeException("the two intensities are not equal");
+
         return Math.max(0, result);
     }
 
@@ -157,7 +224,6 @@ public class TransitionCountFactor implements CollisionFactor {
         double [] v = context.velocity.toArray();
         double part1 = univariateFeatures[state1].dotProduct(v)+bivariateFeatures[state0][state1IdxOfBivariateFeatures].dotProduct(v);
         result = getTransitionCount() * Math.abs(getOmegaMax(context)- part1);
-        result = Math.max(0, result);
         return result;
     }
 
@@ -173,7 +239,7 @@ public class TransitionCountFactor implements CollisionFactor {
         SparseVector []  univariateFeatures = ctmcExpFam.univariateFeatures;
         univariateFeatures[state1].linearIncrement( getTransitionCount(),result);
 
-        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(parameters.weights);
+        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(getPosition());
 
         for(int state=0; state< ctmcExpFam.nStates; state ++){
             univariateFeatures[state].linearIncrement(getTransitionCount()*(-1)*ctmcModel.pi[state], result);
@@ -222,8 +288,18 @@ public class TransitionCountFactor implements CollisionFactor {
         return maxOmega;
     }
 
+    public double [] getPosition(){
+        double [] result = new double[nVariables()];
+        for(int i=0; i< nVariables(); i++){
+            result[i] = variables.list.get(i).getValue();
+        }
+        return result;
+
+    }
+
     private double getRateMtxElement(){
-        return parameters.getRateMatrix(0)[state0][state1];
+        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(getPosition());
+        return ctmcModel.getRateMatrix()[state0][state1];
 
     }
 

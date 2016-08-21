@@ -1,7 +1,6 @@
 package conifer.rejfreemodels.phylo;
 
 import bayonet.math.SparseVector;
-import blang.annotations.FactorArgument;
 import blang.annotations.FactorComponent;
 import blang.factors.FactorList;
 import blang.variables.RealVariable;
@@ -11,13 +10,9 @@ import conifer.ctmc.expfam.ExpFamParameters;
 import conifer.local.CollisionContext;
 import conifer.local.CollisionFactor;
 import conifer.rejfreeutil.StaticUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jblas.DoubleMatrix;
 import org.jblas.util.Random;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by crystal on 2016-07-28.
@@ -27,8 +22,6 @@ public class InitialCountFactor implements CollisionFactor {
     @FactorComponent
     public final ExpFamParameters parameters;
 
-    //@FactorArgument(makeStochastic = true)
-    public final List<RealVariable> weights;
 
     @FactorComponent
     public final FactorList<RealVariable> variables;
@@ -41,28 +34,15 @@ public class InitialCountFactor implements CollisionFactor {
 
 
     public InitialCountFactor(ExpFamParameters parameters, CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective Objective,
-                                 CTMCExpFam<CTMCState> ctmcExpFam, int state0, List<RealVariable> weights, FactorList<RealVariable> variables){
+                                 CTMCExpFam<CTMCState> ctmcExpFam, int state0, FactorList<RealVariable> variables){
         this.parameters = parameters;
         this.ctmcExpFam = ctmcExpFam;
         this.auxObjective = Objective;
         this.ctmcExpFam = ctmcExpFam;
         this.state0 = state0;
-        this.weights = weights;
         this.variables = variables;
     }
 
-//    public List<RealVariable> getWeights(){
-//        return transformWeightIntoReal(parameters);
-//    }
-//
-//    public List<RealVariable> transformWeightIntoReal(ExpFamParameters parameters){
-//
-//        List<RealVariable> result = new ArrayList<>();
-//        for(int i=0; i<parameters.getVector().length;i++){
-//            result.add(RealVariable.real(parameters.getVector()[i]));
-//        }
-//        return result;
-//    }
 
 
     /**
@@ -90,8 +70,10 @@ public class InitialCountFactor implements CollisionFactor {
             return Pair.of(result, false);
         }else{
             result = c/(denominator*getInitialCount());
+            double trueIntensity = getTrueIntensity(context, result);
+            double ub = getIntensityUpperBound(context, result);
+            double ratio = trueIntensity/ub;
 
-            double ratio = getTrueIntensity(context, result)/getIntensityUpperBound(context,result);
             Random rand = new Random();
             double V = rand.nextDouble();
             if(V > ratio){
@@ -104,6 +86,14 @@ public class InitialCountFactor implements CollisionFactor {
 
     }
 
+    public double [] getPosition(){
+        double [] result = new double[nVariables()];
+        for(int i=0; i< nVariables(); i++){
+            result[i] = variables.list.get(i).getValue();
+        }
+        return result;
+
+    }
 
     public double getTrueIntensity(CollisionContext context, double tau){
         SparseVector [] univariateFeatures = ctmcExpFam.univariateFeatures;
@@ -113,9 +103,8 @@ public class InitialCountFactor implements CollisionFactor {
         double numerator = 0;
         double denominator=0;
 
-        double [] weightForPi;
-        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(parameters.weights);
-        weightForPi = ctmcModel.weights;
+        double [] weightForPi = getPosition();
+
 
         for(int i=0; i < ctmcExpFam.nStates; i++){
             numerator = numerator + Math.exp(univariateFeatures[i].dotProduct(v)*tau + univariateFeatures[i].dotProduct(weightForPi))*univariateFeatures[i].dotProduct(v);
@@ -150,11 +139,10 @@ public class InitialCountFactor implements CollisionFactor {
     @Override
     public DoubleMatrix gradient() {
         double [] result = new double [nVariables()];
-        SparseVector[][] bivariateFeatures = ctmcExpFam.bivariateFeatures; // S index -> index in support
         SparseVector []  univariateFeatures = ctmcExpFam.univariateFeatures;
         univariateFeatures[state0].linearIncrement( getInitialCount(),result);
 
-        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(parameters.weights);
+        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(getPosition());
 
         for(int state=0; state< ctmcExpFam.nStates; state ++){
             univariateFeatures[state].linearIncrement(getInitialCount()*(-1)*ctmcModel.pi[state], result);
@@ -197,8 +185,8 @@ public class InitialCountFactor implements CollisionFactor {
     @Override
     public double logDensity() {
 
-        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(parameters.weights);
-        return getInitialCount()*Math.log(ctmcModel.pi[state0]);
+        CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(getPosition());
+        return getInitialCount() * Math.log(ctmcModel.pi[state0]);
     }
 
     public double getInitialCount(){

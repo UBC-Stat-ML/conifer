@@ -45,9 +45,6 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     @Option(required = true, gloss = "Location of tree file in newick format")
     public File sequencesFile;
 
-    @Option(gloss = "If the Rejection Free sampler should be used.")
-    public boolean useGlobalRF = false;
-
     @Option(gloss = "If the Hamiltonian Monte Carlo sampler should be used.")
     public boolean useHMC = false;
 
@@ -64,7 +61,10 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     public int L = 100;
 
     @Option(gloss = "Number of parameter moves per auxiliary variable resampling.")
-    public int nItersPerPathAuxVar = 100;
+    public int nItersPerPathAuxVar = 1000;
+
+    @Option(gloss = "If the Rejection Free sampler should be used.")
+    public boolean useGlobalRF = false;
 
     @Option(gloss = "If the local Rejection Free Sampler should be used")
     public boolean useLocalRF = true;
@@ -72,8 +72,8 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
     public boolean isNormalized = false;
 
-//    @Option(gloss="Number of MCMC iterations")
-//    public int nMCMCIterations = 10;
+    @Option(gloss="Number of MCMC iterations")
+    public int nMCMCIterations = 10000;
 
 
     @OptionSet(name = "rfoptions")
@@ -112,6 +112,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
             factory.addNodeMove(ExpFamParameters.class, PhyloRFMove.class);
             factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
             factory.excludeNodeMove(RealVectorAdaptiveMHProposal.class);
+            factory.excludeNodeMove(PhyloLocalRFMove.class);
 
         }
 
@@ -126,12 +127,19 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
         if (useHMC) ;
         else factory.excludeNodeMove(PhyloHMCMove.class);
 
+        if(useAdaptiveHMC){
+            factory.excludeNodeMove(RealVectorAdaptiveMHProposal.class);
+            factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
+            factory.excludeNodeMove(PhyloLocalRFMove.class);
+        }
+
         int nMovesRequested = (useGlobalRF ? 1 : 0) + (useHMC ? 1 : 0) + (useMH ? 1 : 0) + (useLocalRF ? 1 : 0) ;
 
         MCMCAlgorithm mcmc = factory.build(model, false);
-        //mcmc.options.nMCMCSweeps = nMCMCIterations;
+        mcmc.options.nMCMCSweeps = nMCMCIterations;
         //mcmc.options.burnIn=0;
         //mcmc.options.thinningPeriod=1;
+
         if (mcmc.sampler.moves.size() != nMovesRequested)
             throw new RuntimeException("" + mcmc.sampler.moves.size() + "!=" + nMovesRequested);
 
@@ -163,6 +171,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
             for (Move move : mcmc.sampler.moves)
                 if (move instanceof PhyloHMCMove)
                     ((PhyloHMCMove) move).nItersPerPathAuxVar = this.nItersPerPathAuxVar;
+
 
         System.out.println(mcmc.model);
         System.out.println(mcmc.sampler);

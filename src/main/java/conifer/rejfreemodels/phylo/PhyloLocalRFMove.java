@@ -45,7 +45,7 @@ public class PhyloLocalRFMove extends NodeMove {
 
     public LocalRFRunnerOptions localRFRunnerOption = new LocalRFRunnerOptions();
 
-    public  LocalRFSampler sampler;
+    public LocalRFSampler sampler;
 
     public ExpectedCompleteReversibleModel modelSpec;
 
@@ -63,9 +63,8 @@ public class PhyloLocalRFMove extends NodeMove {
         modelSpec = new ExpectedCompleteReversibleModel(parameters, objective, parameters.globalExponentialFamily);
 
         localRFRunnerOption.maxSteps = Integer.MAX_VALUE;
-        localRFRunnerOption.maxTrajectoryLength = 0.1;
+        localRFRunnerOption.maxTrajectoryLength = 0.01;
         LocalRFRunner rfRunner = new LocalRFRunner(localRFRunnerOption);
-
 
         rfRunner.init(modelSpec);
         rfRunner.addMomentRayProcessor();
