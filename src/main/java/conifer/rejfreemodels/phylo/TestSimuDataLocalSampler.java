@@ -72,6 +72,10 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
     public boolean isNormalized = false;
 
+    @Option(gloss = "If the local rejection free sampler is used, we provide the fixed trajectory length")
+    public double maxTrajectoryLength = 1.0;
+
+
     @Option(gloss="Number of MCMC iterations")
     public int nMCMCIterations = 10000;
 
@@ -118,6 +122,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
         if (useLocalRF) {
             factory.addNodeMove(ExpFamParameters.class, PhyloLocalRFMove.class);
+            PhyloLocalRFMove.maxTrajectoryLength = maxTrajectoryLength;
             factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
             factory.excludeNodeMove(RealVectorAdaptiveMHProposal.class);
         }

@@ -89,8 +89,12 @@ public class TransitionCountFactor implements CollisionFactor {
             double ub = getIntensityUpperBound(context,result);
             double trueIntensityFromDotProduct = getTrueIntensityUsingDotProduct(context, result);
 
-            if(Math.abs(trueIntensity-trueIntensityFromDotProduct)>1e-6)
+            if(Math.abs(trueIntensity-trueIntensityFromDotProduct)>1e-6){
+                System.out.print(Math.abs(trueIntensity-trueIntensityFromDotProduct));
                 throw new RuntimeException("the two intensities obtained from two different methods are different");
+
+            }
+
 
             double ratio = trueIntensity/ ub;
             Random rand = new Random();

@@ -49,6 +49,8 @@ public class PhyloLocalRFMove extends NodeMove {
 
     public ExpectedCompleteReversibleModel modelSpec;
 
+    public static double maxTrajectoryLength;
+
 
     @Override
     public void execute(Random rand) {
@@ -63,7 +65,7 @@ public class PhyloLocalRFMove extends NodeMove {
         modelSpec = new ExpectedCompleteReversibleModel(parameters, objective, parameters.globalExponentialFamily);
 
         localRFRunnerOption.maxSteps = Integer.MAX_VALUE;
-        localRFRunnerOption.maxTrajectoryLength = 0.01;
+        localRFRunnerOption.maxTrajectoryLength = maxTrajectoryLength;
         LocalRFRunner rfRunner = new LocalRFRunner(localRFRunnerOption);
 
         rfRunner.init(modelSpec);
