@@ -2,6 +2,9 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: 'download-task'
+apply plugin:'application'
+mainClassName ="conifer.TestSimuDataLocalSampler"
+
 
 import de.undercouch.gradle.tasks.download.Download
 
@@ -140,5 +143,3 @@ if (JavaVersion.current().isJava8Compatible()) {
   }
 }
 
-apply plugin:'application'
-mainClassName ="conifer.TestSimuDataLocalSampler.Main"
