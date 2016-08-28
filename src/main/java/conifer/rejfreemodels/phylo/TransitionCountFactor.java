@@ -77,24 +77,17 @@ public class TransitionCountFactor implements CollisionFactor {
         final double c = StaticUtils.generateUnitRateExponential(context.random);
 
         if(checkState1InSupportOfState0()){
-            denominator = (-univariateFeatures[state1].dotProduct(v.toArray())
+            denominator = Math.abs(-univariateFeatures[state1].dotProduct(v.toArray())
                     -bivariateFeatures[state0][state1IdxOfBivariateFeatures].dotProduct(v.toArray())+ maxOmega)*getTransitionCount();
 
         }else{
-            denominator = (-univariateFeatures[state1].dotProduct(v.toArray())+maxOmega)*getTransitionCount();
+            denominator = Math.abs(-univariateFeatures[state1].dotProduct(v.toArray())+maxOmega)*getTransitionCount();
         }
         result = c / denominator;
         if(result>0){
             double trueIntensity = getTrueIntensity(context, result);
             double ub = getIntensityUpperBound(context,result);
-            double trueIntensityFromDotProduct = getTrueIntensityUsingDotProduct(context, result);
-
-            if(Math.abs(trueIntensity-trueIntensityFromDotProduct)>1e-6){
-                System.out.print(Math.abs(trueIntensity-trueIntensityFromDotProduct));
-                throw new RuntimeException("the two intensities obtained from two different methods are different");
-
-            }
-
+            //double trueIntensityFromDotProduct = getTrueIntensityUsingDotProduct(context, result);
 
             double ratio = trueIntensity/ ub;
             Random rand = new Random();
