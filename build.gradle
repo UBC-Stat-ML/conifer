@@ -141,4 +141,4 @@ if (JavaVersion.current().isJava8Compatible()) {
 }
 
 apply plugin:'application'
-mainClassName ="conifer.rejfreemodels.phylo.TestSimuDataLocalSampler.Main"
+mainClassName ="conifer.TestSimuDataLocalSampler.Main"
