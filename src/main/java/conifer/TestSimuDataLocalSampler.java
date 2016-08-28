@@ -1,4 +1,4 @@
-package conifer.rejfreemodels.phylo;
+package conifer;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +13,8 @@ import com.beust.jcommander.internal.Maps;
 import conifer.ctmc.expfam.RateMtxNames;
 import conifer.moves.RealVectorAdaptiveMHProposal;
 import conifer.moves.RealVectorOverRelaxedSlice;
+import conifer.rejfreemodels.phylo.PhyloLocalRFMove;
+import conifer.rejfreemodels.phylo.PhyloRFMove;
 import conifer.rejfreeutil.RFSamplerOptions;
 import bayonet.distributions.Normal.MeanVarianceParameterization;
 import blang.MCMCAlgorithm;
