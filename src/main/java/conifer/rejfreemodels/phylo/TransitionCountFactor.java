@@ -87,6 +87,7 @@ public class TransitionCountFactor implements CollisionFactor {
         if(result>0){
             double trueIntensity = getTrueIntensity(context, result);
             double ub = getIntensityUpperBound(context,result);
+
             //double trueIntensityFromDotProduct = getTrueIntensityUsingDotProduct(context, result);
 
             double ratio = trueIntensity/ ub;
