@@ -1,9 +1,13 @@
 package conifer.rejfreemodels.phylo;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 
+import briefj.BriefIO;
+import briefj.run.Results;
 import com.beust.jcommander.internal.Maps;
 
 import conifer.ctmc.expfam.RateMtxNames;
@@ -29,6 +33,7 @@ import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.moves.PhyloHMCMove;
 import conifer.moves.RealVectorMHProposal;
+import org.apache.commons.io.FileUtils;
 
 
 /**
@@ -73,12 +78,14 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     public boolean isNormalized = false;
 
     @Option(gloss = "If the local rejection free sampler is used, we provide the fixed trajectory length")
-    public double maxTrajectoryLength = 1.0;
+    public double maxTrajectoryLength = 0.1;
 
 
     @Option(gloss="Number of MCMC iterations")
-    public int nMCMCIterations = 10000;
+    public int nMCMCIterations = 100;
 
+    @Option(gloss="Rate Matrix Method")
+    public RateMtxNames selectedRateMtx = RateMtxNames.DNAGTR;
 
     @OptionSet(name = "rfoptions")
     public RFSamplerOptions rfOptions = new RFSamplerOptions();
@@ -89,12 +96,14 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     public class Model {
         @DefineFactor(onObservations = true)
         public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood =
-                UnrootedTreeLikelihood.fromFastaFile(sequencesFile, RateMtxNames.DNAGTR).withExpFamMixture(ExpFamMixture.rateMtxModel(RateMtxNames.DNAGTR, isNormalized)).withTree(treeFile);
+                UnrootedTreeLikelihood.fromFastaFile(sequencesFile, selectedRateMtx).withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized)).withTree(treeFile);
 
         @DefineFactor
         public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> priorOnParams =
                 IIDRealVectorGenerativeFactor.iidNormalOn(likelihood.evolutionaryModel.rateMatrixMixture.parameters);
     }
+
+    private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
 
     public Model model;
 
@@ -103,6 +112,8 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
         model = new Model();
         factory.addProcessor(this);
         factory.addProcessor(new LogDensityProcessor());
+
+        long startTime = System.currentTimeMillis();
 
         if (useMH)
         {
@@ -182,6 +193,21 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
         System.out.println(mcmc.sampler);
 
         mcmc.run();
+
+        logToFile("Total time in minutes: " + ((System.currentTimeMillis() - startTime)/60000.0));
+        logToFile("Fixed Trajectory length:" + maxTrajectoryLength);
+       // File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed+ "epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
+        logToFile("Samplers:"+ mcmc.toString());
+        File newDirectory = new File(Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "TrajLength"+ maxTrajectoryLength + "useLocal"+ useLocalRF + "useGloba" + useGlobalRF
+        + selectedRateMtx);
+        newDirectory.mkdir();
+        try
+        {
+            FileUtils.copyDirectory(Results.getResultFolder(), newDirectory);
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {
@@ -189,6 +215,12 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     }
 
     Map<String, List<Double>> data = Maps.newLinkedHashMap();
+
+    public void logToFile(String someline) {
+        this.detailWriter.println(someline);
+        this.detailWriter.flush();
+    }
+
 
     @Override
     public void process(ProcessorContext context) {
