@@ -95,6 +95,15 @@ public class InitialCountFactor implements CollisionFactor {
 
     }
 
+    @Override
+    public void setPosition(DoubleMatrix position){
+        double [] result = position.toArray();
+        for(int i=0; i< nVariables(); i++){
+            variables.list.get(i).setValue(result[i]);
+        }
+
+    }
+
     public double getTrueIntensity(CollisionContext context, double tau){
         SparseVector [] univariateFeatures = ctmcExpFam.univariateFeatures;
         double []  v = context.velocity.toArray();

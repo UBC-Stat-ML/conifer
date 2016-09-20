@@ -295,6 +295,15 @@ public class TransitionCountFactor implements CollisionFactor {
 
     }
 
+    @Override
+    public void setPosition(DoubleMatrix position){
+        double [] result = position.toArray();
+        for(int i=0; i< nVariables(); i++){
+            variables.list.get(i).setValue(result[i]);
+        }
+
+    }
+
     private double getRateMtxElement(){
         CTMCExpFam.LearnedReversibleModel ctmcModel = ctmcExpFam.reversibleModelWithParameters(getPosition());
         return ctmcModel.getRateMatrix()[state0][state1];

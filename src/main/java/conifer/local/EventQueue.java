@@ -26,6 +26,11 @@ public class EventQueue<S> {
         }
     }
 
+    public void clear(){
+        sortedEvents.clear();
+        eventTimes.clear();
+    }
+
     public void add(S event, double time) {
         if (Double.isInfinite(time))
             return;

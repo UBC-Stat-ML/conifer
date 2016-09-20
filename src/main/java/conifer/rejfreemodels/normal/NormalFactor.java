@@ -154,6 +154,15 @@ public class NormalFactor implements CollisionFactor, GenerativeFactor {
     }
 
     @Override
+    public void setPosition(DoubleMatrix position){
+        double [] result = position.toArray();
+        for(int i=0; i< nVariables(); i++){
+            variables.list.get(i).setValue(result[i]);
+        }
+
+    }
+
+    @Override
     public void generate(Random random) {
         DoubleMatrix covarMatrix = JBlasUtils.inversePositiveMatrix(precision);
         MultivariateNormalDistribution normal = new MultivariateNormalDistribution(new DoubleMatrix(dim()).data, JBlasUtils.asDoubleArray(covarMatrix));

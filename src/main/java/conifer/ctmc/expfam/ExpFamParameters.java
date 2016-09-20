@@ -20,6 +20,7 @@ import blang.variables.RealVectorInterface;
 import briefj.Indexer;
 import briefj.collections.Counter;
 import conifer.rejfreemodels.phylo.PhyloLocalRFMove;
+import conifer.rejfreemodels.phylo.PhyloRFMove;
 import conifer.rejfreeprocessors.MomentRayProcessor;
 import conifer.rejfreeprocessors.SaveSamplesProcessor;
 
@@ -29,7 +30,8 @@ import conifer.rejfreeprocessors.SaveSamplesProcessor;
         PhyloHMCMove.class,
         RealVectorOverRelaxedSlice.class,
         RealVectorAdaptiveMHProposal.class,
-        PhyloLocalRFMove.class
+        PhyloLocalRFMove.class,
+        PhyloRFMove.class
 })
 @Processors({IIDRealVectorGenerativeFactor.VectorNormProcessor.class, ExpFamParamProcessor.class})
 public class ExpFamParameters implements RealVectorInterface

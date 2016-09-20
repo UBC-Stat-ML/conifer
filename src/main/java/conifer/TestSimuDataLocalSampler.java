@@ -71,23 +71,29 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     public int nItersPerPathAuxVar = 1000;
 
     @Option(gloss = "If the Rejection Free sampler should be used.")
-    public boolean useGlobalRF = false;
+    public boolean useGlobalRF = true;
 
     @Option(gloss = "If the local Rejection Free Sampler should be used")
-    public boolean useLocalRF = true;
+    public boolean useLocalRF = false;
 
     @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
     public boolean isNormalized = false;
 
     @Option(gloss = "If the local rejection free sampler is used, we provide the fixed trajectory length")
-    public double maxTrajectoryLength = 0.1;
+    public double maxTrajectoryLength;
 
 
     @Option(gloss="Number of MCMC iterations")
-    public int nMCMCIterations = 100;
+    public int nMCMCIterations = 10000;
+
+    @Option(gloss="Thinning Period of MCMC")
+    public int thinningPeriod = 1;
 
     @Option(gloss="Rate Matrix Method")
     public RateMtxNames selectedRateMtx = RateMtxNames.DNAGTR;
+
+    @Option(gloss="Use superposition method in global sampler")
+    public boolean useSuperPosition = true;
 
     @OptionSet(name = "rfoptions")
     public RFSamplerOptions rfOptions = new RFSamplerOptions();
@@ -151,12 +157,13 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
             factory.excludeNodeMove(PhyloLocalRFMove.class);
         }
 
+
         int nMovesRequested = (useGlobalRF ? 1 : 0) + (useHMC ? 1 : 0) + (useMH ? 1 : 0) + (useLocalRF ? 1 : 0) ;
 
         MCMCAlgorithm mcmc = factory.build(model, false);
         mcmc.options.nMCMCSweeps = nMCMCIterations;
-        //mcmc.options.burnIn=0;
-        //mcmc.options.thinningPeriod=1;
+        mcmc.options.burnIn=1/10*nMCMCIterations;
+        mcmc.options.thinningPeriod=thinningPeriod;
 
         if (mcmc.sampler.moves.size() != nMovesRequested)
             throw new RuntimeException("" + mcmc.sampler.moves.size() + "!=" + nMovesRequested);
@@ -177,6 +184,8 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
                 if (move instanceof PhyloRFMove) {
                     ((PhyloRFMove) move).options = this.rfOptions;
                     ((PhyloRFMove) move).nItersPerPathAuxVar = this.nItersPerPathAuxVar;
+                    ((PhyloRFMove) move).useSuperPosition = this.useSuperPosition;
+
                 }
 
         if (useLocalRF)
@@ -200,8 +209,8 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
         logToFile("Fixed Trajectory length:" + maxTrajectoryLength);
        // File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed+ "epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
         logToFile("Samplers:"+ mcmc.toString());
-        File newDirectory = new File(Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "TrajLength"+ maxTrajectoryLength + "useLocal"+ useLocalRF + "useGloba" + useGlobalRF
-        + selectedRateMtx);
+        File newDirectory = new File(Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "TrajLength"+ maxTrajectoryLength + "useLocal"+ useLocalRF + "useGlobal" + useGlobalRF
+        + "useSuperPosition"+ useSuperPosition + selectedRateMtx);
         newDirectory.mkdir();
         try
         {

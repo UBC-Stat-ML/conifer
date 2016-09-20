@@ -297,6 +297,7 @@ public class SojournTimeFactor implements CollisionFactor{
         return  variables.list.get(gradientCoordinate);
     }
 
+
     @Override
     public int nVariables() {
         return parameters.getVector().length;
@@ -313,6 +314,15 @@ public class SojournTimeFactor implements CollisionFactor{
         double result;
         result = getSojournTime()*getRateMtxElement()*(-1.0);
         return result;
+    }
+
+    @Override
+    public void setPosition(DoubleMatrix position){
+        double [] result = position.toArray();
+        for(int i=0; i< nVariables(); i++){
+            variables.list.get(i).setValue(result[i]);
+        }
+
     }
 
     private double getRateMtxElement(){

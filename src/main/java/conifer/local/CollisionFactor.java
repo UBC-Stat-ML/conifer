@@ -28,4 +28,6 @@ public interface CollisionFactor extends Factor {
     public RealVariable getVariable(int gradientCoordinate);
 
     public int nVariables();
+
+    public void setPosition(DoubleMatrix position);
 }

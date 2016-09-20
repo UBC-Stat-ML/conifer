@@ -4,6 +4,7 @@ package conifer.rejfreemodels.phylo;
 import java.util.List;
 import java.util.Random;
 
+import blang.ProbabilityModel;
 import org.jblas.DoubleMatrix;
 
 import conifer.rejfreeutil.RFSamplerOptions;
@@ -37,6 +38,10 @@ public class PhyloRFMove extends NodeMove {
 
     public int nItersPerPathAuxVar = 1000;
 
+    public ExpectedCompleteReversibleModel modelSpec;
+
+    public static boolean useSuperPosition = true;
+
     @Override
     public void execute(Random rand) {
         if (prior.marginalDistributionParameters.mean.getValue() != 0.0)
@@ -47,6 +52,8 @@ public class PhyloRFMove extends NodeMove {
 
         ExpectedStatistics<CTMCState> convertedStat = PhyloHMCMove.convert(pathStatistics, parameters, likelihood);
         CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective objective = parameters.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0 / variance, convertedStat);
+        modelSpec = new ExpectedCompleteReversibleModel(parameters, objective, parameters.globalExponentialFamily);
+
 
         double[] initialPoint = parameters.getVector();
 
@@ -54,13 +61,19 @@ public class PhyloRFMove extends NodeMove {
         GlobalRFSampler sampler;
 
         if (initialized) {
-            sampler = new GlobalRFSampler(objective, new DoubleMatrix(initialPoint), options);
+            sampler = new GlobalRFSampler(objective, new DoubleMatrix(initialPoint), options, new ProbabilityModel(modelSpec));
         } else {
             System.out.println("Initializing RF sampler");
-            sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options);
+            sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec));
             initialized = true;
         }
-        sampler.iterate(rand, nItersPerPathAuxVar);
+
+        if(!useSuperPosition){
+            sampler.iterate(rand, nItersPerPathAuxVar);
+        }else{
+            sampler.iterateWithSuperPosition(rand, nItersPerPathAuxVar, true);
+        }
+
         double[] newPoint = sampler.getCurrentPosition().data;
 
         parameters.setVector(newPoint);
