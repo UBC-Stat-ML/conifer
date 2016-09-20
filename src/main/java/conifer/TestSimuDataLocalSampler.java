@@ -86,8 +86,6 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     @Option(gloss="Number of MCMC iterations")
     public int nMCMCIterations = 10000;
 
-    @Option(gloss="Thinning Period of MCMC")
-    public int thinningPeriod = 1;
 
     @Option(gloss="Rate Matrix Method")
     public RateMtxNames selectedRateMtx = RateMtxNames.DNAGTR;
@@ -163,7 +161,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
         MCMCAlgorithm mcmc = factory.build(model, false);
         mcmc.options.nMCMCSweeps = nMCMCIterations;
         mcmc.options.burnIn=1/10*nMCMCIterations;
-        mcmc.options.thinningPeriod=thinningPeriod;
+        mcmc.options.thinningPeriod=1;
 
         if (mcmc.sampler.moves.size() != nMovesRequested)
             throw new RuntimeException("" + mcmc.sampler.moves.size() + "!=" + nMovesRequested);
