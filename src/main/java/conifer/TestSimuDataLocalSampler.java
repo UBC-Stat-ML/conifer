@@ -142,6 +142,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
             PhyloLocalRFMove.maxTrajectoryLength = maxTrajectoryLength;
             factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
             factory.excludeNodeMove(RealVectorAdaptiveMHProposal.class);
+            factory.excludeNodeMove(PhyloRFMove.class);
         }
 
         else ;
