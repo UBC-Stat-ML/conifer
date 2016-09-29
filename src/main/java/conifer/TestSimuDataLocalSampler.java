@@ -84,7 +84,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
 
     @Option(gloss="Number of MCMC iterations")
-    public int nMCMCIterations = 10000;
+    public int nMCMCIterations = 100000;
 
 
     @Option(gloss="Rate Matrix Method")
@@ -161,7 +161,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
         MCMCAlgorithm mcmc = factory.build(model, false);
         mcmc.options.nMCMCSweeps = nMCMCIterations;
-        mcmc.options.burnIn=1/10*nMCMCIterations;
+        mcmc.options.burnIn=0;
         mcmc.options.thinningPeriod=1;
 
         if (mcmc.sampler.moves.size() != nMovesRequested)
