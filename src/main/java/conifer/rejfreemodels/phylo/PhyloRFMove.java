@@ -3,8 +3,12 @@ package conifer.rejfreemodels.phylo;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import blang.ProbabilityModel;
+import briefj.OutputManager;
+import briefj.run.Results;
+import com.google.common.base.Stopwatch;
 import org.jblas.DoubleMatrix;
 
 import conifer.rejfreeutil.RFSamplerOptions;
@@ -42,6 +46,10 @@ public class PhyloRFMove extends NodeMove {
 
     public static boolean useSuperPosition = true;
 
+    public Stopwatch watch = null;
+
+    public OutputManager output = Results.getGlobalOutputManager();
+
     @Override
     public void execute(Random rand) {
         if (prior.marginalDistributionParameters.mean.getValue() != 0.0)
@@ -68,15 +76,42 @@ public class PhyloRFMove extends NodeMove {
             initialized = true;
         }
 
+        watch = Stopwatch.createStarted();
+
         if(!useSuperPosition){
             sampler.iterate(rand, nItersPerPathAuxVar);
         }else{
             sampler.iterateWithSuperPosition(rand, nItersPerPathAuxVar, true);
         }
 
+        watch.stop();
+        long elapsed = watch.elapsed(TimeUnit.MILLISECONDS);
+
+
         double[] newPoint = sampler.getCurrentPosition().data;
 
         parameters.setVector(newPoint);
+
+        if(useSuperPosition){
+            output.printWrite("general-sampler-diagnostic",
+                    "wallClockTimeMilliSeconds", elapsed,
+                    "totalTime", sampler.getTotalTimeWithSuperposition(),
+                    "nBounces", sampler.getNBounces(),
+                    "collisionCalculationTime", sampler.getCollisionCalculationTime(),
+                    "candidateCollisionCalculationTime", sampler.getCandidateCollisionCalculationTime(),
+                    "gradientCalculationTime", sampler.getGradientCalculationTime(),
+                    "nRefreshment", sampler.getNRefreshments());
+        }else{
+            output.printWrite("general-sampler-diagnostic",
+                    "wallClockTimeMilliSeconds", elapsed,
+                    "averageTime", sampler.getAverageTimeWithoutSuperposition(),
+                    "nBounces", sampler.getNBounces(),
+                    "collisionCalculationTime", sampler.getCollisionCalculationTime(),
+                    "gradientCalculationTime", sampler.getGradientCalculationTime(),
+                    "nRefreshment", sampler.getNRefreshments());
+        }
+
+        output.flush();
     }
 
     private boolean initialized = false;
