@@ -97,6 +97,7 @@ public class PhyloRFMove extends NodeMove {
                     "wallClockTimeMilliSeconds", elapsed,
                     "totalTime", sampler.getTotalTimeWithSuperposition(),
                     "nBounces", sampler.getNBounces(),
+                    "nVirtualCollisions", sampler.getNVirtualCollisions(),
                     "collisionCalculationTime", sampler.getCollisionCalculationTime(),
                     "candidateCollisionCalculationTime", sampler.getCandidateCollisionCalculationTime(),
                     "gradientCalculationTime", sampler.getGradientCalculationTime(),
@@ -108,6 +109,7 @@ public class PhyloRFMove extends NodeMove {
                     "nBounces", sampler.getNBounces(),
                     "collisionCalculationTime", sampler.getCollisionCalculationTime(),
                     "gradientCalculationTime", sampler.getGradientCalculationTime(),
+                    "refreshmentTime", sampler.getRefreshmentTime(),
                     "nRefreshment", sampler.getNRefreshments());
         }
 

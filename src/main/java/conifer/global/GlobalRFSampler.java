@@ -54,10 +54,12 @@ public class GlobalRFSampler {
     private int nRefreshments = 0;
     private double totalTime = 0;
     private double averageTime = 0;
+    private int nVirtualCollisions =0;
 
     private long collisionCalculationTime = 0;
     private long candidateCollisionCalculationTime = 0;
     private long gradientCalculationTime =0;
+    private long refreshmentTime = 0;
 
     public Stopwatch watch = null;
 
@@ -163,7 +165,7 @@ public class GlobalRFSampler {
                 watch = Stopwatch.createStarted();
                 currentVelocity = StaticUtils.bounce(currentVelocity, gradient(currentPosition));
                 watch.stop();
-                gradientCalculationTime = gradientCalculationTime + watch.elapsed(TimeUnit.MILLISECONDS);
+                gradientCalculationTime = gradientCalculationTime + watch.elapsed(TimeUnit.NANOSECONDS);
 
             }
 
@@ -183,12 +185,13 @@ public class GlobalRFSampler {
                 // initialize collision map
                 initCollisionQueue(rand, totalTime);
                 watch.stop();
-                collisionCalculationTime = collisionCalculationTime + watch.elapsed(TimeUnit.MILLISECONDS);
+                collisionCalculationTime = collisionCalculationTime + watch.elapsed(TimeUnit.NANOSECONDS);
             }else{
                 watch = Stopwatch.createStarted();
                 updateCandidateCollision(rand, collisionFactor, totalTime);
                 watch.stop();
-                candidateCollisionCalculationTime = candidateCollisionCalculationTime + watch.elapsed(TimeUnit.MILLISECONDS);
+                nVirtualCollisions++;
+                candidateCollisionCalculationTime = candidateCollisionCalculationTime + watch.elapsed(TimeUnit.NANOSECONDS);
             }
 
         }
@@ -221,7 +224,7 @@ public class GlobalRFSampler {
             watch = Stopwatch.createStarted();
             double collisionTime = solver.collisionTime(currentPosition, currentVelocity, energy, exponential);
             watch.stop();
-            collisionCalculationTime = collisionCalculationTime + watch.elapsed(TimeUnit.MILLISECONDS);
+            collisionCalculationTime = collisionCalculationTime + watch.elapsed(TimeUnit.NANOSECONDS);
             double refreshTime = options.refreshRate == 0 ? Double.POSITIVE_INFINITY : Exponential.generate(rand, options.refreshRate);
             double eventTime = Math.min(collisionTime, refreshTime);
             totalTime += eventTime;
@@ -238,12 +241,15 @@ public class GlobalRFSampler {
                 watch = Stopwatch.createStarted();
                 currentVelocity = StaticUtils.bounce(currentVelocity, gradient(currentPosition));
                 watch.stop();
-                gradientCalculationTime = gradientCalculationTime + watch.elapsed(TimeUnit.MILLISECONDS);
+                gradientCalculationTime = gradientCalculationTime + watch.elapsed(TimeUnit.NANOSECONDS);
                 nBounces++;
             }
 
             else{
+                watch = Stopwatch.createStarted();
                 currentVelocity = refreshVelocity(currentPosition, currentVelocity, rand);
+                watch.stop();
+                refreshmentTime = refreshmentTime + watch.elapsed(TimeUnit.NANOSECONDS);
                 nRefreshments++;
             }
 
@@ -378,6 +384,14 @@ public class GlobalRFSampler {
     public long getGradientCalculationTime(){
 
         return gradientCalculationTime;
+    }
+
+    public int getNVirtualCollisions(){
+        return nVirtualCollisions;
+    }
+
+    public long getRefreshmentTime(){
+        return refreshmentTime;
     }
 
     public void setCurrentPosition(DoubleMatrix currentPosition) {
