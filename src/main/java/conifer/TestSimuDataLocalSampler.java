@@ -106,7 +106,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     public double upperbound = 1.0;
 
     @Option(gloss = "If the Adaptive Local Rejection Free sampler should be used.")
-    public boolean useAdaptiveLocalRF = false;
+    public boolean useAdaptiveLocalRF = true;
 
     private String Filename;
 
