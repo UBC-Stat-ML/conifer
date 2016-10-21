@@ -71,20 +71,20 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     public int nItersPerPathAuxVar = 1000;
 
     @Option(gloss = "If the Rejection Free sampler should be used.")
-    public boolean useGlobalRF = true;
+    public boolean useGlobalRF = false;
 
     @Option(gloss = "If the local Rejection Free Sampler should be used")
-    public boolean useLocalRF = false;
+    public boolean useLocalRF = true;
 
     @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
     public boolean isNormalized = false;
 
     @Option(gloss = "If the local rejection free sampler is used, we provide the fixed trajectory length")
-    public double maxTrajectoryLength;
+    public Double maxTrajectoryLength=null;
 
 
     @Option(gloss="Number of MCMC iterations")
-    public int nMCMCIterations = 100000;
+    public int nMCMCIterations = 10000;
 
 
     @Option(gloss="Rate Matrix Method")
@@ -98,6 +98,18 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
     @OptionSet(name = "factory")
     public final MCMCFactory factory = new MCMCFactory();
+
+    @Option(gloss = "lowerbound of the trajectory length for local rejection free sampler")
+    public double lowerbound = 0.02;
+
+    @Option(gloss =  "upperbound of the trajectory length for local rejection free sampler")
+    public double upperbound = 1.0;
+
+    @Option(gloss = "If the Adaptive Local Rejection Free sampler should be used.")
+    public boolean useAdaptiveLocalRF = false;
+
+    private String Filename;
+
 
     public class Model {
         @DefineFactor(onObservations = true)
@@ -139,7 +151,20 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
         if (useLocalRF) {
             factory.addNodeMove(ExpFamParameters.class, PhyloLocalRFMove.class);
-            PhyloLocalRFMove.maxTrajectoryLength = maxTrajectoryLength;
+
+            if(useAdaptiveLocalRF){
+
+                PhyloLocalRFMove.lowerbound = lowerbound;
+                PhyloLocalRFMove.upperbound = upperbound;
+
+
+            }else{
+
+                if(maxTrajectoryLength == null){
+                    throw new RuntimeException("The length of the trajectory should be provided if adaptation is not used");
+                }
+                PhyloLocalRFMove.maxTrajectoryLength = maxTrajectoryLength;
+            }
             factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
             factory.excludeNodeMove(RealVectorAdaptiveMHProposal.class);
             factory.excludeNodeMove(PhyloRFMove.class);
@@ -208,8 +233,21 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
         logToFile("Fixed Trajectory length:" + maxTrajectoryLength);
        // File newDirectory = new File(Results.getResultFolder().getParent() + "rep"+ rep+ "isExcludedHMCMove" + isExcluded + bandwidth+selectedRateMtx+"numSites"+numberOfSites+"Seed"+whichSeedUsed+ "epsilon"+PhyloHMCMove.epsilon+"L"+PhyloHMCMove.L);
         logToFile("Samplers:"+ mcmc.toString());
-        File newDirectory = new File(Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "TrajLength"+ maxTrajectoryLength + "useLocal"+ useLocalRF + "useGlobal" + useGlobalRF
-        + "useSuperPosition"+ useSuperPosition + selectedRateMtx);
+
+        if(useAdaptiveLocalRF){
+
+            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "TrajLength"+ PhyloLocalRFMove.maxTrajectoryLength + "useLocal"+ useLocalRF + "useGlobal" + useGlobalRF
+                    + "useSuperPosition"+ useSuperPosition + selectedRateMtx;
+        }
+
+        if(!useAdaptiveLocalRF&& useLocalRF){
+
+            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "TrajLength"+ maxTrajectoryLength + "useLocal"+ useLocalRF + "useGlobal" + useGlobalRF
+                    + "useSuperPosition"+ useSuperPosition + selectedRateMtx;
+        }
+
+        File newDirectory = new File(Filename);
+
         newDirectory.mkdir();
         try
         {
