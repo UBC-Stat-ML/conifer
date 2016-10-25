@@ -9,6 +9,7 @@ import blang.ProbabilityModel;
 import briefj.OutputManager;
 import briefj.run.Results;
 import com.google.common.base.Stopwatch;
+import conifer.global.SolverNames;
 import org.jblas.DoubleMatrix;
 
 import conifer.rejfreeutil.RFSamplerOptions;
@@ -46,6 +47,8 @@ public class PhyloRFMove extends NodeMove {
 
     public static boolean useSuperPosition = true;
 
+    public static boolean usePegasusSolver = true;
+
     public Stopwatch watch = null;
 
     public OutputManager output = Results.getGlobalOutputManager();
@@ -72,7 +75,12 @@ public class PhyloRFMove extends NodeMove {
             sampler = new GlobalRFSampler(objective, new DoubleMatrix(initialPoint), options, new ProbabilityModel(modelSpec));
         } else {
             System.out.println("Initializing RF sampler");
-            sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec));
+            if(usePegasusSolver){
+                sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec));
+            }else{
+                sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec), SolverNames.Brent);
+            }
+
             initialized = true;
         }
 

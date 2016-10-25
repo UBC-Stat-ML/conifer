@@ -84,7 +84,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
 
     @Option(gloss="Number of MCMC iterations")
-    public int nMCMCIterations = 1000;
+    public int nMCMCIterations = 1;
 
 
     @Option(gloss="Rate Matrix Method")
@@ -92,6 +92,9 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
     @Option(gloss="Use superposition method in global sampler")
     public boolean useSuperPosition = false;
+
+    @Option(gloss="Use Pegasus solver in global sampler or not, if not use Brent Solver")
+    public boolean usePegasusSolver = false;
 
     @OptionSet(name = "rfoptions")
     public RFSamplerOptions rfOptions = new RFSamplerOptions();
@@ -146,6 +149,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
             factory.excludeNodeMove(RealVectorOverRelaxedSlice.class);
             factory.excludeNodeMove(RealVectorAdaptiveMHProposal.class);
             factory.excludeNodeMove(PhyloLocalRFMove.class);
+            PhyloRFMove.usePegasusSolver = usePegasusSolver;
 
         }
 
@@ -237,19 +241,25 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
         if(useAdaptiveLocalRF){
 
-            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "TrajLength"+ PhyloLocalRFMove.maxTrajectoryLength + "useLocal"+ useLocalRF + "useGlobal" + useGlobalRF
-                    + "useSuperPosition"+ useSuperPosition + selectedRateMtx;
+            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "TrajLength"+ PhyloLocalRFMove.maxTrajectoryLength + "useLocal"+ useLocalRF +
+                     "useAdaptiveLocal"+ useAdaptiveLocalRF + selectedRateMtx;
         }
 
         if(!useAdaptiveLocalRF&& useLocalRF){
 
-            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "TrajLength"+ maxTrajectoryLength + "useLocal"+ useLocalRF + "useGlobal" + useGlobalRF
-                    + "useSuperPosition"+ useSuperPosition + selectedRateMtx;
+            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "TrajLength"+ maxTrajectoryLength + "useLocal"+ useLocalRF +
+                       selectedRateMtx;
         }
         if(useHMC||useAdaptiveHMC){
 
             Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "epsilon"+ PhyloHMCMove.epsilon + "L"+ PhyloHMCMove.L+
                      selectedRateMtx;
+        }
+
+        if(useGlobalRF){
+            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "useGlobal" + useGlobalRF + "usePegasusSolver" + usePegasusSolver
+                    + "useSuperPosition"+ useSuperPosition + selectedRateMtx;
+
         }
 
         File newDirectory = new File(Filename);

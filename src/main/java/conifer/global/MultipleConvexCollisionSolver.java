@@ -2,6 +2,8 @@ package conifer.global;
 
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.solvers.BaseAbstractUnivariateSolver;
+import org.apache.commons.math3.analysis.solvers.BrentSolver;
 import org.apache.commons.math3.analysis.solvers.PegasusSolver;
 import org.jblas.DoubleMatrix;
 
@@ -12,8 +14,16 @@ import bayonet.opt.LBFGSMinimizer;
 
 import static conifer.rejfreeutil.StaticUtils.*;
 
-public class PegasusConvexCollisionSolver implements CollisionSolver {
-    private final PegasusSolver solver = new PegasusSolver();
+public class MultipleConvexCollisionSolver implements CollisionSolver{
+
+    //private final PegasusSolver solver = new PegasusSolver();
+    private final BaseAbstractUnivariateSolver solver;
+
+    public MultipleConvexCollisionSolver(SolverNames selectedSolver){
+
+        this.solver = selectedSolver.getSolver();
+
+    }
 
     public double collisionTime(final DoubleMatrix initialPoint, final DoubleMatrix velocity, DifferentiableFunction energy, final double exponential) {
         // go to minimum energy for free

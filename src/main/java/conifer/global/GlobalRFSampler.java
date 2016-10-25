@@ -1,6 +1,5 @@
 package conifer.global;
 
-import java.sql.Time;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -87,7 +86,11 @@ public class GlobalRFSampler {
 
 
     public  GlobalRFSampler(DifferentiableFunction energy, DoubleMatrix initialPosition, RFSamplerOptions options, ProbabilityModel model) {
-        this(energy, initialPosition, options, new PegasusConvexCollisionSolver(), model);
+        this(energy, initialPosition, options, new MultipleConvexCollisionSolver(SolverNames.Pegasus), model);
+    }
+
+    public  GlobalRFSampler(DifferentiableFunction energy, DoubleMatrix initialPosition, RFSamplerOptions options, ProbabilityModel model, SolverNames solverNames) {
+        this(energy, initialPosition, options, new MultipleConvexCollisionSolver(solverNames), model);
     }
 
     public GlobalRFSampler(DifferentiableFunction energy, DoubleMatrix initialPosition, ProbabilityModel model) {
@@ -96,6 +99,10 @@ public class GlobalRFSampler {
 
     public static GlobalRFSampler initializeRFWithLBFGS(DifferentiableFunction energy, RFSamplerOptions options, ProbabilityModel model) {
         return new GlobalRFSampler(energy, optimizePosition(energy), options, model);
+    }
+
+    public static GlobalRFSampler initializeRFWithLBFGS(DifferentiableFunction energy, RFSamplerOptions options, ProbabilityModel model, SolverNames solverNames) {
+        return new GlobalRFSampler(energy, optimizePosition(energy), options, new MultipleConvexCollisionSolver(solverNames), model);
     }
 
     public static GlobalRFSampler initializeRFWithLBFGS(DifferentiableFunction energy, ProbabilityModel model) {
