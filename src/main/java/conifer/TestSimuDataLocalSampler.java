@@ -84,7 +84,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
 
     @Option(gloss="Number of MCMC iterations")
-    public int nMCMCIterations = 1;
+    public int nMCMCIterations = 1000;
 
 
     @Option(gloss="Rate Matrix Method")
