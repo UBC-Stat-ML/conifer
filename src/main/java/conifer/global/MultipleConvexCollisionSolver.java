@@ -1,10 +1,12 @@
 package conifer.global;
 
 
+import bayonet.math.EJMLUtils;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.solvers.BaseAbstractUnivariateSolver;
 import org.apache.commons.math3.analysis.solvers.BrentSolver;
 import org.apache.commons.math3.analysis.solvers.PegasusSolver;
+import org.apache.commons.math3.optim.linear.SolutionCallback;
 import org.jblas.DoubleMatrix;
 
 import conifer.global.GlobalRFSampler.CollisionSolver;
@@ -19,10 +21,20 @@ public class MultipleConvexCollisionSolver implements CollisionSolver{
     //private final PegasusSolver solver = new PegasusSolver();
     private final BaseAbstractUnivariateSolver solver;
 
+    private final QuadraticRegulaFalsiSolver quadraticSolver;
+
+    public static boolean useQuadraticSolver = true;
+
+    public MultipleConvexCollisionSolver(){
+
+        this.solver = SolverNames.Pegasus.getSolver();
+        this.quadraticSolver = new QuadraticRegulaFalsiSolver();
+    }
+
     public MultipleConvexCollisionSolver(SolverNames selectedSolver){
 
         this.solver = selectedSolver.getSolver();
-
+        this.quadraticSolver = new QuadraticRegulaFalsiSolver();
     }
 
     public double collisionTime(final DoubleMatrix initialPoint, final DoubleMatrix velocity, DifferentiableFunction energy, final double exponential) {
@@ -56,8 +68,20 @@ public class MultipleConvexCollisionSolver implements CollisionSolver{
         };
         final double upperBound = findUpperBound(lineSolvingFunction);
         final int maxEval = 100;
-        final double time2 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
-        return time1 + time2;
+        if(useQuadraticSolver){
+            //final double time3 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
+            final double time2 = quadraticSolver.solve(maxEval,lineSolvingFunction, 0.0, upperBound);
+
+//            if(Math.abs(time2-time3)>1e-6){
+//                throw new RuntimeException("Two solvers get different solution");
+//            }
+            return time1 + time2;
+
+        }else{
+            final double time2 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
+            return time1 + time2;
+        }
+
     }
 
     private static DoubleMatrix lineMinimize(
