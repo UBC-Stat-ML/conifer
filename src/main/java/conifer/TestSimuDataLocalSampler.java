@@ -262,8 +262,8 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
         }
 
         if(useGlobalRF){
-            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "useGlobal" + useGlobalRF + "usePegasusSolver" + usePegasusSolver
-                    + "useSuperPosition"+ useSuperPosition + selectedRateMtx;
+            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "useGlobal" + useGlobalRF + "usePegasusSolver" + usePegasusSolver + "useQuadraticSolver"+
+                    useQuadraticSolver + "useSuperPosition"+ useSuperPosition + selectedRateMtx;
 
         }
 
