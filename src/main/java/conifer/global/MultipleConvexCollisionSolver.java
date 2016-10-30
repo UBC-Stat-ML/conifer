@@ -73,6 +73,8 @@ public class MultipleConvexCollisionSolver implements CollisionSolver{
             final double time2 = quadraticSolver.solve(maxEval,lineSolvingFunction, 0.0, upperBound);
 
 //            if(Math.abs(time2-time3)>1e-6){
+//                System.out.println(Double.toString(time3));
+//                System.out.println(Double.toString(time2));
 //                throw new RuntimeException("Two solvers get different solution");
 //            }
             return time1 + time2;

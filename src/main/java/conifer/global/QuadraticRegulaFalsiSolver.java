@@ -323,6 +323,14 @@ public class QuadraticRegulaFalsiSolver {
                 f0 = fanBar;
                 x1 = bnBar;
                 f1 = fbnBar;
+//                if(cnBar < anBar){
+//                    xn = anBar;
+//                    fxn = fanBar;
+//                }
+//                if(cnBar >bnBar){
+//                    xn = bnBar;
+//                    fxn = fbnBar;
+//                }
             }
 
         }
