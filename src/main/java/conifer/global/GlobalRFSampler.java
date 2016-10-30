@@ -192,7 +192,7 @@ public class GlobalRFSampler {
                 // initialize collision map
                 initCollisionQueue(rand, totalTime);
                 //watch.stop();
-                collisionCalculationTime = collisionCalculationTime + watch.elapsed(TimeUnit.NANOSECONDS);
+                //collisionCalculationTime = collisionCalculationTime + watch.elapsed(TimeUnit.NANOSECONDS);
             }else{
                 //watch = Stopwatch.createStarted();
                 updateCandidateCollision(rand, collisionFactor, totalTime);

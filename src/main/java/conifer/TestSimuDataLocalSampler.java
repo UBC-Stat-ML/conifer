@@ -11,6 +11,7 @@ import briefj.run.Results;
 import com.beust.jcommander.internal.Maps;
 
 import conifer.ctmc.expfam.RateMtxNames;
+import conifer.global.MultipleConvexCollisionSolver;
 import conifer.moves.RealVectorAdaptiveMHProposal;
 import conifer.moves.RealVectorOverRelaxedSlice;
 import conifer.rejfreemodels.phylo.PhyloLocalRFMove;
@@ -96,6 +97,9 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     @Option(gloss="Use Pegasus solver in global sampler or not, if not use Brent Solver")
     public boolean usePegasusSolver = false;
 
+    @Option(gloss="Use superposition method in global sampler")
+    public boolean useQuadraticSolver = true;
+
     @OptionSet(name = "rfoptions")
     public RFSamplerOptions rfOptions = new RFSamplerOptions();
 
@@ -150,6 +154,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
             factory.excludeNodeMove(RealVectorAdaptiveMHProposal.class);
             factory.excludeNodeMove(PhyloLocalRFMove.class);
             PhyloRFMove.usePegasusSolver = usePegasusSolver;
+            MultipleConvexCollisionSolver.useQuadraticSolver = useQuadraticSolver;
 
         }
 
