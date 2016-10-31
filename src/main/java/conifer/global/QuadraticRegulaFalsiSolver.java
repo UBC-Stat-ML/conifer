@@ -265,33 +265,30 @@ public class QuadraticRegulaFalsiSolver {
                 return cnBar;
             }
 
-
-            if(fanBar * fcnBar < 0){
-                x0 = anBar;
-                x1 = cnBar;
-                f0 = fanBar;
-                f1 = fcnBar;
-
-
-            }else{
-                x0 = cnBar;
-                f0 = fcnBar;
-                x1 = bnBar;
-                f1 = fbnBar;
-            }
-
-            if(FastMath.abs(cnBar-xn) < FastMath.max(rtol * FastMath.abs(Math.max(cnBar, xn)),
-                    atol)){
-                return xn;
-            }
-
             xn = cnBar;
             fxn = fcnBar;
+
+            if(cnBar >= anBar && cnBar <= bnBar){
+                if(fanBar * fcnBar < 0){
+                    x0 = anBar;
+                    x1 = cnBar;
+                    f0 = fanBar;
+                    f1 = fcnBar;
+
+
+                }else{
+                    x0 = cnBar;
+                    f0 = fcnBar;
+                    x1 = bnBar;
+                    f1 = fbnBar;
+                }
+            }
+
 
             // If the function value of the last approximation is too small,
             // given the function value accuracy, then we can't get closer to
             // the root than we already are.
-            if (FastMath.abs(fxn) <= ftol) {
+            if (fxn ==0 || FastMath.abs(fxn) <= ftol) {
 
                 return xn;
             }
@@ -323,18 +320,12 @@ public class QuadraticRegulaFalsiSolver {
                 f0 = fanBar;
                 x1 = bnBar;
                 f1 = fbnBar;
-                if(cnBar < anBar){
-                    xn = anBar;
-                    fxn = fanBar;
-                }
-                if(cnBar >bnBar){
-                    xn = bnBar;
-                    fxn = fbnBar;
-                }
+
             }
 
         }
     }
+
 
     /**
      * Check that the endpoints specify an interval and the function takes
