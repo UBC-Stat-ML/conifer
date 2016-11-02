@@ -19,30 +19,39 @@ import static conifer.rejfreeutil.StaticUtils.*;
 public class MultipleConvexCollisionSolver implements CollisionSolver{
 
     //private final PegasusSolver solver = new PegasusSolver();
-    private final BaseAbstractUnivariateSolver solver;
+    private BaseAbstractUnivariateSolver solver;
 
-    private final QuadraticRegulaFalsiSolver quadraticSolver;
-    private final ThirdOrderRegulaFalsiSolver thirdOrderRegulaFalsiSolver;
-    private final ImprovedPegasusSolver improvedPegasusSolver;
+    private  SelfImplementedSolverNames selfImplementedSolverNames;
+    private  SelfImplementedSolver selfImplementedSolver;
 
-    public static boolean useQuadraticSolver = false;
-    public static boolean useThirdOrderSolver = false;
-    public static boolean useImprovedPegasusSolver = true;
+    public static boolean useSelfImplementedSolver = false;
+
+    //private final QuadraticRegulaFalsiSolver quadraticSolver;
+    //private final ThirdOrderRegulaFalsiSolver thirdOrderRegulaFalsiSolver;
+    //private final ImprovedPegasusSolver improvedPegasusSolver;
+
+//    public static boolean useQuadraticSolver = false;
+//    public static boolean useThirdOrderSolver = false;
+//    public static boolean useImprovedPegasusSolver = true;
 
     public MultipleConvexCollisionSolver(){
 
         this.solver = SolverNames.Pegasus.getSolver();
-        this.quadraticSolver = new QuadraticRegulaFalsiSolver();
-        this.thirdOrderRegulaFalsiSolver = new ThirdOrderRegulaFalsiSolver();
-        this.improvedPegasusSolver = new ImprovedPegasusSolver();
+        this.selfImplementedSolver = SelfImplementedSolverNames.ImprovedPegasus.getSolver();
+
     }
 
     public MultipleConvexCollisionSolver(SolverNames selectedSolver){
 
         this.solver = selectedSolver.getSolver();
-        this.quadraticSolver = new QuadraticRegulaFalsiSolver();
-        this.thirdOrderRegulaFalsiSolver = new ThirdOrderRegulaFalsiSolver();
-        this.improvedPegasusSolver = new ImprovedPegasusSolver();
+        this.selfImplementedSolver = SelfImplementedSolverNames.ImprovedPegasus.getSolver();
+    }
+
+    public MultipleConvexCollisionSolver(SelfImplementedSolverNames selfImplementedSolverNames){
+
+        this.solver = SolverNames.Pegasus.getSolver();
+        this.selfImplementedSolver = selfImplementedSolverNames.getSolver();
+
     }
 
     public double collisionTime(final DoubleMatrix initialPoint, final DoubleMatrix velocity, DifferentiableFunction energy, final double exponential) {
@@ -74,11 +83,14 @@ public class MultipleConvexCollisionSolver implements CollisionSolver{
                 return exponential - delta;
             }
         };
+
         final double upperBound = findUpperBound(lineSolvingFunction);
         final int maxEval = 100;
-        if(useQuadraticSolver){
+
+        if (useSelfImplementedSolver) {
+
 //            final double time3 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
-            double time2 = quadraticSolver.solve(maxEval,lineSolvingFunction, 0.0, upperBound);
+            double time2 = selfImplementedSolver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
 
 //            if(Math.abs(time2-time3)>1e-6){
 //                System.out.println(Double.toString(time3));
@@ -86,43 +98,61 @@ public class MultipleConvexCollisionSolver implements CollisionSolver{
 ////                //throw new RuntimeException("Two solvers get different solution");
 //           }
             return time1 + time2;
+        } else {
+
+            double time2 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
+            return time1 + time2;
 
         }
 
-        else if(useThirdOrderSolver){
-            //final double time3 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
-            double time2 = thirdOrderRegulaFalsiSolver.solve(maxEval,lineSolvingFunction, 0.0, upperBound);
+    }
+//        if(useQuadraticSolver){
+////            final double time3 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
+//            double time2 = quadraticSolver.solve(maxEval,lineSolvingFunction, 0.0, upperBound);
+//
+////            if(Math.abs(time2-time3)>1e-6){
+////                System.out.println(Double.toString(time3));
+////                System.out.println(Double.toString(time2));
+//////                //throw new RuntimeException("Two solvers get different solution");
+////           }
+//            return time1 + time2;
+//
+//        }
+//
+//        else if(useThirdOrderSolver){
+//            //final double time3 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
+//            double time2 = thirdOrderRegulaFalsiSolver.solve(maxEval,lineSolvingFunction, 0.0, upperBound);
+////            if(Math.abs(time2-time3)>1e-6){
+////                System.out.println(Double.toString(time3));
+////                System.out.println(Double.toString(time2));
+////                //throw new RuntimeException("Two solvers get different solution");
+////            }
+//            return time1 + time2;
+//
+//        }
+//        else if(useImprovedPegasusSolver){
+//
+//            final double time3 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
+//            double time2 = improvedPegasusSolver.solve(3 * maxEval,lineSolvingFunction, 0.0, upperBound);
 //            if(Math.abs(time2-time3)>1e-6){
 //                System.out.println(Double.toString(time3));
 //                System.out.println(Double.toString(time2));
 //                //throw new RuntimeException("Two solvers get different solution");
 //            }
-            return time1 + time2;
-
-        }
-        else if(useImprovedPegasusSolver){
-
-            final double time3 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
-            double time2 = improvedPegasusSolver.solve(3 * maxEval,lineSolvingFunction, 0.0, upperBound);
-            if(Math.abs(time2-time3)>1e-6){
-                System.out.println(Double.toString(time3));
-                System.out.println(Double.toString(time2));
-                //throw new RuntimeException("Two solvers get different solution");
-            }
-            return time1 + time2;
+//            return time1 + time2;
+//
+//
+//
+//        }
+//
+//        else{
+//             double time2 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
+//             return time1 + time2;
+//            }
 
 
 
-        }
 
-        else{
-             double time2 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
-             return time1 + time2;
-            }
-
-
-
-    }
 
     private static DoubleMatrix lineMinimize(
             final DoubleMatrix initialPoint,

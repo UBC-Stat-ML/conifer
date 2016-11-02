@@ -93,6 +93,10 @@ public class GlobalRFSampler {
         this(energy, initialPosition, options, new MultipleConvexCollisionSolver(solverNames), model);
     }
 
+    public  GlobalRFSampler(DifferentiableFunction energy, DoubleMatrix initialPosition, RFSamplerOptions options, ProbabilityModel model, SelfImplementedSolverNames solverNames) {
+        this(energy, initialPosition, options, new MultipleConvexCollisionSolver(solverNames), model);
+    }
+
     public GlobalRFSampler(DifferentiableFunction energy, DoubleMatrix initialPosition, ProbabilityModel model) {
         this(energy, initialPosition, new RFSamplerOptions(), model);
     }
@@ -100,6 +104,11 @@ public class GlobalRFSampler {
     public static GlobalRFSampler initializeRFWithLBFGS(DifferentiableFunction energy, RFSamplerOptions options, ProbabilityModel model) {
         return new GlobalRFSampler(energy, optimizePosition(energy), options, model);
     }
+
+    public static GlobalRFSampler initializeRFWithLBFGS(DifferentiableFunction energy, RFSamplerOptions options, ProbabilityModel model, SelfImplementedSolverNames solverNames) {
+        return new GlobalRFSampler(energy, optimizePosition(energy), options, new MultipleConvexCollisionSolver(solverNames), model);
+    }
+
 
     public static GlobalRFSampler initializeRFWithLBFGS(DifferentiableFunction energy, RFSamplerOptions options, ProbabilityModel model, SolverNames solverNames) {
         return new GlobalRFSampler(energy, optimizePosition(energy), options, new MultipleConvexCollisionSolver(solverNames), model);

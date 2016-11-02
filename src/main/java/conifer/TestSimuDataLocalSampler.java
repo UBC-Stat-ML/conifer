@@ -12,6 +12,9 @@ import com.beust.jcommander.internal.Maps;
 
 import conifer.ctmc.expfam.RateMtxNames;
 import conifer.global.MultipleConvexCollisionSolver;
+import conifer.global.SelfImplementedSolver;
+import conifer.global.SelfImplementedSolverNames;
+import conifer.global.SolverNames;
 import conifer.moves.RealVectorAdaptiveMHProposal;
 import conifer.moves.RealVectorOverRelaxedSlice;
 import conifer.rejfreemodels.phylo.PhyloLocalRFMove;
@@ -85,7 +88,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
 
     @Option(gloss="Number of MCMC iterations")
-    public int nMCMCIterations = 10000;
+    public int nMCMCIterations = 1;
 
 
     @Option(gloss="Rate Matrix Method")
@@ -97,8 +100,11 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     @Option(gloss="Use Pegasus solver in global sampler or not, if not use Brent Solver")
     public boolean usePegasusSolver = false;
 
-    @Option(gloss="Use superposition method in global sampler")
-    public boolean useQuadraticSolver = true;
+    @Option(gloss="Use self implemented solver or not, if not use Pegasus Solver")
+    public boolean useSelfImplementedSolver = true;
+
+    @Option(gloss = "self implemented solver names")
+    public SelfImplementedSolverNames selfSolverNames = SelfImplementedSolverNames.ImprovedPegasus;
 
     @OptionSet(name = "rfoptions")
     public RFSamplerOptions rfOptions = new RFSamplerOptions();
@@ -154,7 +160,20 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
             factory.excludeNodeMove(RealVectorAdaptiveMHProposal.class);
             factory.excludeNodeMove(PhyloLocalRFMove.class);
             PhyloRFMove.usePegasusSolver = usePegasusSolver;
-            MultipleConvexCollisionSolver.useQuadraticSolver = useQuadraticSolver;
+            PhyloRFMove.useSelfImplementedSolver = useSelfImplementedSolver;
+            MultipleConvexCollisionSolver.useSelfImplementedSolver = useSelfImplementedSolver;
+
+            if(usePegasusSolver && !useSelfImplementedSolver){
+                PhyloRFMove.solverNames = SolverNames.Pegasus;
+            }
+            else if(!usePegasusSolver && useSelfImplementedSolver){
+                PhyloRFMove.selfSolverNames = selfSolverNames;
+            }
+            else if(!useSelfImplementedSolver && !usePegasusSolver){
+                PhyloRFMove.solverNames = SolverNames.Brent;
+            }else{
+                throw new RuntimeException("do not use Pegasus/Brent solvers and self implemented solvers at the same time");
+            }
 
         }
 
@@ -262,8 +281,20 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
         }
 
         if(useGlobalRF){
-            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "useGlobal" + useGlobalRF + "usePegasusSolver" + usePegasusSolver + "useQuadraticSolver"+
-                    useQuadraticSolver + "useSuperPosition"+ useSuperPosition + selectedRateMtx;
+            Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "useGlobal" + useGlobalRF + "usePegasusSolver" + usePegasusSolver + "useSelfImplementedSolver"+
+                    useSelfImplementedSolver   +  "useSuperPosition"+ useSuperPosition + selectedRateMtx;
+
+            if(usePegasusSolver && !useSelfImplementedSolver){
+                Filename = Filename + "solverNames" + SolverNames.Pegasus;
+            }
+            else if(!usePegasusSolver && useSelfImplementedSolver){
+                Filename = Filename + "solverNames" + selfSolverNames;
+            }
+            else if(!useSelfImplementedSolver && !usePegasusSolver){
+                Filename = Filename + "solverNames" + SolverNames.Brent;
+            }else{
+                throw new RuntimeException("do not use Pegasus/Brent solvers and self implemented solvers at the same time");
+            }
 
         }
 

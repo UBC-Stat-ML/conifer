@@ -9,6 +9,8 @@ import blang.ProbabilityModel;
 import briefj.OutputManager;
 import briefj.run.Results;
 import com.google.common.base.Stopwatch;
+import conifer.global.SelfImplementedSolver;
+import conifer.global.SelfImplementedSolverNames;
 import conifer.global.SolverNames;
 import org.jblas.DoubleMatrix;
 
@@ -49,6 +51,13 @@ public class PhyloRFMove extends NodeMove {
 
     public static boolean usePegasusSolver = true;
 
+    public static boolean useSelfImplementedSolver = false;
+
+    public static SolverNames solverNames = SolverNames.Pegasus;
+
+    public static SelfImplementedSolverNames selfSolverNames = SelfImplementedSolverNames.ImprovedPegasus;
+
+
     public Stopwatch watch = null;
 
     public OutputManager output = Results.getGlobalOutputManager();
@@ -75,12 +84,24 @@ public class PhyloRFMove extends NodeMove {
             sampler = new GlobalRFSampler(objective, new DoubleMatrix(initialPoint), options, new ProbabilityModel(modelSpec));
         } else {
             System.out.println("Initializing RF sampler");
-            if(usePegasusSolver){
+
+            if(usePegasusSolver && !useSelfImplementedSolver){
                 sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec));
-            }else{
+            }
+
+            else if( useSelfImplementedSolver && !usePegasusSolver){
+
+                sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec), selfSolverNames);
+            }
+
+            else if(!usePegasusSolver && !useSelfImplementedSolver){
                 sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec), SolverNames.Brent);
             }
 
+            else{
+                throw new RuntimeException("We do not use Pegasus/Brent together with self implemented solvers simutaneously");
+
+            }
             initialized = true;
         }
 
