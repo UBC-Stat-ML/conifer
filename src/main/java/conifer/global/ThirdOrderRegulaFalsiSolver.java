@@ -1,24 +1,18 @@
 package conifer.global;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
-import org.apache.commons.math3.analysis.solvers.*;
+import org.apache.commons.math3.analysis.solvers.AbstractUnivariateDifferentiableSolver;
+import org.apache.commons.math3.analysis.solvers.AllowedSolution;
+import org.apache.commons.math3.analysis.solvers.UnivariateSolverUtils;
 import org.apache.commons.math3.exception.*;
 import org.apache.commons.math3.util.FastMath;
 import org.apache.commons.math3.util.Incrementor;
 import org.apache.commons.math3.util.MathUtils;
-import org.jblas.DoubleMatrix;
-
-import conifer.global.GlobalRFSampler.CollisionSolver;
-import bayonet.math.NumericalUtils;
-import bayonet.opt.DifferentiableFunction;
-import bayonet.opt.LBFGSMinimizer;
-
 
 /**
- * Created by crystal on 2016-10-27.
+ * Created by crystal on 2016-10-29.
  */
-public class QuadraticRegulaFalsiSolver {
-
+public class ThirdOrderRegulaFalsiSolver extends SelfImplementedSolver {
     /** Default relative accuracy. */
     private static final double DEFAULT_RELATIVE_ACCURACY = 1e-14;
     /** Default function value accuracy. */
@@ -44,7 +38,7 @@ public class QuadraticRegulaFalsiSolver {
     private final Incrementor evaluations = new Incrementor();
 
 
-    protected QuadraticRegulaFalsiSolver(){
+    protected ThirdOrderRegulaFalsiSolver(){
         this.absoluteAccuracy = DEFAULT_ABSOLUTE_ACCURACY;
         this.allowed = AllowedSolution.ABOVE_SIDE;
 
@@ -55,13 +49,13 @@ public class QuadraticRegulaFalsiSolver {
      *
      * @param absoluteAccuracy Absolute accuracy.
      */
-    protected QuadraticRegulaFalsiSolver(final double absoluteAccuracy) {
+    protected ThirdOrderRegulaFalsiSolver(final double absoluteAccuracy) {
         this.absoluteAccuracy = absoluteAccuracy;
         this.allowed = AllowedSolution.ANY_SIDE;
     }
 
-    protected QuadraticRegulaFalsiSolver(final double relativeAccuracy,
-                               final double absoluteAccuracy) {
+    protected ThirdOrderRegulaFalsiSolver(final double relativeAccuracy,
+                                         final double absoluteAccuracy) {
         this.relativeAccuracy = relativeAccuracy;
         this.absoluteAccuracy = absoluteAccuracy;
         this.allowed = AllowedSolution.ANY_SIDE;
@@ -74,8 +68,8 @@ public class QuadraticRegulaFalsiSolver {
      * @param absoluteAccuracy Maximum absolute error.
      * @param functionValueAccuracy Maximum function value error.
      */
-    protected QuadraticRegulaFalsiSolver(final double relativeAccuracy, final double absoluteAccuracy,
-                               final double functionValueAccuracy) {
+    protected ThirdOrderRegulaFalsiSolver(final double relativeAccuracy, final double absoluteAccuracy,
+                                         final double functionValueAccuracy) {
 
         this.relativeAccuracy = relativeAccuracy;
         this.absoluteAccuracy = absoluteAccuracy;
@@ -151,26 +145,35 @@ public class QuadraticRegulaFalsiSolver {
         return function.value(point);
     }
 
+    protected final double getQn(double fxn, double f1, double f0){
+        double qn = FastMath.abs(fxn)/(f1 - f0);
+        return qn;
+    }
 
-    protected final double getHn(double x0, double x1, double f0, double f1){
-        double hn;
-        hn = (x1-x0)/(f1-f0);
+    protected final double getHn(double x1, double x0, double fxn, double qn){
+
+        double hn = (x1-x0)*qn/(FastMath.abs(fxn));
         return hn;
     }
 
 
-    protected final double getCn(double x0, double x1, double f0, double f1){
-        double cn;
-        cn = (f1*x0-f0*x1)/(f1-f0);
-        return cn;
-    }
 
+    protected final double getPn(double xn, double fxn, double hn){
+        double input1 = xn - fxn;
+        double finput1 = computeObjectiveValue(input1);
+        double input2 = xn + fxn;
+        double finput2 = computeObjectiveValue(input2);
+        double input3 = xn - hn * fxn;
+        double finput3 = computeObjectiveValue(input3);
 
-    protected final double getPn(double fxn, double fcn){
-        double pn = Math.signum(fxn - fcn);
+        double numerator = finput3 * (finput1 + finput2 -2 * fxn);
+        double denominator = 2*(fxn - finput1)* fxn * fxn;
+
+        double pn = -hn * (numerator / denominator + 1/ (2* xn));
         return pn;
     }
 
+    @Override
     protected final double doSolve()
             throws ConvergenceException {
         // Get initial solution
@@ -198,26 +201,25 @@ public class QuadraticRegulaFalsiSolver {
         final double rtol = getRelativeAccuracy();
         double anBar = x0;
         double bnBar = x1;
+        double fanBar = f0;
+        double fbnBar = f1;
 
+        //initialization
         double xn = searchStart;
         double xStar = xn;
-        double pn, hn, cn = 0;
-        // Keep track of inverted intervals, meaning that the left bound is
-        // larger than the right bound.
-        boolean inverted = false;
+        double fxn = computeObjectiveValue(searchStart);
 
-        double fanBar = 0;
-        double fbnBar = 0;
-        double fxn = computeObjectiveValue(xn);
+        double  pn, cn , hn, qn, wn, fwn = 0;
+
 
         // Keep finding better approximations.
         while (true) {
-            //get hn, pn, cn first and then get cnbar
-            hn = getHn(x0, x1, f0, f1);
-            cn = getCn(x0, x1, f0, f1);
-            final double fcn = computeObjectiveValue(cn);
-            pn = getPn(fxn, fcn);
 
+            // Regula-Falsi Iteration
+            cn = getCn(x0, x1, f0, f1);
+
+            // Convergence test
+            final double fcn = computeObjectiveValue(cn);
             if(fcn == 0|| FastMath.abs(fcn)<= ftol){
                 return cn;
             }
@@ -228,18 +230,13 @@ public class QuadraticRegulaFalsiSolver {
                 return cn;
             }
 
-            // Update the bounds with the new approximation.
-            if (f0 * fcn < 0) {
-                // The value of x1 has switched to the other bound, thus inverting
-                // the interval.
+
+            if(f0 * fcn < 0){
+
                 anBar = x0;
-                fanBar = f0;
                 bnBar = cn;
                 fbnBar = fcn;
-
-            }
-
-            if (f1 * fcn < 0){
+            }else{
                 anBar = cn;
                 fanBar = fcn;
                 bnBar = x1;
@@ -249,83 +246,63 @@ public class QuadraticRegulaFalsiSolver {
 
             xStar = cn;
 
-            // call exponential iterative procedure
-            // Calculate the next approximation.
-            final double cnBar = xn * Math.exp(-hn*fxn*fxn/(xn*(pn*fxn*fxn+fxn-fcn)));
-            final double fcnBar = computeObjectiveValue(cnBar);
+            //HEXRF Iteration
+            qn = getQn(fxn, f1, f0);
+            hn = getHn(x1, x0, fxn, qn);
+            pn = getPn(xn, fxn, hn);
+            double numerator = qn * FastMath.abs(fxn);
+            double denominator = xn * (pn * fxn * fxn + fxn- fcn);
+            wn = xn * FastMath.exp(-numerator/denominator);
 
-            incrementEvaluationCount();
 
+            if(wn >= anBar && wn <= bnBar) {
+                xn = wn;
+                fxn = fwn = computeObjectiveValue(wn);
+                incrementEvaluationCount();
 
-
-            // If the new approximation is the exact root, return it. Since
-            // this is not an under-approximation or an over-approximation,
-            // we can return it regardless of the allowed solutions.
-            if (fcnBar == 0.0) {
-                return cnBar;
-            }
-
-            xn = cnBar;
-            fxn = fcnBar;
-
-            if(cnBar >= anBar && cnBar <= bnBar){
-                if(fanBar * fcnBar < 0){
+                if (fanBar * fwn < 0) {
                     x0 = anBar;
-                    x1 = cnBar;
                     f0 = fanBar;
-                    f1 = fcnBar;
+                    x1 = wn;
+                    f1 = fwn;
 
+                } else {
 
-                }else{
-                    x0 = cnBar;
-                    f0 = fcnBar;
+                    x0 = wn;
+                    f0 = fwn;
                     x1 = bnBar;
                     f1 = fbnBar;
                 }
-            }
+            }else{
 
-
-            // If the function value of the last approximation is too small,
-            // given the function value accuracy, then we can't get closer to
-            // the root than we already are.
-            if (fxn ==0 || FastMath.abs(fxn) <= ftol) {
-
-                return xn;
-            }
-
-            // If the current interval is within the given accuracies, we
-            // are satisfied with the current approximation.
-            if (FastMath.abs(x1 - x0) < FastMath.max(rtol * FastMath.abs(x1),
-                    atol)) {
-                switch (allowed) {
-                    case ANY_SIDE:
-                        return x1;
-                    case LEFT_SIDE:
-                        return inverted ? x1 : x0;
-                    case RIGHT_SIDE:
-                        return inverted ? x0 : x1;
-                    case BELOW_SIDE:
-                        return (f1 <= 0) ? x1 : x0;
-                    case ABOVE_SIDE:
-                        return (f1 >= 0) ? x1 : x0;
-                    default:
-                        throw new MathInternalError();
-                }
-            }
-
-
-
-            if(cnBar < anBar || cnBar > bnBar){
                 x0 = anBar;
                 f0 = fanBar;
                 x1 = bnBar;
                 f1 = fbnBar;
-
+                if(wn < anBar){
+                    xn = anBar;
+                    fxn = fanBar;
+                }else{
+                    xn = bnBar;
+                    fxn = fbnBar;
+                }
             }
+
+            // convergence test
+            if( fxn == 0|| FastMath.abs(fxn)<= ftol){
+
+                return xn;
+            }
+
+            if (FastMath.abs(x1 - x0) < FastMath.max(rtol * FastMath.abs(x1),
+                    atol)) {
+               return x1;
+            }
+
+            // if xn and xn+1 are close
 
         }
     }
-
 
     /**
      * Check that the endpoints specify an interval and the function takes
@@ -392,4 +369,11 @@ public class QuadraticRegulaFalsiSolver {
             throw new TooManyEvaluationsException(e.getMax());
         }
     }
+
+
+
+
+
+
+
 }
