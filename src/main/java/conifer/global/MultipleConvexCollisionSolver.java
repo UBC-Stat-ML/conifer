@@ -106,50 +106,6 @@ public class MultipleConvexCollisionSolver implements CollisionSolver{
         }
 
     }
-//        if(useQuadraticSolver){
-////            final double time3 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
-//            double time2 = quadraticSolver.solve(maxEval,lineSolvingFunction, 0.0, upperBound);
-//
-////            if(Math.abs(time2-time3)>1e-6){
-////                System.out.println(Double.toString(time3));
-////                System.out.println(Double.toString(time2));
-//////                //throw new RuntimeException("Two solvers get different solution");
-////           }
-//            return time1 + time2;
-//
-//        }
-//
-//        else if(useThirdOrderSolver){
-//            //final double time3 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
-//            double time2 = thirdOrderRegulaFalsiSolver.solve(maxEval,lineSolvingFunction, 0.0, upperBound);
-////            if(Math.abs(time2-time3)>1e-6){
-////                System.out.println(Double.toString(time3));
-////                System.out.println(Double.toString(time2));
-////                //throw new RuntimeException("Two solvers get different solution");
-////            }
-//            return time1 + time2;
-//
-//        }
-//        else if(useImprovedPegasusSolver){
-//
-//            final double time3 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
-//            double time2 = improvedPegasusSolver.solve(3 * maxEval,lineSolvingFunction, 0.0, upperBound);
-//            if(Math.abs(time2-time3)>1e-6){
-//                System.out.println(Double.toString(time3));
-//                System.out.println(Double.toString(time2));
-//                //throw new RuntimeException("Two solvers get different solution");
-//            }
-//            return time1 + time2;
-//
-//
-//
-//        }
-//
-//        else{
-//             double time2 = solver.solve(maxEval, lineSolvingFunction, 0.0, upperBound);
-//             return time1 + time2;
-//            }
-
 
 
 
