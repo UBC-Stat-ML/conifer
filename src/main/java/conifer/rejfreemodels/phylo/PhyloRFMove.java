@@ -85,23 +85,30 @@ public class PhyloRFMove extends NodeMove {
         } else {
             System.out.println("Initializing RF sampler");
 
-            if(usePegasusSolver && !useSelfImplementedSolver){
-                sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec));
-            }
-
-            else if( useSelfImplementedSolver && !usePegasusSolver){
+            if(!useSelfImplementedSolver){
+                sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec), solverNames);
+            }else{
 
                 sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec), selfSolverNames);
             }
 
-            else if(!usePegasusSolver && !useSelfImplementedSolver){
-                sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec), SolverNames.Brent);
-            }
-
-            else{
-                throw new RuntimeException("We do not use Pegasus/Brent together with self implemented solvers simutaneously");
-
-            }
+//            if(usePegasusSolver && !useSelfImplementedSolver){
+//                sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec));
+//            }
+//
+//            else if( useSelfImplementedSolver && !usePegasusSolver){
+//
+//                sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec), selfSolverNames);
+//            }
+//
+//            else if(!usePegasusSolver && !useSelfImplementedSolver){
+//                sampler = GlobalRFSampler.initializeRFWithLBFGS(objective, options, new ProbabilityModel(modelSpec), SolverNames.Brent);
+//            }
+//
+//            else{
+//                throw new RuntimeException("We do not use Pegasus/Brent together with self implemented solvers simutaneously");
+//
+//            }
             initialized = true;
         }
 
