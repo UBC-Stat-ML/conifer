@@ -75,10 +75,10 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     public int nItersPerPathAuxVar = 1000;
 
     @Option(gloss = "If the Rejection Free sampler should be used.")
-    public boolean useGlobalRF = false;
+    public boolean useGlobalRF = true;
 
     @Option(gloss = "If the local Rejection Free Sampler should be used")
-    public boolean useLocalRF = true;
+    public boolean useLocalRF = false;
 
     @Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
     public boolean isNormalized = false;
@@ -92,16 +92,13 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
 
 
     @Option(gloss="Rate Matrix Method")
-    public RateMtxNames selectedRateMtx = RateMtxNames.DNAGTR;
+    public RateMtxNames selectedRateMtx = RateMtxNames.PROTEINSIMPLEGTR;
 
     @Option(gloss="Use superposition method in global sampler")
     public boolean useSuperPosition = false;
 
     @Option(gloss="Use Pegasus solver in global sampler or not, if not use Brent Solver")
     public boolean usePegasusSolver = false;
-
-    @Option(gloss="Use Pegasus,Brent or NewtonRaphson solver in global sampler")
-    public SolverNames solverNames = SolverNames.Newton;
 
     @Option(gloss="Use self implemented solver or not, if not use Pegasus Solver")
     public boolean useSelfImplementedSolver = true;
@@ -122,7 +119,7 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
     public double upperbound = 1.0;
 
     @Option(gloss = "If the Adaptive Local Rejection Free sampler should be used.")
-    public boolean useAdaptiveLocalRF = true;
+    public boolean useAdaptiveLocalRF = false;
 
     private String Filename;
 
@@ -163,23 +160,20 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
             factory.excludeNodeMove(RealVectorAdaptiveMHProposal.class);
             factory.excludeNodeMove(PhyloLocalRFMove.class);
             PhyloRFMove.usePegasusSolver = usePegasusSolver;
-            PhyloRFMove.solverNames = solverNames;
             PhyloRFMove.useSelfImplementedSolver = useSelfImplementedSolver;
-            PhyloRFMove.selfSolverNames = selfSolverNames;
             MultipleConvexCollisionSolver.useSelfImplementedSolver = useSelfImplementedSolver;
 
-
-//            if(usePegasusSolver && !useSelfImplementedSolver){
-//                PhyloRFMove.solverNames = SolverNames.Pegasus;
-//            }
-//            else if(!usePegasusSolver && useSelfImplementedSolver){
-//                PhyloRFMove.selfSolverNames = selfSolverNames;
-//            }
-//            else if(!useSelfImplementedSolver && !usePegasusSolver){
-//                PhyloRFMove.solverNames = SolverNames.Brent;
-//            }else{
-//                throw new RuntimeException("do not use Pegasus/Brent solvers and self implemented solvers at the same time");
-//            }
+            if(usePegasusSolver && !useSelfImplementedSolver){
+                PhyloRFMove.solverNames = SolverNames.Pegasus;
+            }
+            else if(!usePegasusSolver && useSelfImplementedSolver){
+                PhyloRFMove.selfSolverNames = selfSolverNames;
+            }
+            else if(!useSelfImplementedSolver && !usePegasusSolver){
+                PhyloRFMove.solverNames = SolverNames.Brent;
+            }else{
+                throw new RuntimeException("do not use Pegasus/Brent solvers and self implemented solvers at the same time");
+            }
 
         }
 
@@ -290,23 +284,17 @@ public class TestSimuDataLocalSampler implements Runnable, Processor {
             Filename = Results.getResultFolder().getParent() + "nIter"+nMCMCIterations+ "useGlobal" + useGlobalRF + "usePegasusSolver" + usePegasusSolver + "useSelfImplementedSolver"+
                     useSelfImplementedSolver   +  "useSuperPosition"+ useSuperPosition + selectedRateMtx;
 
-            if(!useSelfImplementedSolver){
-                Filename = Filename + "solverNames" + solverNames;
-            }else{
+            if(usePegasusSolver && !useSelfImplementedSolver){
+                Filename = Filename + "solverNames" + SolverNames.Pegasus;
+            }
+            else if(!usePegasusSolver && useSelfImplementedSolver){
                 Filename = Filename + "solverNames" + selfSolverNames;
             }
-
-//            if(usePegasusSolver && !useSelfImplementedSolver){
-//                Filename = Filename + "solverNames" + SolverNames.Pegasus;
-//            }
-//            else if(!usePegasusSolver && useSelfImplementedSolver){
-//                Filename = Filename + "solverNames" + selfSolverNames;
-//            }
-//            else if(!useSelfImplementedSolver && !usePegasusSolver){
-//                Filename = Filename + "solverNames" + SolverNames.Brent;
-//            }else{
-//                throw new RuntimeException("do not use Pegasus/Brent solvers and self implemented solvers at the same time");
-//            }
+            else if(!useSelfImplementedSolver && !usePegasusSolver){
+                Filename = Filename + "solverNames" + SolverNames.Brent;
+            }else{
+                throw new RuntimeException("do not use Pegasus/Brent solvers and self implemented solvers at the same time");
+            }
 
         }
 

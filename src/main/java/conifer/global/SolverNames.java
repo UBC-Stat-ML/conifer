@@ -2,7 +2,6 @@ package conifer.global;
 
 import org.apache.commons.math3.analysis.solvers.BaseAbstractUnivariateSolver;
 import org.apache.commons.math3.analysis.solvers.BrentSolver;
-import org.apache.commons.math3.analysis.solvers.NewtonRaphsonSolver;
 import org.apache.commons.math3.analysis.solvers.PegasusSolver;
 
 /**
@@ -20,15 +19,7 @@ public enum SolverNames {
         }
 
 
-    },
 
-    Newton{
-      public NewtonRaphsonSolver getSolver(){
-
-          final NewtonRaphsonSolver solver = new NewtonRaphsonSolver();
-          return solver;
-
-      }
 
     },
 
