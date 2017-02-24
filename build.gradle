@@ -52,10 +52,7 @@ repositories {
   mavenCentral()
   jcenter()
   maven {
-    url "file:///Users/bouchard/Documents/web/public_html/maven/"
-  }
-  maven {
-    url "http://www.stat.ubc.ca/~bouchard/maven/"
+    url "https://www.stat.ubc.ca/~bouchard/maven/"
   }
   maven {
     url "http://www.biojava.org/download/maven/"
