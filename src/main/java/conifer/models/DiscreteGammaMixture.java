@@ -2,13 +2,11 @@ package conifer.models;
 
 import java.util.List;
 
-import bayonet.distributions.Gamma;
+
 import bayonet.distributions.Multinomial;
-import blang.annotations.FactorArgument;
-import blang.annotations.FactorComponent;
-import blang.variables.RealVariable;
 
 import com.google.common.collect.Lists;
+import conifer.RandomUtils.Gamma;
 
 import conifer.ctmc.CTMC;
 import conifer.ctmc.CTMCParameters;
@@ -19,20 +17,19 @@ import conifer.ctmc.SimpleRateMatrix;
 
 public class DiscreteGammaMixture implements RateMatrixMixture
 {
-  @FactorArgument
-  public final RealVariable invariantSiteProbability;
+
+  public final blang.core.RealVar invariantSiteProbability;
+
+  public final blang.core.RealVar shapeParameter;
   
-  @FactorArgument
-  public final RealVariable shapeParameter;
-  
-  @FactorComponent
+
   public final CTMCParameters baseRateMatrix;
   
   private final int nPositiveCategories;
   
   public DiscreteGammaMixture(
-      RealVariable invariantSiteProbability,
-      RealVariable shapeParameter, 
+      blang.core.RealVar invariantSiteProbability,
+      blang.core.RealVar shapeParameter,
       CTMCParameters baseRateMatrix,
       int nPositiveCategories)
   {
@@ -45,7 +42,7 @@ public class DiscreteGammaMixture implements RateMatrixMixture
   @Override
   public CTMCParameters getRateMatrix(int index)
   {
-    double rate = computeDiscreteGammaRates(invariantSiteProbability.getValue(), nPositiveCategories, shapeParameter.getValue()).get(index);
+    double rate = computeDiscreteGammaRates(invariantSiteProbability.doubleValue(), nPositiveCategories, shapeParameter.doubleValue()).get(index);
     if (rate == 0.0)
     {
       CTMC base = baseRateMatrix.getProcess();
@@ -67,7 +64,7 @@ public class DiscreteGammaMixture implements RateMatrixMixture
   @Override
   public List<Double> getLogPriorProbabilities()
   {
-    return computeDiscreteGammaLogPriorProbabilities(invariantSiteProbability.getValue(), nPositiveCategories, shapeParameter.getValue());
+    return computeDiscreteGammaLogPriorProbabilities(invariantSiteProbability.doubleValue(), nPositiveCategories, shapeParameter.doubleValue());
   }
   
   public static List<Double> computeDiscreteGammaRates(double invariantCategoryPr, int nPositiveCategories, double shapeParameter)
