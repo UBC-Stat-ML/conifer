@@ -2,7 +2,9 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 apply plugin: 'download-task'
-apply plugin: 'application'
+apply plugin:'application'
+mainClassName ="conifer.TestSimuDataLocalSampler"
+
 
 import de.undercouch.gradle.tasks.download.Download
 
@@ -68,16 +70,21 @@ dependencies {
   compile group: 'junit', name: 'junit', version: '4.11'
   compile group: 'ca.ubc.stat', name: 'tutorialj', version: '2.0.2'
   compile group: 'ca.ubc.stat', name: 'binc', version: '1.2.1'
-  compile group: 'ca.ubc.stat', name: 'briefj', version: '2.4.1'
-  compile group: 'ca.ubc.stat', name: 'bayonet', version: '2.3.10'
-  compile group: 'ca.ubc', name: 'ahmc-java', version: '1.0.0'
+  compile group: 'ca.ubc.stat', name: 'briefj', version: '2.4.15'
+  compile group: 'ca.ubc.stat', name: 'bayonet', version: '2.3.27'
+  compile group: 'ca.ubc', name: 'ahmc-java', version: '1.0.1'
   compile group: 'org.jgrapht', name: 'jgrapht-dist', version: '0.9.0'
   compile group: 'jebl', name: 'jebl', version: '2.0'
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2'
+  compile group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.4.4'
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.4.4'
+  compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.4.4'
   compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24'
   compile 'com.google.code.gson:gson:2.3'
   compile 'org.jblas:jblas:1.2.3'
   compile 'gov.nist.math.jama:gov.nist.math.jama:1.1.1'
+  compile 'net.sourceforge.parallelcolt:parallelcolt:0.10.0'
 }
 
 task(tutorialj, dependsOn: ['build','testClasses'], type: JavaExec) {
@@ -122,4 +129,14 @@ buildscript {
 
 compileJava.dependsOn(fetchDataFiles)
 
-mainClassName = "conifer.InstrumentedSimplePhyloModel"
+if (JavaVersion.current().isJava8Compatible()) {
+  allprojects {
+    //noinspection SpellCheckingInspection
+    tasks.withType(Javadoc) {
+      // disable the crazy super-strict doclint tool in Java 8
+      //noinspection SpellCheckingInspection
+      options.addStringOption('Xdoclint:none', '-quiet')
+    }
+  }
+}
+

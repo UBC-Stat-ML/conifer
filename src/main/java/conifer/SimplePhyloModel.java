@@ -18,8 +18,10 @@ import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.mcmc.Move;
 import blang.processing.ProcessorContext;
 import briefj.BriefIO;
+import briefj.opt.Option;
 import briefj.run.Results;
 import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
@@ -30,12 +32,18 @@ public class SimplePhyloModel extends MCMCRunner
 {
 	File inputFile 
 	= new File("src/main/resources/conifer/sampleInput/FES_4.fasta");
+	
+	@Option(gloss="provide rate matrix model")
+	public RateMtxNames selectedRateMtx;
+
+	@Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+	public boolean isNormalized = true;
 
 	@DefineFactor(onObservations = true)
 	public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
 	UnrootedTreeLikelihood
-	.fromFastaFile(inputFile)
-	.withExpFamMixture(ExpFamMixture.kimura1980())
+	.fromFastaFile(inputFile, selectedRateMtx)
+	.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized))
 	.withTree(new File("src/main/resources/conifer/sampleInput/FES.ape.4.nwk"));
 
 	@DefineFactor

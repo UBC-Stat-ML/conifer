@@ -28,6 +28,7 @@ import briefj.opt.OptionSet;
 import briefj.run.Mains;
 import briefj.run.Results;
 import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.io.FastaUtils;
@@ -64,6 +65,12 @@ public class TestPhyloModel implements Runnable, Processor
 
 	@Option
 	public int nSites = 500;
+	
+	@Option(gloss="provide rate matrix model")
+	public static RateMtxNames selectedRateMtx=RateMtxNames.DNAGTR;
+
+	@Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+	public boolean isNormalized = true;
 
 	public class Model
 	{
@@ -76,8 +83,8 @@ public class TestPhyloModel implements Runnable, Processor
 		@DefineFactor(onObservations = true)
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
 		UnrootedTreeLikelihood//.createEmpty(nSites, leaves)
-		.fromFastaFile(new File(alignmentFilePath))
-		.withExpFamMixture(ExpFamMixture.kimura1980())
+		.fromFastaFile(new File(alignmentFilePath), selectedRateMtx)
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx,true))
 		.withTree(new File(initialTreeFilePath));
 
 		@DefineFactor
@@ -251,7 +258,7 @@ public class TestPhyloModel implements Runnable, Processor
 			//System.out.println(runner.model.likelihood.observations.toString());
 			try {
 				FastaUtils.writeFasta(runner.model.likelihood.observations, 
-						Results.getFileInResultFolder("SimulatedData.fasta"));
+						Results.getFileInResultFolder("SimulatedData.fasta"), selectedRateMtx);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

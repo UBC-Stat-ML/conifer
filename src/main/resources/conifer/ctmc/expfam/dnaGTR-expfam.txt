@@ -1,0 +1,57 @@
+{
+	"nCategories" : 1,
+	"orderedLatents" : ["A","C","G","T"],
+	"fullSupport" : true,
+	"unaryFeatures" :
+	[
+		{
+			"state" : { "categoryIndex" : 0, "latent" : "A" },
+			"features" : { "statio(A)" : 1.0}
+		},
+		{
+			"state" : { "categoryIndex" : 0, "latent" : "C" },
+			"features" : { "statio(C)" : 1.0 }
+		},
+		{
+			"state" : { "categoryIndex" : 0, "latent" : "G" },
+			"features" : { "statio(G)" : 1.0 }
+		},
+		{
+			"state" : { "categoryIndex" : 0, "latent" : "T" },
+			"features" : { "statio(T)" : 1.0 }
+		}
+	],
+	"binaryFeatures" :
+	[
+		{
+			"state0" : { "categoryIndex" : 0, "latent" : "A" },
+			"state1" : { "categoryIndex" : 0, "latent" : "C" },
+			"features" : {"AC": 1.0 }
+		},
+		{
+        	"state0" : { "categoryIndex" : 0, "latent" : "A" },
+        	"state1" : { "categoryIndex" : 0, "latent" : "G" },
+        	"features" : { "AG" : 1.0 }
+        },
+        {
+        	"state0" : { "categoryIndex" : 0, "latent" : "A" },
+        	"state1" : { "categoryIndex" : 0, "latent" : "T" },
+        	"features" : { "AT" : 1.0 }
+        },
+        {
+        	"state0" : { "categoryIndex" : 0, "latent" : "C" },
+        	"state1" : { "categoryIndex" : 0, "latent" : "G" },
+        	"features" : { "CG" : 1.0 }
+        },
+		{
+			"state0" : { "categoryIndex" : 0, "latent" : "C" },
+			"state1" : { "categoryIndex" : 0, "latent" : "T" },
+			"features" : { "CT" : 1.0 }
+		},
+		{
+        	"state0" : { "categoryIndex" : 0, "latent" : "G" },
+        	"state1" : { "categoryIndex" : 0, "latent" : "T" },
+        	"features" : { "GT" : 1.0 }
+        }
+	]
+}

@@ -8,11 +8,14 @@ import blang.mcmc.ConnectedFactor;
 import blang.mcmc.MHProposalDistribution;
 import blang.mcmc.SampledVariable;
 import blang.variables.RealVectorInterface;
+import briefj.opt.Option;
 
 // TODO: this should go in blang!
 
 public class RealVectorMHProposal implements MHProposalDistribution
 {
+  public static double bandWidth = 0.01;
+  
   @SampledVariable RealVectorInterface variable;
   
   @ConnectedFactor List<Factor> connectedFactors;
@@ -22,14 +25,16 @@ public class RealVectorMHProposal implements MHProposalDistribution
   @Override
   public Proposal propose(Random rand)
   {
-//    System.out.println("Computing RealVectorHMProposal");
+    //System.out.println("Computing RealVectorHMProposal");
     if (savedValue != null)
       throw new RuntimeException();
     double [] variableArray = variable.getVector();
     savedValue = variableArray.clone();
     
     for (int i = 0; i < variableArray.length; i++)
-      variableArray[i] += 0.01 * rand.nextGaussian();
+    {
+      variableArray[i] += bandWidth * rand.nextGaussian();
+    }
     variable.setVector(variableArray);
     
     return new ProposalRealization();

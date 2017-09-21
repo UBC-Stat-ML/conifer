@@ -10,6 +10,7 @@ import blang.MCMCRunner;
 import blang.annotations.DefineFactor;
 import blang.factors.IIDRealVectorGenerativeFactor;
 import blang.validation.CheckStationarity;
+import briefj.opt.Option;
 import conifer.TopologyUtils;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
@@ -24,9 +25,11 @@ import conifer.models.MultiCategorySubstitutionModel;
  */
 public class TestExpFamPhyloModel extends MCMCRunner
 {
+  @Option()
+  public static RateMtxNames selectedRateMtx = RateMtxNames.KIMURA1980;
   @DefineFactor
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
-    UnrootedTreeLikelihood.createEmpty(1, TopologyUtils.syntheticTaxaList(2)).withExpFamMixture(ExpFamMixture.dnaGTR());
+    UnrootedTreeLikelihood.createEmpty(1, TopologyUtils.syntheticTaxaList(2), selectedRateMtx).withExpFamMixture(ExpFamMixture.randomGTR(selectedRateMtx));
   
   @DefineFactor
   public final IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior =

@@ -26,6 +26,8 @@ public class TestForwardAndEndPointSamplers
   @Test
   public void test()
   {
+    
+    EndPointSampler.cached=true;
     SimpleRateMatrix k80 = RateMatrices.kimura1980();
     Random rand = new Random(1);
     final double T = 3.0;

@@ -2,6 +2,9 @@ package conifer.ctmc;
 
 import java.util.Random;
 
+import conifer.ctmc.expfam.RateMtxNames;
+import conifer.ctmc.expfam.SerializedExpFamMixture;
+
 import bayonet.distributions.Multinomial;
 
 
@@ -16,6 +19,33 @@ public class RateMatrices
   public static SimpleRateMatrix accordance()
   {
     return SimpleRateMatrix.fromResource("/conifer/ctmc/accordance.txt");
+  }
+  
+  public static SimpleRateMatrix polarity()
+  {
+    return SimpleRateMatrix.fromResource("/conifer/ctmc/polarity.txt");
+  }
+
+  public static SimpleRateMatrix polaritySize()
+  {
+    return SimpleRateMatrix.fromResource("/conifer/ctmc/polaritySize.txt");
+  }
+
+  public static SimpleRateMatrix polaritySizeGTR()
+  {
+    return SimpleRateMatrix.fromResource("/conifer/ctmc/polaritySizeGTR.txt");
+  }
+  
+  public static SimpleRateMatrix rateMtxModel(final RateMtxNames selectedRateMtx)
+  {
+    SimpleRateMatrix rateMtx;
+    RateMatrices result = new RateMatrices();
+    rateMtx=null;
+    
+    if (selectedRateMtx == null) {
+      throw new IllegalArgumentException("selectedRateMtx is null!");
+  }
+    return selectedRateMtx.getRateMtx();     
   }
   
   /**

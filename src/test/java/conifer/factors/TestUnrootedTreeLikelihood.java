@@ -7,7 +7,9 @@ import org.junit.Test;
 import blang.ProbabilityModel;
 import blang.annotations.DefineFactor;
 import blang.validation.CheckDiscreteNormalization;
+import briefj.opt.Option;
 import conifer.TopologyUtils;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.models.DiscreteGammaMixture;
 import conifer.models.MultiCategorySubstitutionModel;
 
@@ -15,9 +17,11 @@ import conifer.models.MultiCategorySubstitutionModel;
 
 public class TestUnrootedTreeLikelihood
 {
+  @Option()
+  public static RateMtxNames selectedRateMtx = RateMtxNames.KIMURA1980;
   @DefineFactor
   public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> likelihood = 
-    UnrootedTreeLikelihood.createEmpty(1, TopologyUtils.syntheticTaxaList(4));
+    UnrootedTreeLikelihood.createEmpty(1, TopologyUtils.syntheticTaxaList(4),selectedRateMtx);
   
   public static void main(String [] args)
   {

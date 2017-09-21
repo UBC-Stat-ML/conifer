@@ -14,6 +14,10 @@ import briefj.Indexer;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
+import conifer.ctmc.RateMatrices;
+import conifer.ctmc.SimpleRateMatrix;
+import conifer.ctmc.expfam.RateMtxNames;
+
 
 /**
  * A PhylogeneticObservationFactory contains the information required to 
@@ -56,18 +60,23 @@ public class PhylogeneticObservationFactory
       _proteinFactory = fromResource("/conifer/io/protein-iupac-encoding.txt");
     return _proteinFactory;
    }
+
   
-  public static PhylogeneticObservationFactory proteinPairFactory()
+  public static PhylogeneticObservationFactory selectedFactory(final RateMtxNames selectedRateMtx)
   {
-    if(_proteinPairFactory == null)
-      _proteinPairFactory = fromResource("/conifer/io/proteinPair-iupac-encoding.txt");
-    return _proteinPairFactory;
-   }
+    PhylogeneticObservationFactory result = null;
+    if (selectedRateMtx == null) {
+      throw new IllegalArgumentException("model is null!");
+    }
+    
+    return selectedRateMtx.getFactory();
+    
+  }
   
   /**
    * Reads the specifications of a PhylogeneticObservationFactory from a JSON file.
    * 
-   * See src/main/resources/conifer/io/dna-iupac-encoding.txt for an example of the format.
+   * @see src/main/resources/conifer/io/dna-iupac-encoding.txt for an example of the format.
    * 
    * @param jsonFile
    * @return
@@ -114,7 +123,7 @@ public class PhylogeneticObservationFactory
     return orderedSymbols.size();
   }
   
-  private int getChunkLength()
+  public int getChunkLength()
   {
      return orderedSymbols.get(0).length();
   }

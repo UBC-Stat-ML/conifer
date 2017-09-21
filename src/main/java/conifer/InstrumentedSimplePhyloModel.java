@@ -4,6 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.RateMtxNames;
+import conifer.factors.NonClockTreePrior;
+import conifer.factors.UnrootedTreeLikelihood;
+import conifer.models.MultiCategorySubstitutionModel;
 import bayonet.distributions.Exponential;
 import bayonet.distributions.Exponential.RateParameterization;
 import bayonet.distributions.Normal.MeanVarianceParameterization;
@@ -40,7 +45,10 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 	new String("src/main/resources/conifer/sampleInput/FES_4.fasta");
 
 	@Option
-	public int burnIn = 1000;
+	public int nMCMCSweeps = 100;
+
+	@Option
+	public int burnIn = (int) Math.round(.1 * nMCMCSweeps);
 
 	@Option
 	public int thinningPeriod = 10;
@@ -48,8 +56,18 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 	@OptionSet(name = "factory")
 	public final MCMCFactory factory = new MCMCFactory();
 
+
+	@Option
+	public int nSites = 500;
+	
+	@Option(gloss="provide rate matrix method") 
+	public RateMtxNames selectedRateMtx;
+
 	@OptionSet(name = "NodeMoves")
-	public final NodeMoves nd = new NodeMoves(); 
+	public final NodeMoves nd = new NodeMoves();
+
+	@Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+	public boolean isNormalized = true;
 	
     public static class NodeMoves
     {
@@ -68,8 +86,8 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 		@DefineFactor(onObservations = true)
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
 		UnrootedTreeLikelihood
-		.fromFastaFile(new File(alignmentFilePath))
-		.withExpFamMixture(ExpFamMixture.kimura1980())
+		.fromFastaFile(new File(alignmentFilePath), selectedRateMtx.KIMURA1980)
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx,isNormalized))
 		.withTree(new File(initialTreeFilePath));
 
 		@DefineFactor
@@ -101,6 +119,7 @@ public class InstrumentedSimplePhyloModel implements Runnable, Processor {
 		treeWriter = BriefIO.output(Results.getFileInResultFolder("FES.trees.newick"));
 
 		factory.addProcessor(this);
+		factory.mcmcOptions.nMCMCSweeps = nMCMCSweeps;
 		factory.mcmcOptions.burnIn = burnIn;
 		factory.mcmcOptions.CODA = true;
 		factory.mcmcOptions.thinningPeriod = thinningPeriod;

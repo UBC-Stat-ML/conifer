@@ -1,0 +1,32 @@
+#!/bin/bash
+#PBS -S /bin/bash
+#PBS -l walltime=72:00:00
+#PBS -l mem=2000mb
+#PBS -r n
+#PBS -e /dev/null
+#PBS -o /dev/null
+
+# Check list:
+# - change pac.Main to your own main
+# - change the command line arguments (last 3 lines in this example)
+# - change the path to java, ~/bin/jdk1.6.0_24/bin/java here, to your 
+#   own installed version of Oracle's java (OpenJDK can cause problems)
+# - adjust the max memory and max time requested to westgrid in the PBS 
+#   lines above (also add -Xmx2g or more to the java command if needed)
+# - add any executables that java might call in the path below
+# - use wrun-launch or wrun-test
+
+export PATH=~/mrbayes-3.1.2/mb:$PATH
+
+# this informs briefj.run.Results to write results in the directory created
+# by the westrun launcher
+export SPECIFIED_RESULT_FOLDER=results/all/@{individualExec.getName()}
+
+# the line below will result in 100 different runs, for example the first one
+# with '-random 1  -nIters 2  -method us' and the last one  
+# with '-random 10 -nIters 32 -method enemy'
+~/bin/jdk1.7.0_13/bin/java -cp @{codeRepo}/build/install/@{codeRepoName()}/lib/\* \
+SingleProteinModel\
+-inputFile alignmenttotal.txt \
+-treeFile tree.nwk.txt \
+-selectedRateMtx @@{polaritySize(), polarity()}

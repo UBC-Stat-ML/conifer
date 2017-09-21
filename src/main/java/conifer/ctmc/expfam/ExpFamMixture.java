@@ -13,6 +13,7 @@ import conifer.ctmc.expfam.features.IdentityBivariate;
 import conifer.ctmc.expfam.features.IdentityUnivariate;
 import conifer.io.Indexers;
 import conifer.models.RateMatrixMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 
 
 
@@ -30,39 +31,22 @@ public class ExpFamMixture implements RateMatrixMixture
   public static int nFeatures;
   public int nFeatures() { return nFeatures; }
   
-  public static Indexer<CTMCState> simpleDNAStateIndexer(int nCategories)
+  
+  
+  public static Indexer<CTMCState> simpleDNAStateIndexer(int nCategories, final RateMtxNames selectedRateMtx)
   {
-    Indexer<String> indexer = Indexers.dnaIndexer();
+    Indexer<String> indexer= Indexers.modelIndexer(selectedRateMtx);
     Indexer<CTMCState> result = new Indexer<CTMCState>();
+    
     for (int cat = 0; cat < nCategories; cat++)
       for (int i = 0; i < indexer.size(); i++)
         result.addToIndex(new CTMCState(cat, indexer.i2o(i), null));
     return result;
   }
   
-  public static Indexer<CTMCState> simpleProteinStateIndexer(int nCategories)
+  public static ExpFamMixture fromSerialized(SerializedExpFamMixture serialized, Indexer<String> observationIndexer, boolean isNormalized)
   {
-    Indexer<String> indexer = Indexers.proteinIndexer();
-    Indexer<CTMCState> result = new Indexer<CTMCState>();
-    for (int cat = 0; cat < nCategories; cat++)
-      for (int i = 0; i < indexer.size(); i++)
-        result.addToIndex(new CTMCState(cat, indexer.i2o(i), null));
-    return result;
-  }
-  
-  public static Indexer<CTMCState> simpleProteinPairStateIndexer(int nCategories)
-  {
-    Indexer<String> indexer = Indexers.proteinPairIndexer();
-    Indexer<CTMCState> result = new Indexer<CTMCState>();
-    for (int cat = 0; cat < nCategories; cat++)
-      for (int i = 0; i < indexer.size(); i++)
-        result.addToIndex(new CTMCState(cat, indexer.i2o(i), null));
-    return result;
-  }
-  
-  public static ExpFamMixture fromSerialized(SerializedExpFamMixture serialized, Indexer<String> observationIndexer)
-  {
-    CTMCExpFam<CTMCState> globalExponentialFamily = new CTMCExpFam<CTMCState>(serialized.getSupport(), serialized.getCTMCStateIndexer(), true);
+    CTMCExpFam<CTMCState> globalExponentialFamily = new CTMCExpFam<CTMCState>(serialized.getSupport(), serialized.getCTMCStateIndexer(), isNormalized);
     globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singletonList(serialized.getBivariateFeatureExtractor()));
     globalExponentialFamily.extractUnivariateFeatures(Collections.singletonList(serialized.getUnivariateFeatureExtractor()));
     nFeatures = globalExponentialFamily.nFeatures();
@@ -77,50 +61,28 @@ public class ExpFamMixture implements RateMatrixMixture
     return mixture;
   }
   
-  public static ExpFamMixture kimura1980()
+  public static ExpFamMixture rateMtxModel(RateMtxNames selectedRateMtx, boolean isNormalized)
   {
-    return fromSerialized(SerializedExpFamMixture.kimura1980(), Indexers.dnaIndexer());
-  }
+   return fromSerialized(SerializedExpFamMixture.rateMtxModel(selectedRateMtx), Indexers.modelIndexer(selectedRateMtx), isNormalized);
+     }
   
-  public static ExpFamMixture accordance()
-  {
-    return fromSerialized(SerializedExpFamMixture.accordance(), Indexers.proteinIndexer());
-  }
-  
-  public static ExpFamMixture pair()
-  {
-    return fromSerialized(SerializedExpFamMixture.pair(), Indexers.proteinPairIndexer());
-  }
-  
-  public static ExpFamMixture dnaGTR()
+
+  public static ExpFamMixture randomGTR(RateMtxNames selectedRateMtx)
   {
     final int nCat = 1;
-    CTMCExpFam<CTMCState> globalExponentialFamily = CTMCExpFam.createModelWithFullSupport(simpleDNAStateIndexer(nCat), true);
+    CTMCExpFam<CTMCState> globalExponentialFamily = CTMCExpFam.createModelWithFullSupport(simpleDNAStateIndexer(nCat,selectedRateMtx), true);
     globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singleton(new IdentityBivariate<CTMCState>()));
     globalExponentialFamily.extractUnivariateFeatures(Collections.singleton(new IdentityUnivariate<CTMCState>()));
     
     RateMatrixToEmissionModel emissionModel = null;
-    Indexer<String> dnaIndexer = Indexers.dnaIndexer();
+    Indexer<String> dnaIndexer = Indexers.modelIndexer(selectedRateMtx);
     CTMCStateSpace stateSpace = new CTMCStateSpace(dnaIndexer, dnaIndexer, nCat);
     ExpFamParameters params = new ExpFamParameters(globalExponentialFamily, stateSpace);
     ExpFamMixture mixture = new ExpFamMixture(params, emissionModel, stateSpace);
     return mixture;
   }
   
-  public static ExpFamMixture proteinGTR()
-  {
-    final int nCat = 1;
-    CTMCExpFam<CTMCState> globalExponentialFamily = CTMCExpFam.createModelWithFullSupport(simpleProteinStateIndexer(nCat), true);
-    globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singleton(new IdentityBivariate<CTMCState>()));
-    globalExponentialFamily.extractUnivariateFeatures(Collections.singleton(new IdentityUnivariate<CTMCState>()));
-    RateMatrixToEmissionModel emissionModel = null;
-    Indexer<String> proteinIndexer = Indexers.proteinIndexer();
-    CTMCStateSpace stateSpace = new CTMCStateSpace(proteinIndexer,proteinIndexer, nCat);
-    ExpFamParameters params = new ExpFamParameters(globalExponentialFamily, stateSpace);
-    ExpFamMixture mixture = new ExpFamMixture(params, emissionModel, stateSpace);
-    return mixture;
-  }
-  
+
   public ExpFamMixture(
       ExpFamParameters parameters,
       RateMatrixToEmissionModel emissionModel, 

@@ -33,6 +33,7 @@ import com.google.common.collect.Maps;
 
 import conifer.TestPhyloModel.Model;
 import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.factors.NonClockTreePrior;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.io.FastaUtils;
@@ -48,7 +49,7 @@ import conifer.moves.SingleNNI;
  *
  */
 public class SimplePhyloSimulator implements Runnable, Processor {
-	@Option
+    @Option
 	public int nMCMCSweeps = 10000;
 
 	@Option
@@ -75,7 +76,11 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 	@Option
 	public boolean fixedBranchLength = false;
 	
-	
+	@Option(gloss="select rate matrix model")
+	public static RateMtxNames selectedRateMtx=RateMtxNames.DNAGTR;
+
+	@Option(gloss="Indicator of we normalize the rate matrix if it is set to true")
+	public boolean isNormalized = true;
 	
 	public List<TreeNode> makeLeaves(int nTaxa, String prefix) 
 	{	
@@ -90,8 +95,8 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 	{
 		@DefineFactor(onObservations = true)
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
-		UnrootedTreeLikelihood.createEmpty(nSites, makeLeaves(nTaxa, "t"))		
-		.withExpFamMixture(ExpFamMixture.kimura1980());
+		UnrootedTreeLikelihood.createEmpty(nSites, makeLeaves(nTaxa, "t"), selectedRateMtx)		
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized));
 
 		@DefineFactor
 		NonClockTreePrior<RateParameterization> treePrior = 
@@ -119,8 +124,8 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 	{
 		@DefineFactor(onObservations = true)
 		public final UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = 
-		UnrootedTreeLikelihood.createEmpty(nSites, makeLeaves(nSites, "t"))		
-		.withExpFamMixture(ExpFamMixture.kimura1980());
+		UnrootedTreeLikelihood.createEmpty(nSites, makeLeaves(nSites, "t"), selectedRateMtx)		
+		.withExpFamMixture(ExpFamMixture.rateMtxModel(selectedRateMtx, isNormalized));
 
 		@DefineFactor
 		NonClockTreePrior<RateParameterization> treePrior = 
@@ -230,7 +235,7 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 
 		for (int i : numbersOfTaxa) {
 			for (ComparisonModes mode :  ComparisonModes.values()) {
-				makeSyntheticData(i, mode);
+				makeSyntheticData(i, mode, selectedRateMtx);
 				
 				// copy the results to another folder 
 				File newDirectory = new File(
@@ -245,7 +250,7 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 		}
 	}
 
-	public static void makeSyntheticData(int numberOfTaxa, ComparisonModes mode) throws IOException {
+	public static void makeSyntheticData(int numberOfTaxa, ComparisonModes mode, RateMtxNames selectedRateMtx) throws IOException {
 		//List realizations = new ArrayList();
 		SimplePhyloSimulator runner = new SimplePhyloSimulator();
 		runner.detailWriter = BriefIO.output(Results.getFileInResultFolder("experiment.details.txt"));
@@ -282,7 +287,7 @@ public class SimplePhyloSimulator implements Runnable, Processor {
 			//realizations.add(runner.model.getLikelihood().observations.toString());
 			runner.writeTree(runner.model.getLikelihood().tree);
 			// write the FASTA file corresponding to the simulation
-			FastaUtils.writeFasta(runner.model.getLikelihood().observations, Results.getFileInResultFolder("SimulatedData.fasta"));
+			FastaUtils.writeFasta(runner.model.getLikelihood().observations, Results.getFileInResultFolder("SimulatedData.fasta"), selectedRateMtx);
 		}
 		
 		runner.detailWriter.write("Total BranchLength: " +
