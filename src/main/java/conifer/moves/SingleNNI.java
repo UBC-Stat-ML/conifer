@@ -31,7 +31,6 @@ public class SingleNNI extends MHSampler<UnrootedTree>
     variable.interchange(moved1, referenceEdge.getFirst(), moved2, referenceEdge.getSecond());
     if (!callback.sampleAcceptance())
       variable.interchange(moved1, referenceEdge.getFirst(), moved2, referenceEdge.getSecond());
-
   }
   
   private TreeNode sampleMovedEndpoint(

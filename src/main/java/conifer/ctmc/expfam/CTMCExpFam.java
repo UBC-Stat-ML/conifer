@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import blang.annotations.FactorArgument;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.io.TreeObservations;
