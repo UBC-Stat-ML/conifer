@@ -1,17 +1,12 @@
 package conifer.ctmc;
 
-import blang.annotations.FactorArgument;
-import blang.variables.RealVariable;
-
-
 
 public class NoisyEmissionModel implements RateMatrixToEmissionModel
 {
   private final int [] latent2observed;
   private final int nObserved;
-  
-  @FactorArgument
-  public final RealVariable errorProbability;
+
+  public final blang.core.RealVar errorProbability;
   // TODO: will definitely need bounds here on the real variable
   //       if you want to allow resampling the errorPr 
 
@@ -25,8 +20,8 @@ public class NoisyEmissionModel implements RateMatrixToEmissionModel
     
     final double[][] result = new double[nLatents][nObserved];
     
-    final double individualErrorPr = errorProbability.getValue()/(((double) nObserved) - 1.0);
-    final double correctPr = 1.0 - errorProbability.getValue();
+    final double individualErrorPr = errorProbability.doubleValue()/(((double) nObserved) - 1.0);
+    final double correctPr = 1.0 - errorProbability.doubleValue();
     
     for (int latentIndex = 0; latentIndex < nLatents; latentIndex++)
       for (int obsIndex = 0; obsIndex < nObserved; obsIndex++)
@@ -36,7 +31,7 @@ public class NoisyEmissionModel implements RateMatrixToEmissionModel
   }
 
   public NoisyEmissionModel(int[] latent2observed, int nObserved,
-      RealVariable errorProbability)
+      blang.core.RealVar errorProbability)
   {
     this.latent2observed = latent2observed;
     this.nObserved = nObserved;
