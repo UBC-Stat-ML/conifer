@@ -4,7 +4,6 @@ import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import bayonet.distributions.Multinomial;
 import bayonet.math.NumericalUtils;
-import conifer.mmpp.MMPP;
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 
@@ -124,12 +123,6 @@ public class RateMatrixUtils
         return QStar.toArray2();
     }
 
-    public static double [][] rateMatrixMinusDiagIntensity(MMPP mmpp){
-        double [][] rateMatrix = mmpp.getRateMatrix();
-        double [] intensities = mmpp.getIntensities();
-        double [][] QStar= rateMatrixMinusDiagIntensity(rateMatrix, intensities);
-        return QStar;
-    }
 
     /**
      * if the CTMC has n state, the virtual rate matrix for MMPP is (n+1)*(n+1)

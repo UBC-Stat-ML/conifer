@@ -10,7 +10,6 @@ import org.jgrapht.UndirectedGraph;
 
 import bayonet.graphs.GraphUtils;
 import bayonet.marginal.algo.EdgeSorter;
-import blang.annotations.Processors;
 import blang.annotations.Samplers;
 import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
@@ -22,9 +21,6 @@ import conifer.moves.AllBranchesScaling;
 import conifer.moves.SPRMove;
 import conifer.moves.SingleBranchScaling;
 import conifer.moves.SingleNNI;
-import conifer.processors.TotalTreeLengthProcessor;
-import conifer.processors.TreeDiameterProcessor;
-import conifer.processors.TreeDistanceProcessor;
 
 
 /**
@@ -38,11 +34,6 @@ import conifer.processors.TreeDistanceProcessor;
   SingleBranchScaling.class, // only branch length
   AllBranchesScaling.class, // affect only branch length
   SPRMove.class				// only topology
-})
-@Processors({
-  TotalTreeLengthProcessor.class,
-  TreeDiameterProcessor.class,
-  TreeDistanceProcessor.class
 })
 public class UnrootedTree
 {
