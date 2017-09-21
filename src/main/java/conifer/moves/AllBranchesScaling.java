@@ -12,7 +12,7 @@ import briefj.collections.UnorderedPair;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.ctmc.expfam.ExpFamMixture;
-import conifer.factors.NonClockTreePrior;
+import conifer.factors.NonClockTreePriorUtils;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.models.MultiCategorySubstitutionModel.PoissonAuxiliarySample;
@@ -24,7 +24,7 @@ public class AllBranchesScaling extends NodeMove
   @SampledVariable UnrootedTree tree;
   
   @ConnectedFactor UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
-  @ConnectedFactor NonClockTreePrior<Exponential.Parameters> prior;
+  @ConnectedFactor NonClockTreePriorUtils<Exponential.Parameters> prior;
   
 
   @Override

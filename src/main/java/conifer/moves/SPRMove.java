@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 
 import conifer.TreeNode;
 import conifer.UnrootedTree;
-import conifer.factors.NonClockTreePrior;
+import conifer.factors.NonClockTreePriorUtils;
 import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.EvolutionaryModel;
 import conifer.models.EvolutionaryModelUtils;
@@ -43,7 +43,7 @@ public class SPRMove extends NodeMove
 {
   @SampledVariable UnrootedTree tree;
   
-  @ConnectedFactor NonClockTreePrior<?> treePrior;
+  @ConnectedFactor NonClockTreePriorUtils<?> treePrior;
   
   @ConnectedFactor UnrootedTreeLikelihood<?> treeLikelihood;
   

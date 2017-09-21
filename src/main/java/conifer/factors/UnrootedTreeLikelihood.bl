@@ -1,0 +1,24 @@
+package conifer.factors
+
+import conifer.io.TreeObservations
+import conifer.UnrootedTree
+import conifer.models.EvolutionaryModel
+
+model UnrootedTreeLikelihood {
+  
+  random TreeObservations observations
+  param UnrootedTree tree
+  param EvolutionaryModel evolutionaryModel
+  
+  laws {
+    
+    logf(tree, observations, evolutionaryModel) {
+      throw new RuntimeException
+    }
+  }
+  
+  generate (rand) {
+    throw new RuntimeException
+  }
+  
+}

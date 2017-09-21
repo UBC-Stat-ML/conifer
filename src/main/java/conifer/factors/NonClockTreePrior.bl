@@ -1,0 +1,25 @@
+package conifer.factors
+
+import conifer.UnrootedTree
+
+model NonClockTreePrior {
+  
+  random UnrootedTree tree
+  param RealValuedDensity branchLengthDensity
+  
+  laws {
+    
+    logf(tree, branchLengthDensity) {
+      var result = 0.0
+      for (double edgeLength : tree.getBranchLengths.values) {
+        result += branchLengthDensity.logDensity(edgeLength) 
+      }
+      return result
+    }
+  }
+  
+  generate (rand) {
+    tree.setTo(NonClockTreePriorUtils.sample(rand, branchLengthDensity, tree.leaves))
+  }
+  
+}

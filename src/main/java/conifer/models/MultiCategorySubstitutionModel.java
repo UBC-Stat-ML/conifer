@@ -37,7 +37,7 @@ import com.google.common.collect.Maps;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
-import conifer.factors.NonClockTreePrior;
+import conifer.factors.NonClockTreePriorUtils;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
 
@@ -642,7 +642,7 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
     public static UnrootedTree defaultTree(List<TreeNode> leaves)
     {
         Random rand = new Random(1);
-        return NonClockTreePrior.generate(rand, Exponential.newExponential(), leaves);
+        return NonClockTreePriorUtils.generate(rand, Exponential.newExponential(), leaves);
     }
 
     /**

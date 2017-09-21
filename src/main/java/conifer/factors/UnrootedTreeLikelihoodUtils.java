@@ -47,9 +47,9 @@ import conifer.ctmc.expfam.RateMtxNames;
  *
  * @param <M>
  */
-public class UnrootedTreeLikelihood
+public class UnrootedTreeLikelihoodUtils
   <M extends EvolutionaryModel> 
-  implements GenerativeFactor
+  //implements GenerativeFactor
 {
   /**
    * 
@@ -169,7 +169,7 @@ public class UnrootedTreeLikelihood
   public static UnrootedTree defaultTree(Collection<TreeNode> leaves)
   {
     Random rand = new Random(1);
-    return NonClockTreePrior.generate(rand, Exponential.on(RealVariable.real()), leaves);
+    return NonClockTreePriorUtils.generate(rand, Exponential.on(RealVariable.real()), leaves);
   }
 
   /**

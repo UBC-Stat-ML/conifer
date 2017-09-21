@@ -1,0 +1,26 @@
+package conifer.factors
+
+import conifer.io.TreeObservations
+import conifer.UnrootedTree
+import conifer.models.EvolutionaryModel
+
+model Example {
+  
+  param Plate<String> datasets
+  
+  random Plated<TreeObservations> observations
+  random Plated<UnrootedTree> trees
+  param EvolutionaryModel evolutionaryModel
+  param RealValuedDensity branchLengthDensity
+  
+  laws {
+    
+    
+    
+    for (Index<String> dataset : datasets.indices) {
+     trees.get(dataset) | branchLengthDensity ~ NonClockTreePrior(branchLengthDensity)
+     observations.get(dataset) | UnrootedTree tree = trees.get(dataset), evolutionaryModel ~ UnrootedTreeLikelihood(tree, evolutionaryModel)
+    }
+  }
+  
+}
