@@ -5,18 +5,15 @@ import java.util.Random;
 
 import org.jgrapht.Graphs;
 
-import blang.mcmc.Callback;
-import blang.mcmc.ConnectedFactor;
-import blang.mcmc.MHSampler;
-import blang.mcmc.SampledVariable;
-import briefj.collections.UnorderedPair;
-
 import com.google.common.collect.Lists;
 
+import blang.mcmc.Callback;
+import blang.mcmc.MHSampler;
+import briefj.collections.UnorderedPair;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
-
+import conifer.RandomUtils.DiscreteUniform;
 
 
 public class SingleNNI extends MHSampler<UnrootedTree>
