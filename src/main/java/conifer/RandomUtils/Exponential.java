@@ -4,6 +4,8 @@ package conifer.RandomUtils;
  * Created by crystal on 2017-09-21.
  */
 
+import blang.types.RealScalar;
+
 import java.util.Random;
 
 /**
@@ -36,5 +38,6 @@ public class Exponential {
         return sampleExponential(random, rate);
     }
 
+  
 
 }

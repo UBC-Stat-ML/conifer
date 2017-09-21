@@ -7,7 +7,7 @@ import briefj.opt.Option;
 import org.ejml.simple.SimpleMatrix;
 import org.jblas.DoubleMatrix;
 
-import bayonet.distributions.Exponential;
+import conifer.RandomUtils.Exponential;
 import bayonet.distributions.Multinomial;
 import bayonet.math.SpecialFunctions;
 

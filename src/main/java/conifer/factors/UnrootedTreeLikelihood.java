@@ -11,6 +11,7 @@ import bayonet.marginal.FactorGraph;
 import blang.annotations.FactorArgument;
 import blang.annotations.FactorComponent;
 import blang.factors.GenerativeFactor;
+import blang.types.RealScalar;
 import blang.variables.RealVariable;
 import briefj.BriefCollections;
 import conifer.TopologyUtils;
@@ -54,19 +55,17 @@ public class UnrootedTreeLikelihood
    * 
    */
   // TODO: @Sohrab, is this the best way to supress sampling of the tree (fixed topology and branch lenght?)
-  @FactorArgument
   public final UnrootedTree tree;
   
   /**
    * 
    */
-  @FactorComponent
+
   public final M evolutionaryModel;
   
   /**
    * 
    */
-  @FactorArgument(makeStochastic = true)
   public final TreeObservations observations;
   
   public UnrootedTreeLikelihood(
@@ -88,7 +87,7 @@ public class UnrootedTreeLikelihood
   {
     UnrootedTree tree = defaultTree(leaves);
     SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
-    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0.1), RealVariable.real(1.0), baseRateMatrix, 4);
+    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(new RealScalar(0.1), new RealScalar(1.0), baseRateMatrix, 4);
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
   }
@@ -105,7 +104,7 @@ public class UnrootedTreeLikelihood
   {
     UnrootedTree tree = UnrootedTree.fromNewick(treeFile);
     SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
-    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0), RealVariable.real(1.0), baseRateMatrix, 1);
+    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(new RealScalar(0), new RealScalar(1.0), baseRateMatrix, 1);
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
   }
@@ -122,7 +121,7 @@ public class UnrootedTreeLikelihood
     Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
     UnrootedTree tree = defaultTree(data.keySet());
     SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
-    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(RealVariable.real(0.1), RealVariable.real(1.0), baseRateMatrix, 4);
+    DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(new RealScalar(0.1),new RealScalar(1.0), baseRateMatrix, 4);
     PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.selectedFactory(selectedRateMtx);
     TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).length()/factory.getChunkLength());
     MultiCategorySubstitutionModel.loadObservations(observations, data, factory); 
@@ -146,7 +145,7 @@ public class UnrootedTreeLikelihood
   
   public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> withSingleRateMatrix(CTMCParameters ctmc)
   {
-    DiscreteGammaMixture mix = new DiscreteGammaMixture(RealVariable.real(0), RealVariable.real(1.0), ctmc, 1);
+    DiscreteGammaMixture mix = new DiscreteGammaMixture(new RealScalar(0), new RealScalar(1.0), ctmc, 1);
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(mix, this.observations.nSites()); //observations.nSites()/factory.getChunkLength());
     return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(this.tree, subModel, this.observations);
   }
