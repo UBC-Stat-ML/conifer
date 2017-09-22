@@ -3,8 +3,6 @@ package conifer.ctmc.expfam;
 import java.util.Collections;
 import java.util.List;
 
-import blang.annotations.FactorArgument;
-import blang.annotations.FactorComponent;
 import briefj.Indexer;
 import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.RateMatrixToEmissionModel;
@@ -20,10 +18,10 @@ import conifer.ctmc.expfam.RateMtxNames;
 public class ExpFamMixture implements RateMatrixMixture
 {
   
-  @FactorArgument
+  
   public final ExpFamParameters parameters;
   
-  @FactorComponent
+
   public final RateMatrixToEmissionModel emissionModel;
   
   public final CTMCStateSpace stateSpace;
