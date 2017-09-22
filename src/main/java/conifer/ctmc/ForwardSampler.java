@@ -2,7 +2,7 @@ package conifer.ctmc;
 
 import java.util.Random;
 
-import bayonet.distributions.Exponential;
+import conifer.RandomUtils.Exponential;
 import bayonet.distributions.Multinomial;
 
 
