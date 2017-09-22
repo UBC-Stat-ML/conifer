@@ -19,7 +19,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import briefj.BriefIO;
 import briefj.run.Results;
-import conifer.factors.UnrootedTreeLikelihood;
+import conifer.factors.UnrootedTreeLikelihoodUtils;
 import conifer.io.FastaUtils;
 import conifer.io.NexusString;
 import jebl.evolution.align.SystemOut;
@@ -133,7 +133,7 @@ public class MajorityRuleTree {
 	public static File randomUnrootedPhylogenyFromMultipleAlignmentFastaFile(File fastaFile) {
 		
 		Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
-		UnrootedTree tree = UnrootedTreeLikelihood.defaultTree(data.keySet());
+		UnrootedTree tree = UnrootedTreeLikelihoodUtils.defaultTree(data.keySet());
 		String outputFileName = FilenameUtils.removeExtension(fastaFile.getName()) + "_" + System.currentTimeMillis() + ".nwk";
 		File outputFile = Results.getFileInResultFolder(outputFileName);
 		final PrintWriter treeWriter = BriefIO.output(outputFile);
