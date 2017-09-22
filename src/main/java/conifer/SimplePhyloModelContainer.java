@@ -1,10 +1,10 @@
 package conifer;
 
 import conifer.ctmc.expfam.ExpFamMixture;
-import conifer.factors.UnrootedTreeLikelihood;
+import conifer.factors.UnrootedTreeLikelihoodUtils;
 import conifer.models.MultiCategorySubstitutionModel;
 
 public interface SimplePhyloModelContainer {
 	
-	public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> getLikelihood();
+	public UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> getLikelihood();
 }
