@@ -16,7 +16,7 @@ import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 import org.jgrapht.UndirectedGraph;
 
-import bayonet.distributions.Exponential;
+import conifer.RandomUtils.Exponential;
 import bayonet.distributions.Multinomial;
 import bayonet.graphs.GraphUtils;
 import bayonet.marginal.DiscreteFactorGraph;
@@ -26,7 +26,6 @@ import bayonet.marginal.UnaryFactor;
 import bayonet.marginal.algo.ExactSampler;
 import bayonet.marginal.algo.SumProduct;
 import bayonet.math.NumericalUtils;
-import blang.annotations.FactorComponent;
 import briefj.BriefMath;
 import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
@@ -60,7 +59,7 @@ import conifer.io.TreeObservations;
  */
 public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> implements EvolutionaryModel
 {
-    @FactorComponent
+   
     public final T rateMatrixMixture;
 
     public final int nSites;

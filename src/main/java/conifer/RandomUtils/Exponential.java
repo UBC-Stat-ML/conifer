@@ -96,6 +96,12 @@ public class Exponential<P> {
         return sampleUnitRateExponential(random) / rate;
 
     }
+    
+    public static Exponential<RateParameterization> newExponential()
+    {
+      return Exponential.on(new RealScalar(1.0));
+    }
+    
 
     public static double generate(Random random, double rate){
         return sampleExponential(random, rate);
