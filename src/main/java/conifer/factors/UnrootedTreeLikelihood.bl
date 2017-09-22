@@ -4,7 +4,9 @@ import conifer.io.TreeObservations
 import conifer.UnrootedTree
 import conifer.models.EvolutionaryModel
 import conifer.TreeNode;
-import conifer.models.LikelihoodComputationContext;
+import conifer.models.LikelihoodComputationContext
+import conifer.TopologyUtils
+import conifer.models.EvolutionaryModelUtils
 
 model UnrootedTreeLikelihood {
   
@@ -12,34 +14,20 @@ model UnrootedTreeLikelihood {
   param UnrootedTree tree
   param EvolutionaryModel evolutionaryModel
   
-  public double logDensity()
-  {
-    TreeNode arbitraryRoot = arbitraryNode();
-    LikelihoodComputationContext context = new LikelihoodComputationContext(buildFactorGraphs(arbitraryRoot), arbitraryRoot);
-    return evolutionaryModel.computeLogLikelihood(context);
-  }
-
-
-  public void generate(Random random)
-  {
-    observations.clear();
-    if (!observations.getObservedTreeNodes().isEmpty())
-      throw new RuntimeException("The method clear() seems to be incorrectly implemented in " + observations.getClass().getName());
-    evolutionaryModel.generateObservationsInPlace(random, observations, tree, arbitraryNode());
-  }
-  
-  
   laws {
     
     logf(tree, observations, evolutionaryModel) {
-      TreeNode arbitraryRoot = arbitraryNode()
-      LikelihoodComputationContext context = new LikelihoodComputationContext(buildFactorGraphs(arbitraryRoot), arbitraryRoot)
+      val TreeNode arbitraryRoot = TopologyUtils.arbitraryNode(tree)
+      val LikelihoodComputationContext context = new LikelihoodComputationContext(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, tree, arbitraryRoot, observations), arbitraryRoot)
       return evolutionaryModel.computeLogLikelihood(context)
     }
   }
   
   generate (rand) {
-    throw new RuntimeException
+  	observations.clear()
+    if (!observations.getObservedTreeNodes().isEmpty())
+      throw new RuntimeException("The method clear() seems to be incorrectly implemented in " + observations.getClass().getName())
+    evolutionaryModel.generateObservationsInPlace(rand, observations, tree, TopologyUtils.arbitraryNode(tree))
   }
   
 }
