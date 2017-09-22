@@ -3,6 +3,8 @@ package conifer.factors
 import conifer.io.TreeObservations
 import conifer.UnrootedTree
 import conifer.models.EvolutionaryModel
+import conifer.TreeNode;
+import conifer.models.LikelihoodComputationContext;
 
 model UnrootedTreeLikelihood {
   
@@ -10,10 +12,29 @@ model UnrootedTreeLikelihood {
   param UnrootedTree tree
   param EvolutionaryModel evolutionaryModel
   
+  public double logDensity()
+  {
+    TreeNode arbitraryRoot = arbitraryNode();
+    LikelihoodComputationContext context = new LikelihoodComputationContext(buildFactorGraphs(arbitraryRoot), arbitraryRoot);
+    return evolutionaryModel.computeLogLikelihood(context);
+  }
+
+
+  public void generate(Random random)
+  {
+    observations.clear();
+    if (!observations.getObservedTreeNodes().isEmpty())
+      throw new RuntimeException("The method clear() seems to be incorrectly implemented in " + observations.getClass().getName());
+    evolutionaryModel.generateObservationsInPlace(random, observations, tree, arbitraryNode());
+  }
+  
+  
   laws {
     
     logf(tree, observations, evolutionaryModel) {
-      throw new RuntimeException
+      TreeNode arbitraryRoot = arbitraryNode()
+      LikelihoodComputationContext context = new LikelihoodComputationContext(buildFactorGraphs(arbitraryRoot), arbitraryRoot)
+      return evolutionaryModel.computeLogLikelihood(context)
     }
   }
   
