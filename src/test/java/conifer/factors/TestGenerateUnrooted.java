@@ -7,8 +7,8 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import bayonet.distributions.Exponential;
-import bayonet.distributions.Exponential.RateParameterization;
+import conifer.RandomUtils.Exponential;
+import conifer.RandomUtils.Exponential.RateParameterization;
 import briefj.Indexer;
 import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
