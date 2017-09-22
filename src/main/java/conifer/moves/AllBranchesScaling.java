@@ -18,8 +18,8 @@ import conifer.models.MultiCategorySubstitutionModel.PoissonAuxiliarySample;
 
 public class AllBranchesScaling 
 {
+  // original code AllBranchesScaling extends NodeMove
   UnrootedTree tree;
-  
   UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
   NonClockTreePriorUtils<Exponential.Parameters> prior;
   
