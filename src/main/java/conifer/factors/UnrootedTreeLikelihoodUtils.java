@@ -43,14 +43,12 @@ import conifer.ctmc.expfam.RateMtxNames;
  *
  * @param <M>
  */
-public class UnrootedTreeLikelihoodUtils
-  <M extends EvolutionaryModel> 
-  //implements GenerativeFactor
+public class UnrootedTreeLikelihoodUtils<M>
 {
   /**
    * 
    */
-  // TODO: @Sohrab, is this the best way to supress sampling of the tree (fixed topology and branch lenght?)
+  // TODO: @Sohrab, is this the best way to supress sampling of the tree (fixed topology and branch length?)
   public final UnrootedTree tree;
   
   /**
@@ -79,7 +77,7 @@ public class UnrootedTreeLikelihoodUtils
    * no data. Used mostly for simulation-based testing.
    * @return
    */
-  public static UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmpty(int nSites, List<TreeNode> leaves, RateMtxNames selectedRateMtx)
+  public static  UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmpty(int nSites, List<TreeNode> leaves, RateMtxNames selectedRateMtx)
   {
     UnrootedTree tree = defaultTree(leaves);
     SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
@@ -126,35 +124,7 @@ public class UnrootedTreeLikelihoodUtils
   }
   
     
-  /**
-   * Chained method to change the evolutionary model into an exponential family mixture, keeping the other aspects (tree and
-   * observations) unchanged.
-   * 
-   * @param mixture
-   * @return
-   */
-  public UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> withExpFamMixture(ExpFamMixture mixture)
-  {
-    MultiCategorySubstitutionModel<ExpFamMixture> subModel = new MultiCategorySubstitutionModel<ExpFamMixture>(mixture, this.observations.nSites());
-    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>>(this.tree, subModel, this.observations);
-  }
-  
-  public UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>> withSingleRateMatrix(CTMCParameters ctmc)
-  {
-    DiscreteGammaMixture mix = new DiscreteGammaMixture(new RealScalar(0), new RealScalar(1.0), ctmc, 1);
-    MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(mix, this.observations.nSites()); //observations.nSites()/factory.getChunkLength());
-    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(this.tree, subModel, this.observations);
-  }
-  
-  public UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>> withSingleRateMatrix(double [][] matrix)
-  {
-    return withSingleRateMatrix(new SimpleRateMatrix(matrix, null));
-  }
-  
-  public UnrootedTreeLikelihoodUtils<M> withTree(File newickFile)
-  {
-    return new UnrootedTreeLikelihoodUtils<M>(UnrootedTree.fromNewick(newickFile), this.evolutionaryModel, this.observations);
-  }
+ 
   
   /**
    * 
@@ -168,41 +138,6 @@ public class UnrootedTreeLikelihoodUtils
     return NonClockTreePriorUtils.sample(rand, Exponential.on(new RealScalar(0)), leaves);
   }
 
-  /**
-   * 
-   * @return An arbitrary rooting. Does not matter as long as the model is reversible.
-   */
-  public TreeNode arbitraryNode()
-  {
-    return TopologyUtils.arbitraryNode(tree);
-  }
-  
-  
-  public List<FactorGraph<TreeNode>> buildFactorGraphs()
-  {
-    return buildFactorGraphs(arbitraryNode());
-  }
-  
-  public List<FactorGraph<TreeNode>> buildFactorGraphs(TreeNode arbitraryRoot)
-  {
-    return EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, tree, arbitraryRoot, observations);
-  }
-
-  public double logDensity()
-  {
-    TreeNode arbitraryRoot = arbitraryNode();
-    LikelihoodComputationContext context = new LikelihoodComputationContext(buildFactorGraphs(arbitraryRoot), arbitraryRoot);
-    return evolutionaryModel.computeLogLikelihood(context);
-  }
-
-
-  public void generate(Random random)
-  {
-    observations.clear();
-    if (!observations.getObservedTreeNodes().isEmpty())
-      throw new RuntimeException("The method clear() seems to be incorrectly implemented in " + observations.getClass().getName());
-    evolutionaryModel.generateObservationsInPlace(random, observations, tree, arbitraryNode());
-  }
   
   public static void main(String [] args)
   {
