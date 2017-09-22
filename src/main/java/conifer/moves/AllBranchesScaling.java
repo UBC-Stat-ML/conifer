@@ -3,31 +3,27 @@ package conifer.moves;
 import java.util.List;
 import java.util.Random;
 
-import bayonet.distributions.Exponential;
-import bayonet.distributions.Gamma;
-import blang.mcmc.ConnectedFactor;
-import blang.mcmc.NodeMove;
-import blang.mcmc.SampledVariable;
+import conifer.RandomUtils.Exponential;
+import conifer.RandomUtils.Gamma;
 import briefj.collections.UnorderedPair;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.factors.NonClockTreePriorUtils;
-import conifer.factors.UnrootedTreeLikelihood;
+import conifer.factors.UnrootedTreeLikelihoodUtils;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.models.MultiCategorySubstitutionModel.PoissonAuxiliarySample;
 
 
 
-public class AllBranchesScaling extends NodeMove
+public class AllBranchesScaling 
 {
-  @SampledVariable UnrootedTree tree;
+  UnrootedTree tree;
   
-  @ConnectedFactor UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
-  @ConnectedFactor NonClockTreePriorUtils<Exponential.Parameters> prior;
+  UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
+  NonClockTreePriorUtils<Exponential.Parameters> prior;
   
 
-  @Override
   public void execute(Random rand)
   {
     // hack for now to make this sampled less often

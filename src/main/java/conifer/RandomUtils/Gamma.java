@@ -1,12 +1,22 @@
 package conifer.RandomUtils;
 
+import bayonet.distributions.Random2RandomGenerator;
 import bayonet.math.SpecialFunctions;
+import org.apache.commons.math3.distribution.GammaDistribution;
+
+import java.util.Random;
 
 /**
  * Created by crystal on 2017-09-21.
  */
 public class Gamma {
 
+
+    public static double generate(Random random, double rate, double shape)
+    {
+        final GammaDistribution gd = new GammaDistribution(new Random2RandomGenerator(random), shape, 1.0/rate, GammaDistribution.DEFAULT_INVERSE_ABSOLUTE_ACCURACY);
+        return gd.sample();
+    }
 
     public static double quantile(double y, double shape, double scale) {
         return 0.5 * scale * pointChi2(y, 2.0 * shape);

@@ -19,7 +19,7 @@ import conifer.UnrootedTree;
 
 
 
-public class NonClockTreePriorUtils
+public class NonClockTreePriorUtils<P>
 {
   /**
    * Generate a tree with a topology uniformly distributed
@@ -108,4 +108,7 @@ public class NonClockTreePriorUtils
       result.add(list.get(i));
     return result;
   }
+
+public P branchDistributionParameters;
+
 }
