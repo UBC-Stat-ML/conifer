@@ -8,13 +8,12 @@ import java.util.Random;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jgrapht.Graphs;
 
-import bayonet.distributions.DiscreteUniform;
+import conifer.RandomUtils.DiscreteUniform;
 import bayonet.distributions.Multinomial;
 import bayonet.graphs.GraphUtils;
 import bayonet.marginal.UnaryFactor;
 import bayonet.marginal.algo.SumProduct;
 import blang.mcmc.ConnectedFactor;
-import blang.mcmc.NodeMove;
 import blang.mcmc.SampledVariable;
 import briefj.collections.UnorderedPair;
 
@@ -23,7 +22,7 @@ import com.google.common.collect.Lists;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.factors.NonClockTreePriorUtils;
-import conifer.factors.UnrootedTreeLikelihood;
+import conifer.factors.UnrootedTreeLikelihoodUtils;
 import conifer.models.EvolutionaryModel;
 import conifer.models.EvolutionaryModelUtils;
 import conifer.models.LikelihoodComputationContext;
@@ -39,16 +38,16 @@ import conifer.models.LikelihoodComputationContext;
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  *
  */
-public class SPRMove extends NodeMove
+public class SPRMove 
 {
-  @SampledVariable UnrootedTree tree;
+  UnrootedTree tree;
   
-  @ConnectedFactor NonClockTreePriorUtils<?> treePrior;
+  NonClockTreePriorUtils<?> treePrior;
   
-  @ConnectedFactor UnrootedTreeLikelihood<?> treeLikelihood;
+  UnrootedTreeLikelihoodUtils<?> treeLikelihood;
   
   @SuppressWarnings("unchecked")
-  @Override
+  
   public void execute(Random rand)
   {
     // nothing interesting to do if tree is only a single branch

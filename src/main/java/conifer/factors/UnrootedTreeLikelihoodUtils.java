@@ -6,13 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import bayonet.distributions.Exponential;
+import conifer.RandomUtils.Exponential;
 import bayonet.marginal.FactorGraph;
-import blang.annotations.FactorArgument;
-import blang.annotations.FactorComponent;
-import blang.factors.GenerativeFactor;
 import blang.types.RealScalar;
-import blang.variables.RealVariable;
 import briefj.BriefCollections;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
@@ -68,7 +64,7 @@ public class UnrootedTreeLikelihoodUtils
    */
   public final TreeObservations observations;
   
-  public UnrootedTreeLikelihood(
+  public UnrootedTreeLikelihoodUtils(
       UnrootedTree tree, 
       M evolutionaryModel,
       TreeObservations observations)
@@ -83,13 +79,13 @@ public class UnrootedTreeLikelihoodUtils
    * no data. Used mostly for simulation-based testing.
    * @return
    */
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmpty(int nSites, List<TreeNode> leaves, RateMtxNames selectedRateMtx)
+  public static UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmpty(int nSites, List<TreeNode> leaves, RateMtxNames selectedRateMtx)
   {
     UnrootedTree tree = defaultTree(leaves);
     SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
     DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(new RealScalar(0.1), new RealScalar(1.0), baseRateMatrix, 4);
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
-    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
+    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
   }
 
   /**
@@ -100,13 +96,13 @@ public class UnrootedTreeLikelihoodUtils
    * @return
    */
 
-  public static  UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmptyWithFixedTree(int nSites, File treeFile, RateMtxNames selectedRateMtx)
+  public static  UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>> createEmptyWithFixedTree(int nSites, File treeFile, RateMtxNames selectedRateMtx)
   {
     UnrootedTree tree = UnrootedTree.fromNewick(treeFile);
     SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
     DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(new RealScalar(0), new RealScalar(1.0), baseRateMatrix, 1);
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
-    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
+    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(nSites));
   }
   
   /**
@@ -116,7 +112,7 @@ public class UnrootedTreeLikelihoodUtils
    * @param fastaFile
    * @return
    */
-  public static UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> fromFastaFile(File fastaFile, final RateMtxNames selectedRateMtx)
+  public static UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>> fromFastaFile(File fastaFile, final RateMtxNames selectedRateMtx)
   {
     Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
     UnrootedTree tree = defaultTree(data.keySet());
@@ -126,7 +122,7 @@ public class UnrootedTreeLikelihoodUtils
     TreeObservations observations = new FixedTreeObservations(BriefCollections.pick(data.values()).length()/factory.getChunkLength());
     MultiCategorySubstitutionModel.loadObservations(observations, data, factory); 
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, observations.nSites());
-    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, observations);
+    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, observations);
   }
   
     
@@ -137,27 +133,27 @@ public class UnrootedTreeLikelihoodUtils
    * @param mixture
    * @return
    */
-  public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> withExpFamMixture(ExpFamMixture mixture)
+  public UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> withExpFamMixture(ExpFamMixture mixture)
   {
     MultiCategorySubstitutionModel<ExpFamMixture> subModel = new MultiCategorySubstitutionModel<ExpFamMixture>(mixture, this.observations.nSites());
-    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>>(this.tree, subModel, this.observations);
+    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>>(this.tree, subModel, this.observations);
   }
   
-  public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> withSingleRateMatrix(CTMCParameters ctmc)
+  public UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>> withSingleRateMatrix(CTMCParameters ctmc)
   {
     DiscreteGammaMixture mix = new DiscreteGammaMixture(new RealScalar(0), new RealScalar(1.0), ctmc, 1);
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(mix, this.observations.nSites()); //observations.nSites()/factory.getChunkLength());
-    return new UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(this.tree, subModel, this.observations);
+    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(this.tree, subModel, this.observations);
   }
   
-  public UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> withSingleRateMatrix(double [][] matrix)
+  public UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>> withSingleRateMatrix(double [][] matrix)
   {
     return withSingleRateMatrix(new SimpleRateMatrix(matrix, null));
   }
   
-  public UnrootedTreeLikelihood<M> withTree(File newickFile)
+  public UnrootedTreeLikelihoodUtils<M> withTree(File newickFile)
   {
-    return new UnrootedTreeLikelihood<M>(UnrootedTree.fromNewick(newickFile), this.evolutionaryModel, this.observations);
+    return new UnrootedTreeLikelihoodUtils<M>(UnrootedTree.fromNewick(newickFile), this.evolutionaryModel, this.observations);
   }
   
   /**
@@ -169,7 +165,7 @@ public class UnrootedTreeLikelihoodUtils
   public static UnrootedTree defaultTree(Collection<TreeNode> leaves)
   {
     Random rand = new Random(1);
-    return NonClockTreePriorUtils.generate(rand, Exponential.on(RealVariable.real()), leaves);
+    return NonClockTreePriorUtils.sample(rand, Exponential.on(new RealScalar(0)), leaves);
   }
 
   /**
@@ -192,7 +188,6 @@ public class UnrootedTreeLikelihoodUtils
     return EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, tree, arbitraryRoot, observations);
   }
 
-  @Override
   public double logDensity()
   {
     TreeNode arbitraryRoot = arbitraryNode();
@@ -200,7 +195,7 @@ public class UnrootedTreeLikelihoodUtils
     return evolutionaryModel.computeLogLikelihood(context);
   }
 
-  @Override
+
   public void generate(Random random)
   {
     observations.clear();
@@ -212,7 +207,7 @@ public class UnrootedTreeLikelihoodUtils
   public static void main(String [] args)
   {
     RateMtxNames selectedRateMtx = RateMtxNames.KIMURA1980;
-    UnrootedTreeLikelihood<MultiCategorySubstitutionModel<DiscreteGammaMixture>> ll = fromFastaFile(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"), selectedRateMtx);
+    UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>> ll = fromFastaFile(new File("/Users/bouchard/Documents/data/utcs/23S.E/R0/cleaned.alignment.fasta"), selectedRateMtx);
     System.out.println("nSites=" + ll.observations.nSites());
     System.out.println("nNodes=" + ll.tree.getTopology().vertexSet().size());
     Random rand = new Random(1);
