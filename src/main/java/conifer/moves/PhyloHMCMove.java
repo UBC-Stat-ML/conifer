@@ -26,7 +26,7 @@ import conifer.ctmc.expfam.CTMCStateSpace;
 import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.ctmc.expfam.ExpFamParameters;
 import conifer.ctmc.expfam.ExpectedStatistics;
-import conifer.factors.UnrootedTreeLikelihood;
+import conifer.factors.UnrootedTreeLikelihoodUtils;
 import conifer.models.MultiCategorySubstitutionModel;
 import bayonet.distributions.Normal.MeanVarianceParameterization;
 import blang.factors.IIDRealVectorGenerativeFactor;
@@ -42,10 +42,10 @@ import briefj.run.Results;
 
 public class PhyloHMCMove extends NodeMove
 {
-    @SampledVariable ExpFamParameters parameters;
+    ExpFamParameters parameters;
 
-    @ConnectedFactor UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
-    @ConnectedFactor IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior;
+    UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
+    IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior;
 
     public static Double epsilon = null;
 
@@ -137,7 +137,7 @@ public class PhyloHMCMove extends NodeMove
     public static ExpectedStatistics<CTMCState> convert(
             List<PathStatistics> pathStatistics,
             ExpFamParameters parameters,
-            UnrootedTreeLikelihood<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood)
+            UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood)
     {
         ExpectedStatistics<CTMCState> result = new ExpectedStatistics<CTMCState>(parameters.globalExponentialFamily);
         CTMCStateSpace space = likelihood.evolutionaryModel.rateMatrixMixture.stateSpace;
