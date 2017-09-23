@@ -15,11 +15,13 @@ model Example {
   
   laws {
     
-    
-    
     for (Index<String> dataset : datasets.indices) {
      trees.get(dataset) | branchLengthDensity ~ NonClockTreePrior(branchLengthDensity)
+     
      observations.get(dataset) | UnrootedTree tree = trees.get(dataset), evolutionaryModel ~ UnrootedTreeLikelihood(tree, evolutionaryModel)
+     
+     //observations.get(dataset) | trees, evolutionaryModel, Index<String> mydataset = dataset ~ UnrootedTreeLikelihood(trees.get(mydataset), evolutionaryModel)
+    
     }
   }
   
