@@ -5,7 +5,7 @@ import conifer.UnrootedTree
 model NonClockTreePrior {
   
   random UnrootedTree tree
-  param RealValuedDensity branchLengthDensity
+  param RealDistribution branchLengthDensity
   
   laws {
     

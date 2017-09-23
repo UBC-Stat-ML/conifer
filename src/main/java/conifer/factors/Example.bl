@@ -11,7 +11,7 @@ model Example {
   random Plated<TreeObservations> observations
   random Plated<UnrootedTree> trees
   param EvolutionaryModel evolutionaryModel
-  param RealValuedDensity branchLengthDensity
+  param RealDistribution branchLengthDensity ?: Exponential.distribution(1.0) 
   
   laws {
     

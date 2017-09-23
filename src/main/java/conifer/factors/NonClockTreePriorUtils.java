@@ -10,6 +10,7 @@ import java.util.Random;
 import org.apache.commons.lang3.tuple.Pair;
 
 import bayonet.math.SamplingUtils;
+import blang.core.RealDistribution;
 import briefj.collections.UnorderedPair;
 
 import com.google.common.collect.Lists;
@@ -31,7 +32,7 @@ public class NonClockTreePriorUtils<P>
    */
   public static UnrootedTree sample(
       Random random, 
-      RealValuedDensity branchDistribution,
+      RealDistribution branchDistribution,
       Collection<TreeNode> leaves)
   {
     UnrootedTree result = new UnrootedTree();
