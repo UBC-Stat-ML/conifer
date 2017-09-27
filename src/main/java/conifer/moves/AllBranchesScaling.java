@@ -5,6 +5,8 @@ import java.util.Random;
 
 import conifer.RandomUtils.Exponential;
 import conifer.RandomUtils.Gamma;
+import blang.mcmc.Callback;
+import blang.mcmc.MHSampler;
 import briefj.collections.UnorderedPair;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
@@ -16,7 +18,7 @@ import conifer.models.MultiCategorySubstitutionModel.PoissonAuxiliarySample;
 
 
 
-public class AllBranchesScaling 
+public class AllBranchesScaling extends MHSampler
 {
   // original code AllBranchesScaling extends NodeMove
   UnrootedTree tree;
@@ -24,6 +26,13 @@ public class AllBranchesScaling
   NonClockTreePriorUtils<Exponential.Parameters> prior;
   
 
+  @Override
+  public void propose(Random random, Callback callback) {
+  	// TODO Auto-generated method stub
+  	
+  }
+  
+  
   public void execute(Random rand)
   {
     // hack for now to make this sampled less often
