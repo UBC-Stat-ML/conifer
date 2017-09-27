@@ -24,7 +24,7 @@ import briefj.collections.Counter;
 @Samplers({
         PhyloHMCMove.class
 })
-@Processors({IIDRealVectorGenerativeFactor.VectorNormProcessor.class, ExpFamParamProcessor.class})
+
 
 public class ExpFamParameters implements RealVectorInterface
 {

@@ -80,7 +80,7 @@ public class UnrootedTreeUtils
       leavesSoFar.add(leaf);
     }
   }
-
+  
   private static void process(
       UnrootedTree result, Tree<TreeNode> topo,
       Map<TreeNode, Double> bls, TreeNode ancestor)
