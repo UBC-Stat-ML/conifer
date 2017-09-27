@@ -7,8 +7,8 @@ import org.jgrapht.Graphs;
 
 import com.google.common.collect.Lists;
 
-import blang.mcmc.Callback;
-import blang.mcmc.MHSampler;
+import blang.mcmc.internals.Callback;
+import blang.mcmc.MHSampler;    
 import briefj.collections.UnorderedPair;
 import conifer.TopologyUtils;
 import conifer.TreeNode;

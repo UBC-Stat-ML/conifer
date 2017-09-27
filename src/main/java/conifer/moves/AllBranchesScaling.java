@@ -5,16 +5,18 @@ import java.util.Random;
 
 import conifer.RandomUtils.Exponential;
 import conifer.RandomUtils.Gamma;
-import blang.mcmc.Callback;
+import blang.mcmc.internals.Callback;
 import blang.mcmc.MHSampler;
 import briefj.collections.UnorderedPair;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.ctmc.expfam.ExpFamMixture;
 import conifer.factors.NonClockTreePriorUtils;
-import conifer.factors.UnrootedTreeLikelihoodUtils;
+import conifer.factors.UnrootedTreeLikelihood;
+//import conifer.factors.UnrootedTreeLikelihoodUtils;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.models.MultiCategorySubstitutionModel.PoissonAuxiliarySample;
+import conifer.factors.UnrootedTreeLikelihood;
 
 
 
@@ -22,7 +24,7 @@ public class AllBranchesScaling extends MHSampler
 {
   // original code AllBranchesScaling extends NodeMove
   UnrootedTree tree;
-  UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
+  UnrootedTreeLikelihood likelihood;
   NonClockTreePriorUtils<Exponential.Parameters> prior;
   
 
@@ -40,13 +42,14 @@ public class AllBranchesScaling extends MHSampler
     if (rand.nextInt(10) != 0)
       return;
     
-    List<PoissonAuxiliarySample> auxVars = likelihood.evolutionaryModel.samplePoissonAuxiliaryVariables(rand, likelihood.observations, likelihood.tree);
+    // case likelihood to be MultiCategorySubstitutionModel
+    List<PoissonAuxiliarySample> auxVars = ((MultiCategorySubstitutionModel) likelihood.getEvolutionaryModel()).samplePoissonAuxiliaryVariables(rand, likelihood.getObservations(), likelihood.getTree());
 
     final double alpha = 1.0;
     final double beta = prior.branchDistributionParameters.getRate();
     
     // loop over edges
-    for (UnorderedPair<TreeNode, TreeNode> edge : likelihood.tree.getTopology().edgeSet())
+    for (UnorderedPair<TreeNode, TreeNode> edge : likelihood.getTree().getTopology().edgeSet())
     {
       double updatedShape = alpha;
       double updatedRate = beta;

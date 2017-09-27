@@ -3,7 +3,7 @@ package conifer.moves;
 import java.util.List;
 import java.util.Random;
 
-import blang.mcmc.Callback;
+import blang.mcmc.internals.Callback;
 import blang.mcmc.MHSampler;
 import briefj.collections.UnorderedPair;
 

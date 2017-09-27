@@ -22,7 +22,7 @@ import com.google.common.collect.Lists;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.factors.NonClockTreePriorUtils;
-import conifer.factors.UnrootedTreeLikelihoodUtils;
+import conifer.factors.UnrootedTreeLikelihood;
 import conifer.models.EvolutionaryModel;
 import conifer.models.EvolutionaryModelUtils;
 import conifer.models.LikelihoodComputationContext;
