@@ -3,26 +3,36 @@ package conifer.factors
 import conifer.io.TreeObservations
 import conifer.UnrootedTree
 import conifer.models.EvolutionaryModel
+import conifer.models.MultiCategorySubstitutionModel
+import conifer.models.RateMatrixMixture
 
 model Example {
   
-  param Plate<String> datasets
   
-  random Plated<TreeObservations> observations
-  random Plated<UnrootedTree> trees
-  param EvolutionaryModel evolutionaryModel
+  random TreeObservations observations
+  random UnrootedTree trees
+  param RateMatrixMixture rateMtxMixutre ?: new 
+  param EvolutionaryModel evolutionaryModel ?: new MultiCategorySubstitutionModel()
+  
+   public MultiCategorySubstitutionModel(T rateMatrixMixture, int nSites)
+    {
+        this.rateMatrixMixture = rateMatrixMixture;
+        this.nSites = nSites;
+    }
   param RealDistribution branchLengthDensity ?: Exponential.distribution(1.0) 
   
   laws {
+  	trees | branchLengthDensity ~ NonClockTreePrior(branchLengthDensity)
+  	observations | UnrootedTree tree = trees, evolutionaryModel ~ UnrootedTreeLikelihood(tree, evolutionaryModel)
     
-    for (Index<String> dataset : datasets.indices) {
-     trees.get(dataset) | branchLengthDensity ~ NonClockTreePrior(branchLengthDensity)
-     
-     observations.get(dataset) | UnrootedTree tree = trees.get(dataset), evolutionaryModel ~ UnrootedTreeLikelihood(tree, evolutionaryModel)
-     
-     //observations.get(dataset) | trees, evolutionaryModel, Index<String> mydataset = dataset ~ UnrootedTreeLikelihood(trees.get(mydataset), evolutionaryModel)
-    
-    }
+//    for (Index<String> dataset : datasets.indices) {
+//     trees.get(dataset) | branchLengthDensity ~ NonClockTreePrior(branchLengthDensity)
+//     
+//    
+//     
+//     //observations.get(dataset) | trees, evolutionaryModel, Index<String> mydataset = dataset ~ UnrootedTreeLikelihood(trees.get(mydataset), evolutionaryModel)
+//    
+//    }
   }
   
 }
