@@ -8,7 +8,7 @@ import conifer.TreeNode;
  * Maps TreeNodes to data.
  * 
  * Observations can be simple discrete traits, but could also
- * be backed by an alignment to be resampled.
+ * be backed by an alignment to be re-sampled.
  * 
  * Continuous traits might be another later possibility.
  */

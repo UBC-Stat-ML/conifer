@@ -125,18 +125,18 @@ public class UnrootedTreeLikelihoodUtils<M>
   
     
  
-  
-  /**
-   * 
-   * @param leaves
-   * @return A default tree obtained by sampling a nonclock tree with an exponential rate one
-   *         and a fixed seed.
-   */
-  public static UnrootedTree defaultTree(Collection<TreeNode> leaves)
-  {
-    Random rand = new Random(1);
-    return NonClockTreePriorUtils.sample(rand, Exponential.on(new RealScalar(0)), leaves);
-  }
+//  
+//  /**
+//   * 
+//   * @param leaves
+//   * @return A default tree obtained by sampling a nonclock tree with an exponential rate one
+//   *         and a fixed seed.
+//   */
+//  public static UnrootedTree defaultTree(Collection<TreeNode> leaves)
+//  {
+//    Random rand = new Random(1);
+//    return NonClockTreePriorUtils.sample(rand, Exponential.on(new RealScalar(0)), leaves);
+//  }
 
   
   public static void main(String [] args)

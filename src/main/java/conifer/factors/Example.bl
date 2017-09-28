@@ -4,35 +4,26 @@ import conifer.io.TreeObservations
 import conifer.UnrootedTree
 import conifer.models.EvolutionaryModel
 import conifer.models.MultiCategorySubstitutionModel
-import conifer.models.RateMatrixMixture
+import conifer.models.DiscreteGammaMixture
+import conifer.ctmc.SimpleRateMatrix
 
 model Example {
   
-  
   random TreeObservations observations
-  random UnrootedTree trees
-  param RateMatrixMixture rateMtxMixutre ?: new 
-  param EvolutionaryModel evolutionaryModel ?: new MultiCategorySubstitutionModel()
-  
-   public MultiCategorySubstitutionModel(T rateMatrixMixture, int nSites)
-    {
-        this.rateMatrixMixture = rateMatrixMixture;
-        this.nSites = nSites;
-    }
-  param RealDistribution branchLengthDensity ?: Exponential.distribution(1.0) 
+  random UnrootedTree tree 
+  param EvolutionaryModel evoModel ?: 
+    new MultiCategorySubstitutionModel(
+      new DiscreteGammaMixture(
+        0.0, 
+        1.0, 
+        SimpleRateMatrix::fromResource("/conifer/ctmc/kimura1980.txt"), 
+        1
+      ), 
+      observations.nSites)
   
   laws {
-  	trees | branchLengthDensity ~ NonClockTreePrior(branchLengthDensity)
-  	observations | UnrootedTree tree = trees, evolutionaryModel ~ UnrootedTreeLikelihood(tree, evolutionaryModel)
-    
-//    for (Index<String> dataset : datasets.indices) {
-//     trees.get(dataset) | branchLengthDensity ~ NonClockTreePrior(branchLengthDensity)
-//     
-//    
-//     
-//     //observations.get(dataset) | trees, evolutionaryModel, Index<String> mydataset = dataset ~ UnrootedTreeLikelihood(trees.get(mydataset), evolutionaryModel)
-//    
-//    }
+    	tree ~ NonClockTreePrior(Exponential.distribution(1.0))
+  	  observations | tree, evoModel ~ UnrootedTreeLikelihood(tree, evoModel) 
   }
   
 }
