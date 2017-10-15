@@ -5,20 +5,19 @@ import conifer.UnrootedTree
 import conifer.models.EvolutionaryModel
 import conifer.models.MultiCategorySubstitutionModel
 import conifer.models.RateMatrixMixture
+import conifer.ctmc.SimpleRateMatrix
+import conifer.ctmc.expfam.RateMtxNames;
+import conifer.ctmc.RateMatrices
 
 model Example {
   
   
   random TreeObservations observations
   random UnrootedTree trees
-  param RateMatrixMixture rateMtxMixutre ?: new 
-  param EvolutionaryModel evolutionaryModel ?: new MultiCategorySubstitutionModel()
-  
-   public MultiCategorySubstitutionModel(T rateMatrixMixture, int nSites)
-    {
-        this.rateMatrixMixture = rateMatrixMixture;
-        this.nSites = nSites;
-    }
+  param SimpleRateMatrix baseRateMatrix ?: RateMatrices.rateMtxModel(RateMtxNames.DNAGTR)
+  param DiscreteGammaMixture gammaMixture ?: new DiscreteGammaMixture(new RealScalar(0.1), new RealScalar(1.0), baseRateMatrix, 4)
+  param EvolutionaryModel evolutionaryModel ?: = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites)
+ 
   param RealDistribution branchLengthDensity ?: Exponential.distribution(1.0) 
   
   laws {
