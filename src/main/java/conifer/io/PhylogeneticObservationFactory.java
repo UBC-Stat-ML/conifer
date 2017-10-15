@@ -1,16 +1,14 @@
 package conifer.io;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import briefj.BriefCollections;
 import briefj.BriefIO;
 import briefj.BriefLog;
 import briefj.Indexer;
 
+import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
@@ -47,19 +45,161 @@ public class PhylogeneticObservationFactory
    * 
    * @return The PhylogeneticObservationFactory corresponding to the standard iupac encodings.
    */
-  public static PhylogeneticObservationFactory nucleotidesFactory()
-  {
-    if (_nucleotideFactory == null)
-      _nucleotideFactory = fromResource("/conifer/io/dna-iupac-encoding.txt");
-    return _nucleotideFactory;
-  }
-  
+
   public static PhylogeneticObservationFactory proteinFactory()
   {
-    if(_proteinFactory == null)
-      _proteinFactory = fromResource("/conifer/io/protein-iupac-encoding.txt");
-    return _proteinFactory;
-   }
+
+    boolean caseSensitive = false;
+    List<String> orderedSymbols = Lists.newArrayList("A", "R", "N", "D", "C", "Q", "E", "G", "H", "L", "I", "K", "M", "F", "P", "S", "T", "W", "Y", "V");
+
+    Map<String, Set<String>> ambiguousSymbols = new HashMap<>();
+    ambiguousSymbols.put("X", new HashSet<String>(orderedSymbols));
+    ambiguousSymbols.put("-", new HashSet<String>(orderedSymbols));
+    ambiguousSymbols.put("B", new HashSet<String>(Lists.newArrayList("N", "D")));
+    ambiguousSymbols.put("Z", new HashSet<>(Lists.newArrayList("Q", "E")));
+
+    return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
+
+  }
+  
+  
+  public static PhylogeneticObservationFactory codonFactory(){
+	  
+	  boolean caseSensitive = false;
+	  List<String> allDNAStates = Lists.newArrayList("A", "C", "G", "T");
+	  List<String> stoppingCodons = Lists.newArrayList("TAA", "TAG", "TGA");
+	  
+	  List<String> orderedSymbols = Lists.newArrayList();
+	  Map<String, Set<String>> ambiguousSymbols = new HashMap<>();
+	  
+	  // write code to generate all codon states
+	  for(String ele1:allDNAStates){
+		  for(String ele2:allDNAStates){
+			  for(String ele3:allDNAStates){
+				  String result = ele1.concat(ele2).concat(ele3);
+				  orderedSymbols.add(result);
+				  }			  
+		  }	  
+	   }
+	  
+	  orderedSymbols.removeAll(stoppingCodons);
+	  
+	  // no inclusion of keys TRA, since it is compressed code for stopping codon
+	  List<String> nPrefix = Lists.newArrayList("GC", "CG", "GG", "CT", "CC", "TC", "AC", "GT");
+      List<String> yPrefix = Lists.newArrayList("AA", "GA", "TG", "CA", "TT", "AG", "TA");
+      List<String> hPrefix = Lists.newArrayList("AT");
+      List<String> rPrefix = Lists.newArrayList("CA", "GA", "AA"); // remove TA since TAR is used for stopping codons
+      List<String> multiSymbols = Lists.newArrayList("MGR");
+
+      
+      Map<String, List<String>> singleCharMaps = new HashMap<>();
+      singleCharMaps.put("N", Lists.newArrayList("A", "C", "G", "T"));
+      singleCharMaps.put("Y", Lists.newArrayList("C", "T"));
+      singleCharMaps.put("R", Lists.newArrayList("A", "G"));
+      singleCharMaps.put("H", Lists.newArrayList("A", "C", "T"));
+      
+      // create all the keys and values for ambiguous symbols
+      for(String ele: nPrefix){
+    	  String key = ele.concat("N");
+    	  // each key corresponds to four values, for example GCN correspond to GCA, GCC, GCG, GCT
+    	  Set<String> values = new HashSet<>();
+    	  for(String ele2:singleCharMaps.get("N")){
+    		  String value = ele.concat(ele2);
+    		  values.add(value);
+    	  	}
+    	  ambiguousSymbols.put(key, values);
+    	  }
+      
+      for(String ele: yPrefix){
+    	  String key = ele.concat("Y");
+    	  Set<String> values = new HashSet<>();
+    	  for(String ele2:singleCharMaps.get("Y")){
+    		  String value = ele.concat(ele2);
+    		  values.add(value);    		  
+    	  }
+    	  ambiguousSymbols.put(key, values);	  
+      }
+      
+      for(String ele: rPrefix){
+    	  String key = ele.concat("R");
+    	  Set<String> values = new HashSet<>();
+    	  for(String ele2:singleCharMaps.get("R")){
+    		  String value = ele.concat(ele2);
+    		  values.add(value);    		  
+    	  }
+    	  ambiguousSymbols.put(key, values);	  
+      }
+      
+      
+      for(String ele: hPrefix){
+    	  String key = ele.concat("H");
+    	  Set<String> values = new HashSet<>();
+    	  for(String ele2:singleCharMaps.get("H")){
+    		  String value = ele.concat(ele2);
+    		  values.add(value);
+    		  }
+    	  ambiguousSymbols.put(key, values);
+    	  }
+      
+      ambiguousSymbols.put("MGR", new HashSet<>(Lists.newArrayList("AGA", "AGG", "CGA", "CGG")));
+      ambiguousSymbols.put("YTR", new HashSet<>(Lists.newArrayList("CTA", "CTG", "TTA", "TTG")));
+      
+      return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
+  }
+
+  public static PhylogeneticObservationFactory nucleotidesFactory(){
+
+      boolean caseSensitive = false;
+      List<String> orderedSymbols = Lists.newArrayList("A", "C", "G", "T");
+      Map<String, Set<String>> ambiguousSymbols = new HashMap<>();
+      Set<String> wholeValue = new HashSet<String>(Lists.newArrayList("A", "C", "G", "T"));
+      Map<String, Set<String>> allMaps = new HashMap<>();
+
+      List<String> eleHasAppeared = Lists.newArrayList();
+      // create all possible values for ambiguousSymbols
+      for(String element:wholeValue){
+        List<String> states = Lists.newArrayList("A", "C", "G", "T");
+        states.remove(element);
+        List<String> complementSet = states;
+
+        // putting all the three states into allMaps
+        Set<String> threeLetterStates = new HashSet<String>(complementSet);
+        String threeLetterKeyValues = "";
+        for(String secondElement: complementSet){
+          threeLetterKeyValues = threeLetterKeyValues.concat(secondElement);
+        }
+
+        allMaps.put(threeLetterKeyValues, threeLetterStates);
+        
+        for(String secondElement : complementSet){
+        	Set<String> result = new HashSet<>(Lists.newArrayList(element));
+            result.add(secondElement);
+            String keyValue = element.concat(secondElement);
+            allMaps.put(keyValue, result);
+            }  
+        	     
+      }
+
+    Set<String> tValue = new HashSet<String>(Lists.newArrayList("T"));
+    ambiguousSymbols.put("?", wholeValue);
+    ambiguousSymbols.put("-", wholeValue);
+    ambiguousSymbols.put("N", wholeValue);
+    ambiguousSymbols.put("U", tValue);
+    ambiguousSymbols.put("W", allMaps.get("AT"));
+    ambiguousSymbols.put("S", allMaps.get("CG"));
+    ambiguousSymbols.put("M", allMaps.get("AC"));
+    ambiguousSymbols.put("K", allMaps.get("GT"));
+    ambiguousSymbols.put("R", allMaps.get("AG"));
+    ambiguousSymbols.put("Y", allMaps.get("CT"));
+    ambiguousSymbols.put("B", allMaps.get("CGT"));
+    ambiguousSymbols.put("D", allMaps.get("AGT"));
+    ambiguousSymbols.put("H", allMaps.get("ACT"));
+    ambiguousSymbols.put("V", allMaps.get("ACG"));
+
+    return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
+
+    }
+
 
   
   public static PhylogeneticObservationFactory selectedFactory(final RateMtxNames selectedRateMtx)
@@ -189,9 +329,9 @@ public class PhylogeneticObservationFactory
 	  return a2s;
   }
   
-  private final List<String> orderedSymbols;
-  private final Map<String, Set<String>> ambiguousSymbols;
-  private final boolean caseSensitive;
+  public final List<String> orderedSymbols;
+  public final Map<String, Set<String>> ambiguousSymbols;
+  public final boolean caseSensitive;
   
   private transient Integer chunkLength = null;
   private transient Indexer<String> _indexer;
@@ -234,7 +374,7 @@ public class PhylogeneticObservationFactory
       throw new RuntimeException();
   }
   
-  private PhylogeneticObservationFactory(List<String> orderedSymbols,
+  public PhylogeneticObservationFactory(List<String> orderedSymbols,
       Map<String, Set<String>> ambiguousSymbols, boolean caseSensitive)
   {
     this.orderedSymbols = orderedSymbols;
@@ -251,4 +391,22 @@ public class PhylogeneticObservationFactory
     return BriefCollections.pick(getIndicators().values()).length;
     //return BriefCollections.pick(getIndicators().values()).length()/factory.getChunkLength());
   }
+
+  public static void main(String[] args) {
+
+    PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.codonFactory();
+    boolean caseSensitive = factory.caseSensitive;
+    System.out.println(caseSensitive);
+
+    System.out.println(Arrays.deepToString(factory.orderedSymbols.toArray()));
+    System.out.println(factory.orderedSymbols.size());
+
+    // print all the keys and values of a HashMap
+    for(String name: factory.ambiguousSymbols.keySet()){
+      String key = name.toString();
+      Set<String> value = factory.ambiguousSymbols.get(key);
+      System.out.println(key+" "+ Arrays.deepToString(value.toArray()));
+    }
+  }
+
 }
