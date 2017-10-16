@@ -78,14 +78,12 @@ public class NonClockTreePriorUtils<P>
   }
   
   public static UnrootedTree sampleBalancedUnrootedBinaryTree(
-	      Random random, 
 	      double defaultLength,
 	      Collection<TreeNode> leaves)
 	  {
 	    UnrootedTree result = new UnrootedTree();
 	    
 	    List<TreeNode> shuffled = Lists.newArrayList(leaves);
-	    Collections.shuffle(shuffled, random);
 	    Queue<TreeNode> queue = Lists.newLinkedList(shuffled);
 	   
 	    if (queue.isEmpty())
@@ -98,7 +96,6 @@ public class NonClockTreePriorUtils<P>
 	    
 	    List<TreeNode> firstNRemainderLeaves = shuffled.subList(0, (remainder));
 	    List<TreeNode> binaryLeaves = shuffled.subList(remainder,(shuffled.size()));
-	    Collections.shuffle(firstNRemainderLeaves, random);
 	    Queue<TreeNode> queueRemainder = Lists.newLinkedList(firstNRemainderLeaves);
 	    Queue<TreeNode> binaryQueue = Lists.newLinkedList(binaryLeaves);
 	   
