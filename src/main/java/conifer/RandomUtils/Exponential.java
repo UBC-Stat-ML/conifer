@@ -6,7 +6,6 @@ package conifer.RandomUtils;
 
 import blang.core.RealVar;
 import blang.types.RealScalar;
-import conifer.factors.RealValuedDensity;
 
 import java.util.Random;
 
