@@ -6,7 +6,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import bayonet.marginal.FactorGraph;
 import bayonet.marginal.UnaryFactor;
-import bayonet.marginal.algo.EdgeSorter;
 import bayonet.marginal.algo.SumProduct;
 
 import com.google.common.collect.Lists;

@@ -27,7 +27,6 @@ public class LikelihoodFactoryContext
 
   private final UnrootedTree tree;
   
-  
   LikelihoodFactoryContext(
       FactorGraph<TreeNode> factorGraph,
       UnrootedTree tree, TreeObservations observations, 

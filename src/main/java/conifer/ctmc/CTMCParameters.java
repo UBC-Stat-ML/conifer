@@ -1,6 +1,5 @@
 package conifer.ctmc;
 
-import briefj.Indexer;
 
 
 
@@ -14,10 +13,6 @@ import briefj.Indexer;
 public interface CTMCParameters
 {
   public CTMC getProcess();
-  
-  // TODO: this should not be String: either a generic or a wrapper around a Map
-  // note: sometimes you do just want indexer over strings
-//  public Indexer<String> getRateMatrixIndexer();
   
   /**
    * A model for transitions from latent states to observations,

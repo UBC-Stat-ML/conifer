@@ -4,6 +4,7 @@ import java.util.List;
 
 
 import bayonet.distributions.Multinomial;
+import blang.core.RealVar;
 
 import com.google.common.collect.Lists;
 import conifer.RandomUtils.Gamma;
@@ -18,18 +19,17 @@ import conifer.ctmc.SimpleRateMatrix;
 public class DiscreteGammaMixture implements RateMatrixMixture
 {
 
-  public final blang.core.RealVar invariantSiteProbability;
+  public final RealVar invariantSiteProbability;
 
-  public final blang.core.RealVar shapeParameter;
-  
+  public final RealVar shapeParameter;
 
   public final CTMCParameters baseRateMatrix;
   
   private final int nPositiveCategories;
   
   public DiscreteGammaMixture(
-      blang.core.RealVar invariantSiteProbability,
-      blang.core.RealVar shapeParameter,
+      RealVar invariantSiteProbability,
+      RealVar shapeParameter,
       CTMCParameters baseRateMatrix,
       int nPositiveCategories)
   {

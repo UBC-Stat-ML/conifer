@@ -1,6 +1,7 @@
 package conifer.io;
 
 import java.io.File;
+
 import java.util.*;
 
 import briefj.BriefCollections;
@@ -12,8 +13,8 @@ import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
-import conifer.ctmc.RateMatrices;
-import conifer.ctmc.SimpleRateMatrix;
+import blang.inits.DesignatedConstructor;
+import blang.inits.Input;
 import conifer.ctmc.expfam.RateMtxNames;
 
 
@@ -61,7 +62,7 @@ public class PhylogeneticObservationFactory
     return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
 
   }
-  
+
   
   public static PhylogeneticObservationFactory codonFactory(){
 	  
@@ -227,6 +228,20 @@ public class PhylogeneticObservationFactory
     return fromJSONString(jsonString);
   }
   
+  @DesignatedConstructor
+  public static PhylogeneticObservationFactory parse(@Input(formatDescription = "DNA, protein, codon or path to JSON spec") String description)
+  {
+    String cleanedDescr = description.trim().toUpperCase();
+    if (cleanedDescr.equals("DNA"))
+      return nucleotidesFactory();
+    else if (cleanedDescr.equals("PROTEIN"))
+      return proteinFactory();
+    else if (cleanedDescr.equals("CODON"))
+      return codonFactory();
+    else
+      return fromJSONFile(new File(description));
+  }
+  
   /**
    *
    * @param sequence To be chunked and indexed.
@@ -310,24 +325,6 @@ public class PhylogeneticObservationFactory
     }
     return _indicators;
   }
- 
-  /**
-   * 
-   * @return Inverse of getIndicators(), with string value of the indicator arrays as keys and the 
-   * string chunk as values.
-   *  
-   */
-  public Map<String,String> getIndicator2ChunkMap() 
-  {
-	  Map<String, String> a2s = Maps.newHashMap();
-	  // TODO: this will not include U, as it comes after T, what could be done for not 1-to-1 relations?
-	  for (Map.Entry<String, double[]> e : this.getIndicators().entrySet()) {
-		  if (e.getKey() != "U")
-			  a2s.put(Arrays.toString(e.getValue()), e.getKey());
-	  }
-	  
-	  return a2s;
-  }
   
   public final List<String> orderedSymbols;
   public final Map<String, Set<String>> ambiguousSymbols;
@@ -384,8 +381,6 @@ public class PhylogeneticObservationFactory
   
   private static PhylogeneticObservationFactory _nucleotideFactory = null;
   private static PhylogeneticObservationFactory _proteinFactory = null;
-  private static PhylogeneticObservationFactory _proteinPairFactory=null;
-
   public int nSites()
   {
     return BriefCollections.pick(getIndicators().values()).length;

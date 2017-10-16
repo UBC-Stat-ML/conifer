@@ -15,19 +15,21 @@ model UnrootedTreeLikelihood {
   param EvolutionaryModel evolutionaryModel
   
   laws {
-    
     logf(tree, observations, evolutionaryModel) {
       val TreeNode arbitraryRoot = TopologyUtils.arbitraryNode(tree)
-      val LikelihoodComputationContext context = new LikelihoodComputationContext(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, tree, arbitraryRoot, observations), arbitraryRoot)
+      val LikelihoodComputationContext context = new LikelihoodComputationContext(
+        EvolutionaryModelUtils::buildFactorGraphs(
+          evolutionaryModel, 
+          tree, 
+          arbitraryRoot, 
+          observations), 
+        arbitraryRoot)
       return evolutionaryModel.computeLogLikelihood(context)
     }
   }
   
   generate (rand) {
-  	observations.clear()
-    if (!observations.getObservedTreeNodes().isEmpty())
-      throw new RuntimeException("The method clear() seems to be incorrectly implemented in " + observations.getClass().getName())
+  	  observations.clear()
     evolutionaryModel.generateObservationsInPlace(rand, observations, tree, TopologyUtils.arbitraryNode(tree))
   }
-  
 }

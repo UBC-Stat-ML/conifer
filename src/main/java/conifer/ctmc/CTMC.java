@@ -1,14 +1,6 @@
 package conifer.ctmc;
 
-import org.ejml.data.Eigenpair;
-import org.ejml.ops.EigenOps;
-import org.ejml.simple.SimpleMatrix;
 
-import tutorialj.Tutorial;
-import bayonet.distributions.Multinomial;
-import bayonet.math.EJMLUtils;
-import bayonet.math.EJMLUtils.SimpleEigenDecomposition;
-import bayonet.math.NumericalUtils;
 
 /**
  * A continuous time Markov chain. The main functionalities consists

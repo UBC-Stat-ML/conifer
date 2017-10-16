@@ -1,11 +1,8 @@
 package conifer.models;
 
 
-import java.io.PrintWriter;
 import java.util.*;
 
-import briefj.BriefIO;
-import briefj.run.Results;
 import conifer.ctmc.*;
 import conifer.ctmc.expfam.CTMCExpFam;
 import conifer.ctmc.expfam.CTMCState;
@@ -13,10 +10,8 @@ import conifer.ctmc.expfam.ExpectedStatistics;
 import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
 import org.jblas.DoubleMatrix;
-import org.jblas.MatrixFunctions;
 import org.jgrapht.UndirectedGraph;
 
-import conifer.RandomUtils.Exponential;
 import bayonet.distributions.Multinomial;
 import bayonet.graphs.GraphUtils;
 import bayonet.marginal.DiscreteFactorGraph;
@@ -36,8 +31,6 @@ import com.google.common.collect.Maps;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
-import conifer.factors.NonClockTreePriorUtils;
-import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
 
 
@@ -51,8 +44,8 @@ import conifer.io.TreeObservations;
  *
  * This also supports a transition matrix at each leaf to model 
  * for example measurement error models, or more general setups where
- * the characters evolved along the topology come from a different
- * space thant the space of observations (e.g. covarion models).
+ * the characters evolving along the topology come from a different
+ * space than the space of observations (e.g. covarion models).
  *
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  *
@@ -64,16 +57,11 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
 
     public final int nSites;
 
-    public static boolean recordCacheSize = false;
     public MultiCategorySubstitutionModel(T rateMatrixMixture, int nSites)
     {
         this.rateMatrixMixture = rateMatrixMixture;
         this.nSites = nSites;
     }
-
-    private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("cacheSize.details.txt"));
-
-
 
     /**
      *
@@ -138,24 +126,6 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
             }
         }
 
-        if(recordCacheSize){
-
-            // find the maximum cache size of endPointSamplers among all sites
-            int maxCachedSize =0;
-            for (int c=0; c<endPointSamplers.size(); c++){
-                if(endPointSamplers.get(c).cacheSize()>maxCachedSize){
-                    maxCachedSize=endPointSamplers.get(c).cacheSize();
-                    System.out.println(endPointSamplers.get(c).cacheSize());
-                }
-            }
-            logToFile("Maximum Cached Size" +""+ maxCachedSize);
-
-        }else{
-
-
-        }
-
-
         return categorySpecificStats;
     }
 
@@ -173,7 +143,6 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
 
         // sample posterior internal reconstructions and indicators
         MultiCategoryInternalNodeSample internalSample = samplePosteriorInternalNodes(rand, observations, tree, root);
-
 
         List<PoissonAuxiliarySample> result = Lists.newArrayList();
         for (int cat = 0; cat < nCategories(); cat++)
@@ -197,11 +166,6 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
         }
 
         return result;
-    }
-
-    public void logToFile(String someline) {
-        this.detailWriter.println(someline);
-        this.detailWriter.flush();
     }
 
     /**
@@ -414,13 +378,13 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
         return brExpmRateMtx;
     }
 
-    public  List<Map< Pair<TreeNode, TreeNode>, double [][]>> getMarginalCount(TreeObservations observations, UnrootedTree tree){
+    public  List<Map< Pair<TreeNode, TreeNode>, double [][]>> getMarginalCount(TreeObservations observations, UnrootedTree tree)
+    {
         return getMarginalCount(observations, tree, TopologyUtils.arbitraryNode(tree));
     }
 
-
-
-    public List<Map< Pair<TreeNode, TreeNode>, double [][]>> getMarginalCount(TreeObservations observations, UnrootedTree tree, TreeNode root){
+    public List<Map< Pair<TreeNode, TreeNode>, double [][]>> getMarginalCount(TreeObservations observations, UnrootedTree tree, TreeNode root)
+    {
 
         List<FactorGraph<TreeNode>> factorGraphs = EvolutionaryModelUtils.buildFactorGraphs(this, tree, root, observations);
         int nSites = -1;
@@ -476,15 +440,18 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
 
     }
 
-
-    public ExpectedStatistics<CTMCState> getTotalExpectedStatistics(TreeObservations observations, UnrootedTree tree, CTMCExpFam<CTMCState> model) {
+    /*
+     * TODO: move the stuff below into ExpFam
+     */
+    
+    public ExpectedStatistics<CTMCState> getTotalExpectedStatistics(TreeObservations observations, UnrootedTree tree, CTMCExpFam<CTMCState> model) 
+    {
         return getTotalExpectedStatistics(observations, tree, TopologyUtils.arbitraryNode(tree), model);
-
     }
 
-
     public ExpectedStatistics<CTMCState> getTotalExpectedStatistics(TreeObservations observations, UnrootedTree tree, TreeNode root,
-                                                                    CTMCExpFam<CTMCState> model){
+                                                                    CTMCExpFam<CTMCState> model)
+    {
 
         List<Map< Pair<TreeNode, TreeNode>, double [][]>> totalMarginalCount = getMarginalCount(observations, tree);
         ExpectedStatistics<CTMCState> result = new ExpectedStatistics<CTMCState>(model);
@@ -511,11 +478,6 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
         return result;
 
     }
-
-
-
-
-
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private MultiCategoryInternalNodeSample sampleInternal(
@@ -617,31 +579,6 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
             this.categoryIndicators = categoryIndicators;
             this.internalIndicators = reconstructions;
         }
-    }
-
-    public static void loadObservations(
-            TreeObservations observations,
-            Map<TreeNode, ? extends CharSequence> rawStrings,
-            PhylogeneticObservationFactory observationFactory)
-    {
-        for (TreeNode treeNode : rawStrings.keySet())
-        {
-            String rawString = rawStrings.get(treeNode).toString();
-            double [][] indicators = observationFactory.site2CharacterIndicators(rawString);
-            observations.set(treeNode, indicators);
-        }
-    }
-
-    /**
-     *
-     * @param leaves
-     * @return A default tree obtained by sampling a nonclock tree with an exponential rate one
-     *         and a fixed seed.
-     */
-    public static UnrootedTree defaultTree(List<TreeNode> leaves)
-    {
-        Random rand = new Random(1);
-        return NonClockTreePriorUtils.generate(rand, Exponential.newExponential(), leaves);
     }
 
     /**

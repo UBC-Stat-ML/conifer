@@ -1,18 +1,11 @@
 package conifer.io;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.Map;
-
-import conifer.ctmc.expfam.RateMtxNames;
-import org.apache.commons.io.FileUtils;
-
-import briefj.BriefIO;
 
 import com.google.common.collect.Maps;
 
+import briefj.BriefIO;
 import conifer.TreeNode;
 
 
@@ -29,7 +22,7 @@ import conifer.TreeNode;
  */
 public class FastaUtils
 {
-	public static LinkedHashMap<TreeNode, CharSequence> readFasta(File f)
+	public static LinkedHashMap<TreeNode, String> readFasta(File f)
 	{
 		LinkedHashMap<TreeNode,CharSequence> map = Maps.newLinkedHashMap();
 		StringBuilder current = null;
@@ -48,41 +41,14 @@ public class FastaUtils
 				{
 					line = line.replaceAll("\\s+", "");
 					if (current == null)
-						throw new RuntimeException("Error in the currenlty picky implementation of the fasta reader: the first line did not start with '>'");
+						throw new RuntimeException("Error in the fasta reader: the first line did not start with '>'");
 					current.append(line);
 				}
 			}
 		}
-
-		return map;
+		LinkedHashMap<TreeNode,String> result = Maps.newLinkedHashMap();
+		for (TreeNode key : map.keySet())
+		  result.put(key, map.get(key).toString());
+		return result;
 	}
-
-	/**
-	 * Currently assumes that the alphabet order is ACGT 
-	 * @param observations
-	 * @throws IOException 
-	 */
-	public static String writeFasta(TreeObservations observations, File outFile, RateMtxNames selectedRateMtx) throws IOException
-	{
-		// get the alphabet map
-		Map<String,String> a2s = PhylogeneticObservationFactory.selectedFactory(selectedRateMtx).getIndicator2ChunkMap();
-
-		StringBuilder result = new StringBuilder();
-		for (TreeNode node : observations.getObservedTreeNodes()) {
-			result.append(">" + node + "\n");
-			double[][] s = (double[][]) observations.get(node);
-			char charAtSite = 'N';
-			for (int j = 0; j < s.length; j++) {
-				charAtSite = a2s.get(Arrays.toString(s[j])).charAt(0);
-				result.append(charAtSite);
-			}
-			result.append("\n");
-		}
-		
-		FileUtils.writeStringToFile(outFile, result.toString());
-
-		return result.toString();
-	}
-
-
 }

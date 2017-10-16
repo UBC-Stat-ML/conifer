@@ -17,7 +17,7 @@
 			"features" : { "statio(G)" : 1.0 }
 		},
 		{
-			"state" : { "categoryIndex" : 0, "latent" : "T" },
+			"state" : { "categoryIndex" : 0, "latent" : "T" }, n,j
 			"features" : { "statio(T)" : 1.0 }
 		}
 	],
