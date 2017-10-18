@@ -251,7 +251,7 @@
 "latent": "Q" 
 },
 "features": {
- "AcidicNon":      1,
+ "NonPolar":      1,
 "BigMicro":      1 
 } 
 },
@@ -265,7 +265,7 @@
 "latent": "E" 
 },
 "features": {
- "NonPolar":      1,
+ "AcidicNon":      1,
 "BigMicro":      1 
 } 
 },
@@ -503,7 +503,7 @@
 "latent": "Q" 
 },
 "features": {
- "AcidicBasic":      1,
+ "BasicPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -517,7 +517,7 @@
 "latent": "E" 
 },
 "features": {
- "BasicPolar":      1,
+ "AcidicBasic":      1,
 "BigBig":      1 
 } 
 },
@@ -741,7 +741,7 @@
 "latent": "Q" 
 },
 "features": {
- "AcidicPolar":      1,
+ "PolarPolar":      1,
 "BigMicro":      1 
 } 
 },
@@ -755,7 +755,7 @@
 "latent": "E" 
 },
 "features": {
- "PolarPolar":      1,
+ "AcidicPolar":      1,
 "BigMicro":      1 
 } 
 },
@@ -963,6 +963,20 @@
 "state1": {
  "categoryIndex":      0,
 "latent": "Q" 
+},
+"features": {
+ "AcidicPolar":      1,
+"BigMicro":      1 
+} 
+},
+{
+ "state0": {
+ "categoryIndex":      0,
+"latent": "D" 
+},
+"state1": {
+ "categoryIndex":      0,
+"latent": "E" 
 },
 "features": {
  "AcidicAcidic":      1,
@@ -976,20 +990,6 @@
 },
 "state1": {
  "categoryIndex":      0,
-"latent": "E" 
-},
-"features": {
- "AcidicPolar":      1,
-"BigMicro":      1 
-} 
-},
-{
- "state0": {
- "categoryIndex":      0,
-"latent": "D" 
-},
-"state1": {
- "categoryIndex":      0,
 "latent": "G" 
 },
 "features": {
@@ -1175,7 +1175,7 @@
 "latent": "Q" 
 },
 "features": {
- "AcidicNon":      1,
+ "NonPolar":      1,
 "BigMicro":      1 
 } 
 },
@@ -1189,7 +1189,7 @@
 "latent": "E" 
 },
 "features": {
- "NonPolar":      1,
+ "AcidicNon":      1,
 "BigMicro":      1 
 } 
 },
@@ -1399,7 +1399,7 @@
 "latent": "G" 
 },
 "features": {
- "AcidicNon":      1,
+ "NonPolar":      1,
 "BigMicro":      1 
 } 
 },
@@ -1413,7 +1413,7 @@
 "latent": "H" 
 },
 "features": {
- "AcidicBasic":      1,
+ "BasicPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -1427,7 +1427,7 @@
 "latent": "L" 
 },
 "features": {
- "AcidicNon":      1,
+ "NonPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -1441,7 +1441,7 @@
 "latent": "I" 
 },
 "features": {
- "AcidicNon":      1,
+ "NonPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -1455,7 +1455,7 @@
 "latent": "K" 
 },
 "features": {
- "AcidicBasic":      1,
+ "BasicPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -1469,7 +1469,7 @@
 "latent": "M" 
 },
 "features": {
- "AcidicNon":      1,
+ "NonPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -1483,7 +1483,7 @@
 "latent": "F" 
 },
 "features": {
- "AcidicNon":      1,
+ "NonPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -1497,7 +1497,7 @@
 "latent": "P" 
 },
 "features": {
- "AcidicNon":      1,
+ "NonPolar":      1,
 "BigMicro":      1 
 } 
 },
@@ -1511,7 +1511,7 @@
 "latent": "S" 
 },
 "features": {
- "AcidicPolar":      1,
+ "PolarPolar":      1,
 "BigMicro":      1 
 } 
 },
@@ -1525,7 +1525,7 @@
 "latent": "T" 
 },
 "features": {
- "AcidicPolar":      1,
+ "PolarPolar":      1,
 "BigMicro":      1 
 } 
 },
@@ -1539,7 +1539,7 @@
 "latent": "W" 
 },
 "features": {
- "AcidicNon":      1,
+ "NonPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -1553,7 +1553,7 @@
 "latent": "Y" 
 },
 "features": {
- "AcidicPolar":      1,
+ "PolarPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -1567,7 +1567,7 @@
 "latent": "V" 
 },
 "features": {
- "AcidicNon":      1,
+ "NonPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -1581,7 +1581,7 @@
 "latent": "G" 
 },
 "features": {
- "NonPolar":      1,
+ "AcidicNon":      1,
 "BigMicro":      1 
 } 
 },
@@ -1595,7 +1595,7 @@
 "latent": "H" 
 },
 "features": {
- "BasicPolar":      1,
+ "AcidicBasic":      1,
 "BigBig":      1 
 } 
 },
@@ -1609,7 +1609,7 @@
 "latent": "L" 
 },
 "features": {
- "NonPolar":      1,
+ "AcidicNon":      1,
 "BigBig":      1 
 } 
 },
@@ -1623,7 +1623,7 @@
 "latent": "I" 
 },
 "features": {
- "NonPolar":      1,
+ "AcidicNon":      1,
 "BigBig":      1 
 } 
 },
@@ -1637,7 +1637,7 @@
 "latent": "K" 
 },
 "features": {
- "BasicPolar":      1,
+ "AcidicBasic":      1,
 "BigBig":      1 
 } 
 },
@@ -1651,7 +1651,7 @@
 "latent": "M" 
 },
 "features": {
- "NonPolar":      1,
+ "AcidicNon":      1,
 "BigBig":      1 
 } 
 },
@@ -1665,7 +1665,7 @@
 "latent": "F" 
 },
 "features": {
- "NonPolar":      1,
+ "AcidicNon":      1,
 "BigBig":      1 
 } 
 },
@@ -1679,7 +1679,7 @@
 "latent": "P" 
 },
 "features": {
- "NonPolar":      1,
+ "AcidicNon":      1,
 "BigMicro":      1 
 } 
 },
@@ -1693,7 +1693,7 @@
 "latent": "S" 
 },
 "features": {
- "PolarPolar":      1,
+ "AcidicPolar":      1,
 "BigMicro":      1 
 } 
 },
@@ -1707,7 +1707,7 @@
 "latent": "T" 
 },
 "features": {
- "PolarPolar":      1,
+ "AcidicPolar":      1,
 "BigMicro":      1 
 } 
 },
@@ -1721,7 +1721,7 @@
 "latent": "W" 
 },
 "features": {
- "NonPolar":      1,
+ "AcidicNon":      1,
 "BigBig":      1 
 } 
 },
@@ -1735,7 +1735,7 @@
 "latent": "Y" 
 },
 "features": {
- "PolarPolar":      1,
+ "AcidicPolar":      1,
 "BigBig":      1 
 } 
 },
@@ -1749,7 +1749,7 @@
 "latent": "V" 
 },
 "features": {
- "NonPolar":      1,
+ "AcidicNon":      1,
 "BigBig":      1 
 } 
 },
