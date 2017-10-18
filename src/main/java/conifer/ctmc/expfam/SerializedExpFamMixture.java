@@ -260,10 +260,6 @@ public class SerializedExpFamMixture
         return FeatureFactory.dnaGTR();
     }
 
-//    public static SerializedExpFamMixture accordance()
-//    {
-//        return fromResource("/conifer/ctmc/expfam/accordance-expfam.txt");
-//    }
 
     public static SerializedExpFamMixture polarity()
     {
