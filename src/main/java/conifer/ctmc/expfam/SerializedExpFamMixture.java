@@ -36,7 +36,7 @@ public class SerializedExpFamMixture
 
     public static void main(String [] args)
     {
-        SerializedExpFamMixture s = fromResource("/conifer/ctmc/expfam/kimura1980-expfam.txt");
+        SerializedExpFamMixture s = fromResource("/conifer/ctmc/expfam/dnaGTR-expfam.txt");
         System.out.println(s);
         System.out.println(s.getCTMCStateIndexer());
         System.out.println(s.getSupport());
