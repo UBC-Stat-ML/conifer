@@ -21,6 +21,7 @@ public class FeatureFactory {
 	public static final List<String> PROTEIN = Lists.newArrayList("A", "R", "N", "D", "C", "Q", "E", "G", "H", "L", "I", "K", "M", "F", "P", "S", "T", "W", "Y", "V");
 	public static final List<String> CODON = PhylogeneticObservationFactory.codonFactory().orderedSymbols;
 	private static List<List<String>> supportEdges = null;
+	public static Map<String, String> codonsToAminoAcid = AminoAcidAndCodonMap.AminoAcidFromAndToCodons().getRight();
 	
 	
 	public static List<UnaryFeature> constructUnaryFeatures(List<String> stateSpace){
@@ -40,49 +41,16 @@ public class FeatureFactory {
 		
 	}
 	
-	public static List<BinaryFeature> constructGTRBinaryFeatures(List<String> stateSpace){
-		List<BinaryFeature> binaryFeatures = Lists.newArrayList();
-		List<String> wholeState = Lists.newArrayList();
-		wholeState.addAll(stateSpace);
-		int categoryIndex = 0;
-		while(wholeState.size()>0){
-			String element = wholeState.get(0);
-			String latent0 = element;
-			CTMCState ctmcState0 = new CTMCState(categoryIndex, latent0, partition);
-			
-			wholeState.remove(element);
-			
-			for(String element1: wholeState){
-				String latent1 = element1;
-				CTMCState ctmcState1 = new CTMCState(categoryIndex, latent1, partition);
-				String featureKeys = element.concat(element1);
-			    Map<String, Double> features = new HashMap<>();
-			    features.put(featureKeys, Double.valueOf(1.0));
-			    BinaryFeature binaryFeature = new BinaryFeature(ctmcState0, ctmcState1, features);
-				binaryFeatures.add(binaryFeature);
-				}
-			}
-		return binaryFeatures;
-	}
-	
-	
-	
+	// code related to DNA modelling
 	public static SerializedExpFamMixture dnaGTR(){
 		
 		List<String> orderedLatents = DNA;
 		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(DNA);
-	    List<BinaryFeature> binaryFeatures = constructGTRBinaryFeatures(DNA);
+		List<Map<String, String>> featureTemplate = constructBinaryFeatureTemplate("GTR", DNA);
+		List<BinaryFeature> binaryFeatures = constructAminoAcidPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate, DNA);
 	    return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport);
 	}
-	
-	public static SerializedExpFamMixture proteinSimpleGTR(){
-		List<String> orderedLatents = PROTEIN;
-		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(PROTEIN);
-	    List<BinaryFeature> binaryFeatures = constructGTRBinaryFeatures(PROTEIN);
-	    return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport);
-	}
-	
-	
+
 	
 	public static SerializedExpFamMixture kimura1980(){
 	
@@ -104,7 +72,7 @@ public class FeatureFactory {
     return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport);		
 			
 }
-	
+	// code related to Amino Acid model
 	public static Map<String, String> mapAminoAcidToPolarity(){
 		
 		// Acidic stands for Acidic Polar, Basic stands for Basic Polar, Non stands for NonPolar, Polar stands for Polar
@@ -143,19 +111,17 @@ public class FeatureFactory {
 		
 	}
 	
-	public static Map<String, String> mapAminoAcidToGTR(){
-		Map<String, String>  aminoAcidToGTR = new LinkedHashMap<>();
-		List<String> stateSpace = PROTEIN;
+	public static Map<String, String> mapStateSpaceCharacterToGTR(List<String> stateSpace){
+		Map<String, String>  charToGTR = new LinkedHashMap<>();
 		for(String ele: stateSpace){
-			aminoAcidToGTR.put(ele, ele);
+			charToGTR.put(ele, ele);
 		}
-		return aminoAcidToGTR;
+		return charToGTR;
 	}
 	
 	
-	public static List<BinaryFeature> constructAminoAcidPairwiseBinaryFeatureCombiningFeatureTemplates(List<Map<String, String>> featureTemplates){
+	public static List<BinaryFeature> constructAminoAcidPairwiseBinaryFeatureCombiningFeatureTemplates(List<Map<String, String>> featureTemplates, List<String> stateSpace){
 		
-		List<String> stateSpace = PROTEIN;
 		List<BinaryFeature> binaryFeatures = Lists.newArrayList();
 		List<String> wholeState = Lists.newArrayList();
 		wholeState.addAll(stateSpace);
@@ -188,7 +154,7 @@ public class FeatureFactory {
 	}
 	
 	
-	public static List<Map<String, String>> constructBinaryFeatureTemplate(String featureTemplateNames){
+	public static List<Map<String, String>> constructBinaryFeatureTemplate(String featureTemplateNames, List<String> stateSpace){
 	    List<Map<String, String>> result = Lists.newArrayList();
 		if(featureTemplateNames.contentEquals("polarity")){
 			result.add( mapAminoAcidToPolarity());
@@ -201,19 +167,28 @@ public class FeatureFactory {
 			
 			result.add(mapAminoAcidToPolarity());
 			result.add(mapAminoAcidToSize());
-			result.add(mapAminoAcidToGTR());
+			result.add(mapStateSpaceCharacterToGTR(stateSpace));
+		}else if(featureTemplateNames.contentEquals("GTR")){
+			result.add(mapStateSpaceCharacterToGTR(stateSpace));
 		}
 			
 		return result;
 	}
-	
-	
-	
+
+	public static SerializedExpFamMixture proteinSimpleGTR(){
+		List<String> orderedLatents = PROTEIN;
+		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(PROTEIN);
+		List<Map<String, String>> featureTemplate = constructBinaryFeatureTemplate("GTR", PROTEIN);
+		List<BinaryFeature> binaryFeatures = constructAminoAcidPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate, PROTEIN);
+		return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport);
+	}
+
+
 	public static SerializedExpFamMixture polarity(){
 		List<String> orderedLatents = PROTEIN;
 		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(PROTEIN);
-		List<Map<String, String>> featureTemplate = constructBinaryFeatureTemplate("polarity");
-		List<BinaryFeature> binaryFeatures = constructAminoAcidPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate);
+		List<Map<String, String>> featureTemplate = constructBinaryFeatureTemplate("polarity", PROTEIN);
+		List<BinaryFeature> binaryFeatures = constructAminoAcidPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate, PROTEIN);
 		return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport);
 		
 	}
@@ -221,18 +196,39 @@ public class FeatureFactory {
 	public static SerializedExpFamMixture polaritySize(){
 		List<String> orderedLatents = PROTEIN;
 		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(PROTEIN);
-		List<Map<String,String>> featureTemplate = constructBinaryFeatureTemplate("polarityPlusSize");
-		List<BinaryFeature> binaryFeatures = constructAminoAcidPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate);
+		List<Map<String,String>> featureTemplate = constructBinaryFeatureTemplate("polarityPlusSize", PROTEIN);
+		List<BinaryFeature> binaryFeatures = constructAminoAcidPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate, PROTEIN);
 		return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport); 
 	}
 	
 	public static SerializedExpFamMixture polaritySizeGTR(){
 		List<String> orderedLatents = PROTEIN;
 		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(PROTEIN);
-		List<Map<String, String>> featureTemplate = constructBinaryFeatureTemplate("polarityPlusSizePlusGTR");
-		List<BinaryFeature> binaryFeatures = constructAminoAcidPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate);
+		List<Map<String, String>> featureTemplate = constructBinaryFeatureTemplate("polarityPlusSizePlusGTR", PROTEIN);
+		List<BinaryFeature> binaryFeatures = constructAminoAcidPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate, PROTEIN);
 		return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport); 
 	}
+	
+	// code related to construct features for codon evolution
+	// features at the Amino Acid level
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// features at the DNA level
+	
+	
+	
+	
+	
+	
 	
 	 public static void main(String [] args)
 	    {
