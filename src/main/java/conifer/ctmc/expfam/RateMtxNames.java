@@ -67,28 +67,7 @@ public enum RateMtxNames
       
       
     },
-    ACCORDANCE {
-      @Override
-      public SerializedExpFamMixture getSerialized()
-      {
-        return SerializedExpFamMixture.accordance();
-      }
-      
-      public Indexer<String> getIndexer()
-      {
-        return proteinIndexer();
-      }
-      
-      public PhylogeneticObservationFactory getFactory()
-      {
-        return proteinFactory();
-      }
-      
-      public SimpleRateMatrix getRateMtx()
-      {
-        return RateMatrices.accordance();
-      }
-    },
+    
     POLARITY {
       @Override
       public SerializedExpFamMixture getSerialized()

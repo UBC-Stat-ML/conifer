@@ -1,6 +1,9 @@
-package conifer.io;
+package conifer.io.featurefactory;
 
 import com.beust.jcommander.internal.Lists;
+
+import conifer.io.PhylogeneticObservationFactory;
+
 import java.util.*;
 
 import org.apache.commons.lang3.tuple.Pair;

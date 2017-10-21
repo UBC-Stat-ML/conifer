@@ -12,6 +12,8 @@ import org.junit.Test;
 
 import com.beust.jcommander.internal.Lists;
 
+import conifer.io.featurefactory.AminoAcidAndCodonMap;
+
 
 public class TestAminoAcidAndCodonMap
 {
