@@ -42,7 +42,6 @@ import conifer.models.LikelihoodComputationContext;
  */
 public class SPRMove extends MHSampler<UnrootedTree>
 {
-  UnrootedTree tree;
   
   NonClockTreePrior treePrior;
   
@@ -62,7 +61,7 @@ public class SPRMove extends MHSampler<UnrootedTree>
 	    TreeNode removedRoot = DiscreteUniform.sample(internalNodes, random);
 	    
 	    // one neighbor will from the edge to disconnect, and another one, the new root
-	    List<UnorderedPair<TreeNode,TreeNode>> neighbors = Lists.newArrayList(tree.getTopology().edgesOf(removedRoot));
+	    List<UnorderedPair<TreeNode,TreeNode>> neighbors = Lists.newArrayList(variable.getTopology().edgesOf(removedRoot));
 	    if (neighbors.size() != 3)
 	      throw new RuntimeException("Currently supporting only internal arities of 3.");
 	    Collections.shuffle(neighbors, random);
