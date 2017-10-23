@@ -89,7 +89,7 @@ public class SPRMove extends MHSampler<UnrootedTree>
 	    List<TreeNode> attachmentPoints = variable.addAuxiliaryInternalNodes(random, removedRoot);//smallRatio, largerRatio, newRoot);
 	    
 	    // run the sum product on the main tree
-	    List<SumProduct<TreeNode>> mainTreeSumProducts = EvolutionaryModelUtils.getSumProductsFromFactorGraphs(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, tree, newRoot, treeLikelihood.getObservations(), false), newRoot);
+	    List<SumProduct<TreeNode>> mainTreeSumProducts = EvolutionaryModelUtils.getSumProductsFromFactorGraphs(EvolutionaryModelUtils.buildFactorGraphs(evolutionaryModel, variable, newRoot, treeLikelihood.getObservations(), false), newRoot);
 	    
 	    // consider all re-attachments
 	    double [] samplingArray = new double[attachmentPoints.size()];
