@@ -186,11 +186,4 @@ public class MajorityRuleTree {
 	}
 	
 	
-	public static File FESape4Tree() {
-		return new File("src/main/resources/conifer/sampleInput/FES.ape.4.nwk");
-	}
-	
-	public static File UTYape4Tree() {
-		return new File("src/main/resources/conifer/sampleInput/UTY.ape.4.nwk");
-	}
 }
