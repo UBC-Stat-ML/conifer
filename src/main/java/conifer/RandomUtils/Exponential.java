@@ -1,5 +1,7 @@
 package conifer.RandomUtils;
 
+import blang.core.RealDistribution;
+
 /**
  * Created by crystal on 2017-09-21.
  */
@@ -16,7 +18,7 @@ import java.util.Random;
  *
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  */
-public class Exponential<P> {
+public class Exponential<P> implements RealDistribution{
 
     public final blang.core.RealVar realization;
     /**
@@ -105,6 +107,17 @@ public class Exponential<P> {
     public static double generate(Random random, double rate){
         return sampleExponential(random, rate);
     }
+
+	@Override
+	public double sample(Random random) {
+		// TODO Auto-generated method stub
+		return sampleUnitRateExponential(random);
+	}
+
+	@Override
+	public double logDensity(double point) {
+		return this.logDensity(point);
+	}
 
 
   

@@ -12,6 +12,7 @@ import conifer.models.DiscreteGammaMixture
 
 model Example {
   random UnrootedTree tree 
+  param TreeObservations observations
   param EvolutionaryModel evoModel ?: 
     new MultiCategorySubstitutionModel(
       new DiscreteGammaMixture(
