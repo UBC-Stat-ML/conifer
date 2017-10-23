@@ -246,7 +246,7 @@ public static void main(String[] args){
 	Random rand = new Random(1);
 	double defaultLength = 1.0;
 	Collection<TreeNode> leaves = TopologyUtils.syntheticTaxaList((int) 15);
-	UnrootedTree unrootedTree = sampleBalancedUnrootedBinaryTree(rand, defaultLength,leaves);
+	UnrootedTree unrootedTree = sampleBalancedUnrootedBinaryTree(defaultLength,leaves);
 	System.out.println(unrootedTree.toNewick());	
 	}
 

@@ -132,7 +132,7 @@ public class MajorityRuleTree {
 	 */ 
 	public static File randomUnrootedPhylogenyFromMultipleAlignmentFastaFile(File fastaFile) {
 		
-		Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
+		Map<TreeNode,String> data = FastaUtils.readFasta(fastaFile);
 		UnrootedTree tree = UnrootedTreeLikelihoodUtils.defaultTree(data.keySet());
 		String outputFileName = FilenameUtils.removeExtension(fastaFile.getName()) + "_" + System.currentTimeMillis() + ".nwk";
 		File outputFile = Results.getFileInResultFolder(outputFileName);
@@ -149,7 +149,7 @@ public class MajorityRuleTree {
 	 */
 	//TODO: this is an inelegant implementation, doesn't have to be so coupled. Refactor in due time.
 	public static File treeFromFastaFile(File fastaFile) { 
-		Map<TreeNode,CharSequence> data = FastaUtils.readFasta(fastaFile);
+		Map<TreeNode,String> data = FastaUtils.readFasta(fastaFile);
 		Collection<Taxon> taxa = new Vector<Taxon>();
 		
 		for (TreeNode item : data.keySet()) {
