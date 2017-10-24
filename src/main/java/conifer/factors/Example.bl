@@ -9,9 +9,12 @@ import conifer.ctmc.SimpleRateMatrix
 import conifer.ctmc.expfam.RateMtxNames;
 import conifer.ctmc.RateMatrices
 import conifer.models.DiscreteGammaMixture
+import conifer.ctmc.expfam.ExpFamParameters
+import blang.distributions.MultivariateNormal;
 
 model Example {
-  random UnrootedTree tree 
+  random ExpFamParameters weights
+  param UnrootedTree tree 
   param TreeObservations observations
   param EvolutionaryModel evoModel ?: 
     new MultiCategorySubstitutionModel(
@@ -24,7 +27,9 @@ model Example {
       observations.nSites)
 
   laws {
-    	tree ~ NonClockTreePrior(Exponential.distribution(1.0))
+  	  // assign a prior factor for weights
+  	  // get dimension of weights and assign normal prior
+      tree ~ NonClockTreePrior(Exponential.distribution(1.0))
   	  observations | tree, evoModel ~ UnrootedTreeLikelihood(tree, evoModel) 
   }
   

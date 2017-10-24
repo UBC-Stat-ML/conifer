@@ -6,6 +6,9 @@ import java.util.List;
 
 import conifer.TreeNode;
 import conifer.UnrootedTree;
+import conifer.RandomUtils.Normal;
+import conifer.RandomUtils.Normal.MeanVarianceParameterization;
+import conifer.RandomUtils.PriorOfWeights;
 import conifer.io.TreeObservations;
 import conifer.models.MultiCategorySubstitutionModel;
 import conifer.models.RateMatrixMixture;
@@ -41,6 +44,7 @@ public class CTMCExpFam<S>
     public final Indexer<Object> featuresIndexer = new Indexer<Object>();
     public final  boolean  isNormalized;
     public int nFeatures() { return nFeatures; }
+    public PriorOfWeights<?> priorOfWeights;
 
     public CTMCExpFam(
             UndirectedGraph<S,?> support,
@@ -71,10 +75,43 @@ public class CTMCExpFam<S>
         }
     }
 
+    public CTMCExpFam(
+            UndirectedGraph<S,?> support,
+            Indexer<S> indexer,
+            boolean isNormalized,
+            PriorOfWeights<?> priorOfWeights)
+    {
+        // create support info
+        this.stateIndexer = indexer; //= new Indexer<S>(support.vertexSet());
+        this.nStates = this.stateIndexer.size();
+        this.supports = new int[nStates][];
+        this.bivariateFeatures = new SparseVector[nStates][];
+        this.univariateFeatures = new SparseVector[nStates];
+        this.isNormalized = isNormalized;
+        for (int state = 0; state < nStates; state++)
+        {
+            S current = stateIndexer.i2o(state);
+            Collection<S> nbhr = Graphs.neighborListOf(support, current);
+            this.supports[state] = new int[nbhr.size()];
+            int i = 0;
+            for (S item : nbhr)
+            {
+                if (item == current)
+                    throw new RuntimeException();
+                this.supports[state][i++] = stateIndexer.o2i(item);
+            }
+            Arrays.sort(this.supports[state]);
+            this.bivariateFeatures[state] = new SparseVector[nbhr.size()];
+        }
+        this.priorOfWeights = priorOfWeights;
+    }
+    
     public static <S> CTMCExpFam<S> createModelWithFullSupport(Indexer<S> indexer, boolean isNormalized)
     {
         return new CTMCExpFam<S>(GraphUtils.completeGraph(indexer.objects()), indexer, isNormalized);
     }
+    
+    
 
     public void extractUnivariateFeatures(Collection<? extends UnivariateFeatureExtractor<S>> univariateFeatureExtractors)
     {
@@ -205,7 +242,7 @@ public class CTMCExpFam<S>
         }
         private void ensureCache(double[] x) {
             if (requiresUpdate(lastX, x)) {
-                Pair<Double, double[]> currentValueAndDerivative = calculate(x);
+                Pair<Double, double[]> currentValueAndDerivative = calculate(x, priorOfWeights);
 
                 lastValue = currentValueAndDerivative.getLeft();
                 lastDerivative = currentValueAndDerivative.getRight();
@@ -228,7 +265,7 @@ public class CTMCExpFam<S>
             return result;
         }
 
-        private Pair<Double, double[]> calculate(double[] x)
+        private Pair<Double, double[]> calculate(double[] x, PriorOfWeights<?> priorOfWeights)
         {
             final double [] gradient = fixedDerivative.clone();
             double value = 0.0;
@@ -283,8 +320,10 @@ public class CTMCExpFam<S>
             for (int f = 0; f < nFeatures; f++)
             {
                 final double curX = x[f];
-                gradient[f] = -(gradient[f] - kappa * curX);   // (12)
-                value = value - kappa * curX * curX / 2.0;  // (13)
+                gradient[f] = -(gradient[f] + priorOfWeights.gradientOflogDensity(x[f])); 
+                // gradient[f] = -(gradient[f] - kappa * curX);   // (12)
+                value = value - priorOfWeights.logDensity(curX);
+                //value = value - kappa * curX * curX / 2.0;  // (13)
             }
             value = -value;
             return Pair.of(value, gradient);

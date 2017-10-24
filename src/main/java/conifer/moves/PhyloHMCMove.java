@@ -26,7 +26,8 @@ import conifer.ctmc.expfam.ExpFamParameters;
 import conifer.ctmc.expfam.ExpectedStatistics;
 import conifer.factors.UnrootedTreeLikelihoodUtils;
 import conifer.models.MultiCategorySubstitutionModel;
-import blang.distributions.MultivariateNormal;
+import conifer.RandomUtils.Normal;
+import conifer.RandomUtils.Normal.MeanVarianceParameterization;
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.MHSampler;
 import blang.mcmc.SampledVariable;
@@ -41,7 +42,7 @@ import briefj.run.Results;
 public class PhyloHMCMove extends MHSampler<ExpFamParameters>
 {
     UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
-    MultivariateNormal prior;
+    Normal<MeanVarianceParameterization> prior;
 
     public static Double epsilon = null;
 
@@ -61,15 +62,12 @@ public class PhyloHMCMove extends MHSampler<ExpFamParameters>
         // hack for now to make this sampled less often
         if (rand.nextInt(10) != 0)
             return;
-        	
-        int dim = prior.getMean().nEntries();
-        for(int i =0; i < dim; i++ ){
-        		if(prior.getMean().get(i)!=0.0)
-        			throw new RuntimeException("The mean of prior of each weight element should be zero");
-        }
+        if(prior.parameters.getMean()!=0.0)
+        	 throw new RuntimeException("The mean of prior of each weight element should be zero");
+       
         
         // here we assume that the multivariate Normal of the prior distribution has zero mean and equal variance
-        final double variance = Math.pow(1/Math.exp(prior.getPrecision().logDet()), Double.valueOf(-dim)); 
+        final double variance = prior.parameters.getVariance(); 
         // find the relationship between the cholesky decomposition of the variance and the precision matrix
         
         CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective auxObjective = null;
