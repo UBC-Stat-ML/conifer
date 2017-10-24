@@ -47,22 +47,20 @@ public class PhylogeneticObservationFactory
    * @return The PhylogeneticObservationFactory corresponding to the standard iupac encodings.
    */
 
-  public static PhylogeneticObservationFactory proteinFactory()
+	
+  public static PhylogeneticObservationFactory nucleotidesFactory()
   {
-
-    boolean caseSensitive = false;
-    List<String> orderedSymbols = Lists.newArrayList("A", "R", "N", "D", "C", "Q", "E", "G", "H", "L", "I", "K", "M", "F", "P", "S", "T", "W", "Y", "V");
-
-    Map<String, Set<String>> ambiguousSymbols = new HashMap<>();
-    ambiguousSymbols.put("X", new HashSet<String>(orderedSymbols));
-    ambiguousSymbols.put("-", new HashSet<String>(orderedSymbols));
-    ambiguousSymbols.put("B", new HashSet<String>(Lists.newArrayList("N", "D")));
-    ambiguousSymbols.put("Z", new HashSet<>(Lists.newArrayList("Q", "E")));
-
-    return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
-
+    if (_nucleotideFactory == null)
+      _nucleotideFactory = fromResource("/conifer/io/dna-iupac-encoding.txt");
+    return _nucleotideFactory;
   }
 
+  public static PhylogeneticObservationFactory proteinFactory()
+  {
+    if(_proteinFactory == null)
+      _proteinFactory = fromResource("/conifer/io/protein-iupac-encoding.txt");
+    return _proteinFactory;
+   }
   
   public static PhylogeneticObservationFactory codonFactory(){
 	  
@@ -148,61 +146,7 @@ public class PhylogeneticObservationFactory
       return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
   }
 
-  public static PhylogeneticObservationFactory nucleotidesFactory(){
 
-      boolean caseSensitive = false;
-      List<String> orderedSymbols = Lists.newArrayList("A", "C", "G", "T");
-      Map<String, Set<String>> ambiguousSymbols = new HashMap<>();
-      Set<String> wholeValue = new HashSet<String>(Lists.newArrayList("A", "C", "G", "T"));
-      Map<String, Set<String>> allMaps = new HashMap<>();
-
-      List<String> eleHasAppeared = Lists.newArrayList();
-      // create all possible values for ambiguousSymbols
-      for(String element:wholeValue){
-        List<String> states = Lists.newArrayList("A", "C", "G", "T");
-        states.remove(element);
-        List<String> complementSet = states;
-
-        // putting all the three states into allMaps
-        Set<String> threeLetterStates = new HashSet<String>(complementSet);
-        String threeLetterKeyValues = "";
-        for(String secondElement: complementSet){
-          threeLetterKeyValues = threeLetterKeyValues.concat(secondElement);
-        }
-
-        allMaps.put(threeLetterKeyValues, threeLetterStates);
-        
-        for(String secondElement : complementSet){
-        	Set<String> result = new HashSet<>(Lists.newArrayList(element));
-            result.add(secondElement);
-            String keyValue = element.concat(secondElement);
-            allMaps.put(keyValue, result);
-            }  
-        	     
-      }
-
-    Set<String> tValue = new HashSet<String>(Lists.newArrayList("T"));
-    ambiguousSymbols.put("?", wholeValue);
-    ambiguousSymbols.put("-", wholeValue);
-    ambiguousSymbols.put("N", wholeValue);
-    ambiguousSymbols.put("U", tValue);
-    ambiguousSymbols.put("W", allMaps.get("AT"));
-    ambiguousSymbols.put("S", allMaps.get("CG"));
-    ambiguousSymbols.put("M", allMaps.get("AC"));
-    ambiguousSymbols.put("K", allMaps.get("GT"));
-    ambiguousSymbols.put("R", allMaps.get("AG"));
-    ambiguousSymbols.put("Y", allMaps.get("CT"));
-    ambiguousSymbols.put("B", allMaps.get("CGT"));
-    ambiguousSymbols.put("D", allMaps.get("AGT"));
-    ambiguousSymbols.put("H", allMaps.get("ACT"));
-    ambiguousSymbols.put("V", allMaps.get("ACG"));
-
-    return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
-
-    }
-
-
-  
   public static PhylogeneticObservationFactory selectedFactory(final RateMtxNames selectedRateMtx)
   {
     PhylogeneticObservationFactory result = null;
