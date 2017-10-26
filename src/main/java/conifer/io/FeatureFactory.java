@@ -26,8 +26,8 @@ public class FeatureFactory {
 	public static List<String> stateSpace = null;
 	public static int nCategories=1;
 	public static final Object partition = null;
-	public static final List<String> DNA = Lists.newArrayList("A", "C", "G", "T");
-	public static final List<String> PROTEIN = Lists.newArrayList("A", "R", "N", "D", "C", "Q", "E", "G", "H", "L", "I", "K", "M", "F", "P", "S", "T", "W", "Y", "V");
+	public static final List<String> DNA = PhylogeneticObservationFactory.nucleotidesFactory().orderedSymbols;
+	public static final List<String> PROTEIN = PhylogeneticObservationFactory.proteinFactory().orderedSymbols;
 	public static final List<String> CODON = PhylogeneticObservationFactory.codonFactory().orderedSymbols;
 	private static List<List<String>> supportEdges = null;
 	public static Map<String, String> codonsToAminoAcid = AminoAcidAndCodonMap.AminoAcidFromAndToCodons().getRight();
@@ -53,32 +53,12 @@ public class FeatureFactory {
 	// code related to DNA modelling
 	public static SerializedExpFamMixture dnaGTR(){
 		
-		List<String> orderedLatents = DNA;
-		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(DNA);
-		List<Map<String, String>> featureTemplate = constructBinaryFeatureTemplate("GTR", "DNA");
-		List<BinaryFeature> binaryFeatures = constructPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate, DNA);
-	    return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport);
+		return SerializedExpFamMixture.fromResource("/conifer/ctmc/expfam/dnaGTR-expfam.txt");
 	}
 
 	
 	public static SerializedExpFamMixture kimura1980(){
-	
-		List<String> orderedLatents = DNA;
-		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(DNA);
-		List<BinaryFeature> binaryFeatures = Lists.newArrayList();
-		CTMCState ctmcState0 = new CTMCState((int) 0, "A", partition);
-		CTMCState ctmcState1 = new CTMCState((int) 0, "G", partition);
-		CTMCState ctmcState2 = new CTMCState((int) 0, "C", partition);
-		CTMCState ctmcState3 = new CTMCState((int) 0, "T", partition);
-		Map<String, Double> transitionFeature = new HashMap<>();
-		transitionFeature.put("isTransition", Double.valueOf(1.0));
-   
-		BinaryFeature binaryFeature0 = new BinaryFeature(ctmcState0, ctmcState1, transitionFeature);
-		BinaryFeature binaryFeature1 = new BinaryFeature(ctmcState2, ctmcState3, transitionFeature);
-		binaryFeatures.add(binaryFeature0);
-		binaryFeatures.add(binaryFeature1);
- 
-		return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport);		
+		return SerializedExpFamMixture.fromResource("/conifer/ctmc/expfam/kimura1980-expfam.txt");		
 			
     }
 	// code related to Amino Acid model
@@ -479,10 +459,7 @@ public class FeatureFactory {
 		
 	 public static void main(String [] args)
 	    {
-	        SerializedExpFamMixture s = SerializedExpFamMixture.fromResource("/conifer/ctmc/expfam/dnaGTR-expfam.txt");
-	        SerializedExpFamMixture s1 = dnaGTR();
-	        // compare the content of s and s1 are the same or not
-	        System.out.println(s.toString().contentEquals(s1.toString()));
+	
 	        
 	        SerializedExpFamMixture polaritySize = SerializedExpFamMixture.fromResource("/conifer/ctmc/expfam/polaritySize-expfam.txt");
 	        SerializedExpFamMixture polaritySize1 = polaritySize();
