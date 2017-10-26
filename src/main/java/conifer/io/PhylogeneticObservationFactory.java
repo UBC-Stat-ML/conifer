@@ -137,7 +137,7 @@ public class PhylogeneticObservationFactory
 		  ambiguousSymbols.put(element, mapAmbiguousCodonsToAllPossibleCodons(element).get(element));
 	  }
 	  
-	  List<String> allDNAStates = Lists.newArrayList("A", "C", "G", "T");
+	  List<String> allDNAStates = nucleotidesFactory().orderedSymbols;
 	  List<String> stoppingCodons = Lists.newArrayList("TAA", "TAG", "TGA");
 	  
 	  List<String> orderedSymbols = Lists.newArrayList();
