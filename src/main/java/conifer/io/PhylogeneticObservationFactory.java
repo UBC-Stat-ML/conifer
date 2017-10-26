@@ -62,15 +62,85 @@ public class PhylogeneticObservationFactory
     return _proteinFactory;
    }
   
+  
+  public static Map<String, Set<String>> mapAmbiguousCodonsToAllPossibleCodons(String codons){
+	  
+	  // check if the input codon consists of three DNA letters, if it is not three digits, throw an exception
+	  if(codons.length()!=3)
+		  throw new RuntimeException("The length of the codon string is not three");
+	  
+	  // get the ambiguous symbols from DNA
+	  PhylogeneticObservationFactory dnaFactory = nucleotidesFactory();
+	  List<String> dnaStates = dnaFactory.orderedSymbols;
+	  
+	  Map<String, Set<String>> ambiguousDNAMap = dnaFactory.ambiguousSymbols;
+	  Set<String> allAmbiguousDNASymbols = ambiguousDNAMap.keySet();
+	  // if there is no ambiguous symbols, return itself,
+	  // if there exists an ambiguous symbol, return all possible codons, but remove the duplicates
+	  List<Set<String>> result = Lists.newArrayList(new HashSet<>());
+	  
+	  for(int i=0; i < codons.length(); i++){
+		  String element = String.valueOf(codons.charAt(i));
+		  boolean eleIsAmbiguousSymbol = allAmbiguousDNASymbols.contains(element);
+		  if(!dnaStates.contains(element) && !eleIsAmbiguousSymbol)
+			  throw new RuntimeException("The character of the codon is not valid");
+		  // loop over all the keys of the ambiguousSymbols
+		  if(eleIsAmbiguousSymbol){
+			  result.add(i, ambiguousDNAMap.get(element));
+		  }else{
+			  Set<String> storeElement = new HashSet<>();
+			  storeElement.add(element);
+			  result.add(i, storeElement);
+		  }
+	   }
+	  
+	   Set<String> possibleCodons = new HashSet<>();
+	   Set<String> possibleCodonsContainer = new HashSet<>();
+	   // enumerate all combinations of the possible codons based on the string of the three positions
+	   int iter = 0;
+	   while(iter < codons.length()){
+		   
+		   Set<String> allSymbolsCurPosition = result.get(iter);
+		   if(possibleCodons.isEmpty()){
+			   possibleCodons.addAll(allSymbolsCurPosition);
+		   }else{
+			   List<String> backupList = Lists.newArrayList();
+			   int count = possibleCodons.size();
+			   while(backupList.size() < count){
+				   for(String element:possibleCodons){
+					   for(String elementOfCurPosition: allSymbolsCurPosition){
+						   String combinedElement = element.concat(elementOfCurPosition);
+						   possibleCodonsContainer.add(combinedElement);					   
+					   		}	
+					   backupList.add(element);
+				   }
+			   }
+			   possibleCodons.clear();
+			   possibleCodons.addAll(possibleCodonsContainer);
+			   possibleCodonsContainer.clear();
+		   }
+		   iter++;
+	   }
+	   
+	   Map<String, Set<String>> finalResult = new HashMap<>();
+	   finalResult.put(codons, possibleCodons);
+	   return finalResult;
+  }
+  
   public static PhylogeneticObservationFactory codonFactory(){
 	  
 	  boolean caseSensitive = false;
+	  List<String> compressedCodonCodes = Lists.newArrayList("GCN", "CGN", "MGR", "AAY", "GAY", "TGY", "CAR", "GAR", "GGN", "CAY",
+			  "ATH", "YTR", "CTN", "AAR", "TTY", "CCN", "TCN", "AGY", "ACN", "TAY", "GTN");
+	  Map<String, Set<String>> ambiguousSymbols = new HashMap<>();
+	  for(String element : compressedCodonCodes){
+		  ambiguousSymbols.put(element, mapAmbiguousCodonsToAllPossibleCodons(element).get(element));
+	  }
+	  
 	  List<String> allDNAStates = Lists.newArrayList("A", "C", "G", "T");
 	  List<String> stoppingCodons = Lists.newArrayList("TAA", "TAG", "TGA");
 	  
 	  List<String> orderedSymbols = Lists.newArrayList();
-	  Map<String, Set<String>> ambiguousSymbols = new HashMap<>();
-	  
 	  // write code to generate all codon states
 	  for(String ele1:allDNAStates){
 		  for(String ele2:allDNAStates){
@@ -78,74 +148,14 @@ public class PhylogeneticObservationFactory
 				  String result = ele1.concat(ele2).concat(ele3);
 				  orderedSymbols.add(result);
 				  }			  
-		  }	  
-	   }
+			  }	  
+		   }
+	  orderedSymbols.remove(stoppingCodons);
 	  
-	  orderedSymbols.removeAll(stoppingCodons);
-	  
-	  // no inclusion of keys TRA, since it is compressed code for stopping codon
-	  List<String> nPrefix = Lists.newArrayList("GC", "CG", "GG", "CT", "CC", "TC", "AC", "GT");
-      List<String> yPrefix = Lists.newArrayList("AA", "GA", "TG", "CA", "TT", "AG", "TA");
-      List<String> hPrefix = Lists.newArrayList("AT");
-      List<String> rPrefix = Lists.newArrayList("CA", "GA", "AA"); // remove TA since TAR is used for stopping codons
-      List<String> multiSymbols = Lists.newArrayList("MGR");
-
-      
-      Map<String, List<String>> singleCharMaps = new HashMap<>();
-      singleCharMaps.put("N", Lists.newArrayList("A", "C", "G", "T"));
-      singleCharMaps.put("Y", Lists.newArrayList("C", "T"));
-      singleCharMaps.put("R", Lists.newArrayList("A", "G"));
-      singleCharMaps.put("H", Lists.newArrayList("A", "C", "T"));
-      
-      // create all the keys and values for ambiguous symbols
-      for(String ele: nPrefix){
-    	  String key = ele.concat("N");
-    	  // each key corresponds to four values, for example GCN correspond to GCA, GCC, GCG, GCT
-    	  Set<String> values = new HashSet<>();
-    	  for(String ele2:singleCharMaps.get("N")){
-    		  String value = ele.concat(ele2);
-    		  values.add(value);
-    	  	}
-    	  ambiguousSymbols.put(key, values);
-    	  }
-      
-      for(String ele: yPrefix){
-    	  String key = ele.concat("Y");
-    	  Set<String> values = new HashSet<>();
-    	  for(String ele2:singleCharMaps.get("Y")){
-    		  String value = ele.concat(ele2);
-    		  values.add(value);    		  
-    	  }
-    	  ambiguousSymbols.put(key, values);	  
-      }
-      
-      for(String ele: rPrefix){
-    	  String key = ele.concat("R");
-    	  Set<String> values = new HashSet<>();
-    	  for(String ele2:singleCharMaps.get("R")){
-    		  String value = ele.concat(ele2);
-    		  values.add(value);    		  
-    	  }
-    	  ambiguousSymbols.put(key, values);	  
-      }
-      
-      
-      for(String ele: hPrefix){
-    	  String key = ele.concat("H");
-    	  Set<String> values = new HashSet<>();
-    	  for(String ele2:singleCharMaps.get("H")){
-    		  String value = ele.concat(ele2);
-    		  values.add(value);
-    		  }
-    	  ambiguousSymbols.put(key, values);
-    	  }
-      
-      ambiguousSymbols.put("MGR", new HashSet<>(Lists.newArrayList("AGA", "AGG", "CGA", "CGG")));
-      ambiguousSymbols.put("YTR", new HashSet<>(Lists.newArrayList("CTA", "CTG", "TTA", "TTG")));
-      
-      return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
+	  return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
   }
-
+  
+  
 
   public static PhylogeneticObservationFactory selectedFactory(final RateMtxNames selectedRateMtx)
   {
