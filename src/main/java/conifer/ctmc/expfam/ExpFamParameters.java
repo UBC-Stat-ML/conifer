@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import com.google.common.collect.Lists;
 
+import blang.mcmc.Samplers;
 import conifer.ctmc.RateMatrixUtils;
 import conifer.moves.PhyloHMCMove;
 
@@ -13,6 +14,7 @@ import briefj.collections.Counter;
 
 
 // public class ExpFamParameters implements RealVectorInterface
+@Samplers({PhyloHMCMove.class})
 public class ExpFamParameters 
 {
     public final CTMCExpFam<CTMCState> globalExponentialFamily;
