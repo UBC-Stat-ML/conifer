@@ -1,11 +1,11 @@
 package conifer.io.featurefactory;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.gson.Gson;
 
+import briefj.BriefIO;
 import conifer.io.PhylogeneticObservationFactory;
 
 import java.util.*;
-
 import org.apache.commons.lang3.tuple.Pair;
 
 /**
@@ -17,33 +17,28 @@ import org.apache.commons.lang3.tuple.Pair;
 */
 public class AminoAcidAndCodonMap {
 	
-	public static final List<String> aminoAcids = Lists.newArrayList("A", "R", "N", "D", "C", "Q", "E", "G", "H", "L", "I", "K", "M", "F", "P", "S", "T", "W", "Y", "V");
+	public static final List<String> aminoAcids = PhylogeneticObservationFactory.proteinFactory().orderedSymbols;
+	public static Map<String, Set<String>> aminoAcidToCompressedCodes = new LinkedHashMap();
+	 
+	private static Map<String, Set<String>> _aminoAcidToCompressedCodons = null;
+	
+	private static Map<String, Set<String>> fromResource(String resourceURL)
+	{
+	    String jsonString = BriefIO.resourceToString(resourceURL); 
+	    return fromJSONString(jsonString);
+	    }
+	  
+	private static Map<String, Set<String>> fromJSONString(String jsonString)
+	{
+	    return new Gson().fromJson(jsonString, aminoAcidToCompressedCodes.getClass());
+	    }
 	
 	public static Map<String, Set<String>> AminoAcidToCompressedCodons(){
 		
-		Map<String, Set<String>> aminoAcidToCompressedCodes = new HashMap<>();
-		aminoAcidToCompressedCodes.put("A", new HashSet<>(Lists.newArrayList("GCN")));
-		aminoAcidToCompressedCodes.put("R", new HashSet<>(Lists.newArrayList("CGN", "MGR")));
-		aminoAcidToCompressedCodes.put("N", new HashSet<>(Lists.newArrayList("AAY")));
-		aminoAcidToCompressedCodes.put("D", new HashSet<>(Lists.newArrayList("GAY")));
-		aminoAcidToCompressedCodes.put("C", new HashSet<>(Lists.newArrayList("TGY")));
-		aminoAcidToCompressedCodes.put("Q", new HashSet<>(Lists.newArrayList("CAR")));
-		aminoAcidToCompressedCodes.put("E", new HashSet<>(Lists.newArrayList("GAR")));
-		aminoAcidToCompressedCodes.put("G", new HashSet<>(Lists.newArrayList("GGN")));
-		aminoAcidToCompressedCodes.put("H", new HashSet<>(Lists.newArrayList("CAY")));
-		aminoAcidToCompressedCodes.put("I", new HashSet<>(Lists.newArrayList("ATH")));
-		aminoAcidToCompressedCodes.put("L", new HashSet<>(Lists.newArrayList("YTR", "CTN")));
-		aminoAcidToCompressedCodes.put("K", new HashSet<>(Lists.newArrayList("AAR")));
-		aminoAcidToCompressedCodes.put("M", new HashSet<>(Lists.newArrayList("ATG")));
-		aminoAcidToCompressedCodes.put("F", new HashSet<>(Lists.newArrayList("TTY")));
-		aminoAcidToCompressedCodes.put("P", new HashSet<>(Lists.newArrayList("CCN")));
-		aminoAcidToCompressedCodes.put("S", new HashSet<>(Lists.newArrayList("TCN", "AGY")));
-		aminoAcidToCompressedCodes.put("T", new HashSet<>(Lists.newArrayList("ACN")));
-		aminoAcidToCompressedCodes.put("W", new HashSet<>(Lists.newArrayList("TGG")));
-		aminoAcidToCompressedCodes.put("Y", new HashSet<>(Lists.newArrayList("TAY")));
-		aminoAcidToCompressedCodes.put("V", new HashSet<>(Lists.newArrayList("GTN")));
+		if (_aminoAcidToCompressedCodons == null)
+			_aminoAcidToCompressedCodons = fromResource("/conifer/io/AminoAcidToCompressedCodons.txt");
+		    return _aminoAcidToCompressedCodons;
 		
-		return aminoAcidToCompressedCodes;
 	}
 	
 	public static Pair<Map<String, Set<String>>,Map<String, String>> AminoAcidFromAndToCodons(){
@@ -94,4 +89,17 @@ public class AminoAcidAndCodonMap {
 		// return a pair of result
 		return Pair.of(aminoAcidToCodons, codonsToAminoAcids);
 	}
+	
+	
+	
+	
+	public static void main(String [] args){
+		Map<String, Set<String>> aminoAcidToCompressedCodes = AminoAcidToCompressedCodons();
+		String gson = new Gson().toJson(aminoAcidToCompressedCodes);
+		System.out.println("Using reading json file method");
+		System.out.println(JsonStringUtil.toPrettyFormat(gson));
+		
+	}
 }
+
+
