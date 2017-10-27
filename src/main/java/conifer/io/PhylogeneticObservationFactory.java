@@ -63,7 +63,7 @@ public class PhylogeneticObservationFactory
    }
   
   
-  public static Map<String, Set<String>> mapAmbiguousCodonsToAllPossibleCodons(String codons){
+  public static Set<String> mapAmbiguousCodonsToAllPossibleCodons(String codons){
 	  
 	  // check if the input codon consists of three DNA letters, if it is not three digits, throw an exception
 	  if(codons.length()!=3)
@@ -122,9 +122,7 @@ public class PhylogeneticObservationFactory
 		   iter++;
 	   }
 	   
-	   Map<String, Set<String>> finalResult = new HashMap<>();
-	   finalResult.put(codons, possibleCodons);
-	   return finalResult;
+	   return possibleCodons;
   }
   
   public static PhylogeneticObservationFactory codonFactory(){
@@ -134,7 +132,7 @@ public class PhylogeneticObservationFactory
 			  "ATH", "YTR", "CTN", "AAR", "TTY", "CCN", "TCN", "AGY", "ACN", "TAY", "GTN");
 	  Map<String, Set<String>> ambiguousSymbols = new HashMap<>();
 	  for(String element : compressedCodonCodes){
-		  ambiguousSymbols.put(element, mapAmbiguousCodonsToAllPossibleCodons(element).get(element));
+		  ambiguousSymbols.put(element, mapAmbiguousCodonsToAllPossibleCodons(element));
 	  }
 	  
 	  List<String> allDNAStates = nucleotidesFactory().orderedSymbols;
@@ -150,7 +148,7 @@ public class PhylogeneticObservationFactory
 				  }			  
 			  }	  
 		   }
-	  orderedSymbols.remove(stoppingCodons);
+	  orderedSymbols.removeAll(stoppingCodons);
 	  
 	  return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
   }
@@ -346,6 +344,10 @@ public class PhylogeneticObservationFactory
     PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.codonFactory();
     boolean caseSensitive = factory.caseSensitive;
     System.out.println(caseSensitive);
+    
+    // check if the function is correct when we input a codon that doesn't have ambiguous characters
+    System.out.println(mapAmbiguousCodonsToAllPossibleCodons("AGA"));
+    
 
     System.out.println(Arrays.deepToString(factory.orderedSymbols.toArray()));
     System.out.println(factory.orderedSymbols.size());
