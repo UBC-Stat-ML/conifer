@@ -1,10 +1,14 @@
 package conifer.io.featurefactory;
 
 import java.util.Map;
+import java.util.Set;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 
+import briefj.BriefIO;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class MapAminoAcidToPolarity implements MapSingleStateToFeatures {
@@ -15,17 +19,38 @@ public class MapAminoAcidToPolarity implements MapSingleStateToFeatures {
 		
 	}
 	
+	public static Map<String, Set<String>> polarityToAminoAcid = new LinkedHashMap();
+	 
+	private static Map<String, Set<String>> _polarityToAminoAcid = null;
+	
+	private static Map<String, Set<String>> fromResource(String resourceURL)
+	{
+	    String jsonString = BriefIO.resourceToString(resourceURL); 
+	    return fromJSONString(jsonString);
+	    }
+	  
+	private static Map<String, Set<String>> fromJSONString(String jsonString)
+	{
+	    return new Gson().fromJson(jsonString, polarityToAminoAcid.getClass());
+	    }
+	
+	public static Map<String, Set<String>> mapPolarityToAminoAcid(){
+		
+		if (_polarityToAminoAcid == null)
+			_polarityToAminoAcid = fromResource("/conifer/io/polarityToAminoAcid.txt");
+		    return _polarityToAminoAcid;
+		
+	}
+	
+	
 	@Override
 	public Map<String, String> getStatesAndFeatures(){
 		// Acidic stands for Acidic Polar, Basic stands for Basic Polar, Non stands for NonPolar, Polar stands for Polar
-		Map<String, List<String>> polarityToAminoAcid = new HashMap<>();
-		polarityToAminoAcid.put("Acidic", Lists.newArrayList("D", "E"));
-		polarityToAminoAcid.put("Basic", Lists.newArrayList("R", "H", "K"));
-		polarityToAminoAcid.put("Non", Lists.newArrayList("A", "C", "G", "I", "L", "M", "F", "P", "W", "V"));
-		polarityToAminoAcid.put("Polar", Lists.newArrayList("N", "Q", "S", "T", "Y"));
+		
+		polarityToAminoAcid = mapPolarityToAminoAcid();
 		Map<String, String> aminoAcidToPolarity = new HashMap<>();
 		for(String ele: polarityToAminoAcid.keySet()){
-			List<String> values = polarityToAminoAcid.get(ele);
+			Set<String> values = polarityToAminoAcid.get(ele);
 			for(String value:values){
 				aminoAcidToPolarity.put(value, ele);
 			}

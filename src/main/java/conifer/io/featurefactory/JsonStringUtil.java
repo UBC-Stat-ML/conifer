@@ -2,6 +2,7 @@ package conifer.io.featurefactory;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,8 +46,8 @@ public class JsonStringUtil {
 			}	  
 		  
 	  }
-	  	  
-	  
+	  	 
+	 
 	  public static void writePrettyFormatToFile(String jsonString, String url){
 		  String prettyJson = toPrettyFormat(jsonString);
 		  try(  PrintWriter out = new PrintWriter( url) ){
