@@ -3,7 +3,6 @@ package conifer.io.featurefactory;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 
 import briefj.BriefIO;

@@ -1,10 +1,13 @@
 package conifer.io.featurefactory;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import com.google.gson.Gson;
 
-import com.beust.jcommander.internal.Lists;
+import briefj.BriefIO;
 
 public class MapAminoAcidToSize implements MapSingleStateToFeatures {
 	public List<String> stateSpace = null;
@@ -13,15 +16,36 @@ public class MapAminoAcidToSize implements MapSingleStateToFeatures {
 		
 	}
 	
+	public static Map<String, Set<String>> sizeToAminoAcid = new LinkedHashMap();
+	 
+	private static Map<String, Set<String>> _sizeToAminoAcid = null;
+	
+	private static Map<String, Set<String>> fromResource(String resourceURL)
+	{
+	    String jsonString = BriefIO.resourceToString(resourceURL); 
+	    return fromJSONString(jsonString);
+	    }
+	  
+	private static Map<String, Set<String>> fromJSONString(String jsonString)
+	{
+	    return new Gson().fromJson(jsonString, sizeToAminoAcid.getClass());
+	    }
+	
+	public static Map<String, Set<String>> mapSizeToAminoAcid(){
+		
+		if (_sizeToAminoAcid == null)
+			_sizeToAminoAcid = fromResource("/conifer/io/sizeToAminoAcid.txt");
+		    return _sizeToAminoAcid;
+		
+	}
+	
 	@Override
 	public Map<String, String> getStatesAndFeatures(){
 		
-		Map<String, List<String>> sizeToAminoAcid = new HashMap<>();
-		sizeToAminoAcid.put("Micro", Lists.newArrayList("A", "G", "S", "P", "C", "T", "N", "D"));
-		sizeToAminoAcid.put("Big", Lists.newArrayList("R", "E", "Q", "H", "I", "L", "K", "M", "F", "W", "Y", "V"));
+		sizeToAminoAcid = mapSizeToAminoAcid();
 		Map<String, String> aminoAcidToSize = new HashMap<>();
 		for(String ele:sizeToAminoAcid.keySet()){
-			List<String> values = sizeToAminoAcid.get(ele);
+			Set<String> values = sizeToAminoAcid.get(ele);
 			for(String value:values){
 				aminoAcidToSize.put(value, ele);
 			}
