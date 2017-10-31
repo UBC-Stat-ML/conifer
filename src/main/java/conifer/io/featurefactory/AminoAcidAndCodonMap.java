@@ -4,9 +4,10 @@ import com.google.gson.Gson;
 
 import briefj.BriefIO;
 import conifer.io.PhylogeneticObservationFactory;
-
+import com.google.common.collect.Sets;
 import java.util.*;
 import org.apache.commons.lang3.tuple.Pair;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * AminoAcidToCompressedCodons() is a HashMap where the keys are the amino acids and the values are the ambiguous symbols of the codons
@@ -18,7 +19,7 @@ import org.apache.commons.lang3.tuple.Pair;
 public class AminoAcidAndCodonMap {
 	
 	public static final List<String> aminoAcids = PhylogeneticObservationFactory.proteinFactory().orderedSymbols;
-	public static Map<String, Set<String>> aminoAcidToCompressedCodes = new LinkedHashMap();
+	public static Map<String, Set<String>> aminoAcidToCompressedCodon = new HashMap<String, Set<String>>();
 	 
 	private static Map<String, Set<String>> _aminoAcidToCompressedCodons = null;
 	
@@ -30,7 +31,7 @@ public class AminoAcidAndCodonMap {
 	  
 	private static Map<String, Set<String>> fromJSONString(String jsonString)
 	{
-	    return new Gson().fromJson(jsonString, aminoAcidToCompressedCodes.getClass());
+		return new Gson().fromJson(jsonString, new TypeToken<Map<String, Set<String>>>(){}.getType());
 	    }
 	
 	public static Map<String, Set<String>> AminoAcidToCompressedCodons(){
@@ -53,11 +54,12 @@ public class AminoAcidAndCodonMap {
 			
 			// from compressedCodons, we get the exact codons, given a key from amino acid, we get all possible codons that can code this amino acid 
 			Set<String> compressedCodons = aminoAcidToCompressedCodon.get(ele);
+					
 			// Among compressedCodons, ATG coded for amino acid M, TGG coded for W are not compressed code
 			if(allCompressedCodonsKeySet.containsAll(compressedCodons)){
 				// from key "compressedCodons" to get all original possible codons
 				// the compressedCodons is a set, we need to loop over all of its elements
-				Set<String> uniqueCodonsFromCompressedCodon = new HashSet<>();
+				Set<String> uniqueCodonsFromCompressedCodon = Sets.newHashSet();
 			    for(String compressedCodon : compressedCodons){
 					uniqueCodonsFromCompressedCodon.addAll( ambiguousSymbols.get(compressedCodon));
 				}
@@ -94,7 +96,8 @@ public class AminoAcidAndCodonMap {
 	
 	
 	public static void main(String [] args){
-		Map<String, Set<String>> aminoAcidToCompressedCodes = AminoAcidToCompressedCodons();
+		Map<String, Set<String>> aminoAcidToCompressedCodes = AminoAcidFromAndToCodons().getLeft();
+	    System.out.println(aminoAcidToCompressedCodes.get("A").toString());
 		String gson = new Gson().toJson(aminoAcidToCompressedCodes);
 		System.out.println("Using reading json file method");
 		System.out.println(JsonStringUtil.toPrettyFormat(gson));

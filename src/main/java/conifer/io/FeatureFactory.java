@@ -1,6 +1,5 @@
 package conifer.io;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -136,10 +135,10 @@ public class FeatureFactory {
 			result.add( mapAminoAcidToPolarity());
 		}else if(featureTemplateNames.contentEquals("size")){
 			result.add(mapAminoAcidToSize());
-		}else if(featureTemplateNames.contentEquals("polarityPlusSize")){
+		}else if(featureTemplateNames.contentEquals("polaritySize")){
 			result.add( mapAminoAcidToPolarity());
 			result.add(mapAminoAcidToSize());
-		}else if(featureTemplateNames.contentEquals("polarityPlusSizePlusGTR")){
+		}else if(featureTemplateNames.contentEquals("polaritySizeGTR")){
 			
 			result.add(mapAminoAcidToPolarity());
 			result.add(mapAminoAcidToSize());
@@ -161,36 +160,36 @@ public class FeatureFactory {
 		return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport);
 	}
 
+	public static SerializedExpFamMixture constructEvolutionModel(String modelNames, List<String> stateSpace, String stateSpaceDescription){
+		
+		List<String> orderedLatents = stateSpace;
+		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(stateSpace);
+		List<Map<String, String>> featureTemplate = constructBinaryFeatureTemplate(modelNames, stateSpaceDescription);
+		List<BinaryFeature> binaryFeatures = constructPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate, stateSpace);
+		return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport);	
+	}
 
 	public static SerializedExpFamMixture polarity(){
-		List<String> orderedLatents = PROTEIN;
-		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(PROTEIN);
-		List<Map<String, String>> featureTemplate = constructBinaryFeatureTemplate("polarity", "PROTEIN");
-		List<BinaryFeature> binaryFeatures = constructPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate, PROTEIN);
-		return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport);
+		
+		return constructEvolutionModel("polarity", PROTEIN, "PROTEIN");
 		
 	}
 	
 	public static SerializedExpFamMixture polaritySize(){
-		List<String> orderedLatents = PROTEIN;
-		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(PROTEIN);
-		List<Map<String,String>> featureTemplate = constructBinaryFeatureTemplate("polarityPlusSize", "PROTEIN");
-		List<BinaryFeature> binaryFeatures = constructPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate, PROTEIN);
-		return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport); 
+		
+		return constructEvolutionModel("polaritySize", PROTEIN, "PROTEIN");
+		
 	}
 	
 	public static SerializedExpFamMixture polaritySizeGTR(){
-		List<String> orderedLatents = PROTEIN;
-		List<UnaryFeature> unaryFeatures = constructUnaryFeatures(PROTEIN);
-		List<Map<String, String>> featureTemplate = constructBinaryFeatureTemplate("polarityPlusSizePlusGTR", "PROTEIN");
-		List<BinaryFeature> binaryFeatures = constructPairwiseBinaryFeatureCombiningFeatureTemplates(featureTemplate, PROTEIN);
-		return new SerializedExpFamMixture(nCategories, orderedLatents, supportEdges, unaryFeatures, binaryFeatures, fullSupport); 
+		
+		return constructEvolutionModel("polaritySizeGTR", PROTEIN, "PROTEIN");
+		
 	}
+	
 	
 	// code related to construct features for codon evolution
 	// construct codon level features, which is synonymous/non-synonymous feature
-	
-	
 	public static Map<String, Map<String, String>> mapPairOfStatesToSynonymousFeature(String state0, String state1, List<String> stateSpace){
 		// the default input for stateSpace should be codons
 		String featureKeys = "isNonSynonymous";

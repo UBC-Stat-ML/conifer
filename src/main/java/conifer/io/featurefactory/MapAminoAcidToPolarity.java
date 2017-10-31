@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import briefj.BriefIO;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ public class MapAminoAcidToPolarity implements MapSingleStateToFeatures {
 	  
 	private static Map<String, Set<String>> fromJSONString(String jsonString)
 	{
-	    return new Gson().fromJson(jsonString, polarityToAminoAcid.getClass());
+	    return new Gson().fromJson(jsonString, new TypeToken<Map<String, Set<String>>>(){}.getType());
 	    }
 	
 	public static Map<String, Set<String>> mapPolarityToAminoAcid(){
@@ -45,7 +46,7 @@ public class MapAminoAcidToPolarity implements MapSingleStateToFeatures {
 	@Override
 	public Map<String, String> getStatesAndFeatures(){
 		// Acidic stands for Acidic Polar, Basic stands for Basic Polar, Non stands for NonPolar, Polar stands for Polar
-		
+
 		polarityToAminoAcid = mapPolarityToAminoAcid();
 		Map<String, String> aminoAcidToPolarity = new HashMap<>();
 		for(String ele: polarityToAminoAcid.keySet()){

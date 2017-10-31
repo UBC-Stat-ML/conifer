@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import briefj.BriefIO;
 
@@ -28,7 +29,7 @@ public class MapAminoAcidToSize implements MapSingleStateToFeatures {
 	  
 	private static Map<String, Set<String>> fromJSONString(String jsonString)
 	{
-	    return new Gson().fromJson(jsonString, sizeToAminoAcid.getClass());
+	    return new Gson().fromJson(jsonString, new TypeToken<Map<String, Set<String>>>(){}.getType());
 	    }
 	
 	public static Map<String, Set<String>> mapSizeToAminoAcid(){
