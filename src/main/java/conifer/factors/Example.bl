@@ -13,7 +13,7 @@ import conifer.ctmc.expfam.ExpFamParameters
 import blang.distributions.MultivariateNormal;
 
 model Example {
-  random ExpFamParameters weights
+  random ExpFamParameters weights 
   param UnrootedTree tree 
   param TreeObservations observations
   param EvolutionaryModel evoModel ?: 
@@ -29,6 +29,7 @@ model Example {
   laws {
   	  // assign a prior factor for weights
   	  // get dimension of weights and assign normal prior
+  	  
       tree ~ NonClockTreePrior(Exponential.distribution(1.0))
   	  observations | tree, evoModel ~ UnrootedTreeLikelihood(tree, evoModel) 
   }
