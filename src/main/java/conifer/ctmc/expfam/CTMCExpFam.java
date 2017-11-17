@@ -47,7 +47,7 @@ public class CTMCExpFam<S>
             UndirectedGraph<S,?> support,
             Indexer<S> indexer,
             boolean isNormalized)
-    {
+    -{
         // create support info
         this.stateIndexer = indexer; //= new Indexer<S>(support.vertexSet());
         this.nStates = this.stateIndexer.size();

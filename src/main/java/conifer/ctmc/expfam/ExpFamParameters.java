@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import blang.mcmc.RealVariableOverRelaxedSlice;
+//import blang.mcmc.RealVariableOverRelaxedSlice;
 import com.google.common.collect.Lists;
 
 import conifer.ctmc.RateMatrixUtils;
