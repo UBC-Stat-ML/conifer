@@ -3,14 +3,8 @@ package conifer.ctmc;
 import java.io.File;
 import java.util.Arrays;
 
-import org.ejml.simple.SimpleMatrix;
-
 import com.google.gson.Gson;
 
-import conifer.ctmc.expfam.SerializedExpFamMixture;
-
-
-import bayonet.math.EJMLUtils;
 import briefj.BriefIO;
 
 
