@@ -34,7 +34,7 @@ public class TestGenerateUnrooted
     final int nIters = 100000;
     for (int i = 0; i < nIters; i++)
     {
-      UnrootedTree tree = NonClockTreePriorUtils.generate(rand, exp, leaves);
+      UnrootedTree tree = NonClockTreePriorUtils.sample(rand, exp, leaves);
       
       if (tipIndexer == null)
         tipIndexer = UnrootedTreeUtils.tipIndexer(tree);

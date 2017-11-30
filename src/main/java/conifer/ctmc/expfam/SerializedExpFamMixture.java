@@ -17,6 +17,7 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 import conifer.ctmc.RateMatrixToEmissionModel;
+import conifer.io.FeatureFactory;
 import conifer.io.PhylogeneticObservationFactory;
 
 
@@ -35,24 +36,23 @@ public class SerializedExpFamMixture
 
     public static void main(String [] args)
     {
-        SerializedExpFamMixture s = fromResource("/conifer/ctmc/expfam/kimura1980-expfam.txt");
-        SerializedExpFamMixture s1 = fromResource("/conifer/ctmc/expfam/accordance-expfam.txt");
+        SerializedExpFamMixture s = fromResource("/conifer/ctmc/expfam/dnaGTR-expfam.txt");
         System.out.println(s);
         System.out.println(s.getCTMCStateIndexer());
         System.out.println(s.getSupport());
-        System.out.println(s1);
-        System.out.println(s1.getCTMCStateIndexer());
-        System.out.println(s1.getSupport());
     }
+    
+    
+    public SerializedExpFamMixture(int nCategories, List<String> orderedLatents, List<List<String>> supportEdges, List<UnaryFeature> unaryFeatures, List<BinaryFeature> binaryFeatures,  boolean fullSupport){
+    	this.nCategories = nCategories;
+    	this.orderedLatents = orderedLatents;
+    	this.supportEdges = supportEdges;
+    	this.unaryFeatures = unaryFeatures;
+    	this.binaryFeatures = binaryFeatures;
+    	this.fullSupport = fullSupport;
+    	}
   
- /*public int getFeatureNum()
- {
-   int i = unaryFeatures.size();
-   int j= binaryFeatures.size();
-   return  (i+j);
- }
- */
-
+ 
     public BivariateFeatureExtractor<CTMCState> getBivariateFeatureExtractor()
     {
         final Map<UnorderedPair<CTMCState, CTMCState>, Map<String, Double>> binaryFeaturesMap = binaryFeaturesMap(binaryFeatures);
@@ -153,7 +153,7 @@ public class SerializedExpFamMixture
         return new Gson().fromJson(string, SerializedExpFamMixture.class);
     }
 
-    private static SerializedExpFamMixture fromResource(String resourceURL)
+    public static SerializedExpFamMixture fromResource(String resourceURL)
     {
         String jsonString = BriefIO.resourceToString(resourceURL);
         return fromJSONString(jsonString);
@@ -184,12 +184,25 @@ public class SerializedExpFamMixture
         {
             return "UnaryFeature [state=" + state + ", features=" + features + "]";
         }
+        // create a constructor for UnaryFeature
+        public UnaryFeature(CTMCState state, Map<String,Double> features){
+        	this.state = state;
+        	this.features = features;
+        }
+        
+        
     }
 
     public static class BinaryFeature
     {
         public CTMCState state0, state1;
         public Map<String,Double> features;
+        // create a constructor for BinaryFeature
+        public BinaryFeature(CTMCState state0, CTMCState state1, Map<String, Double> features){
+        	this.state0 = state0;
+        	this.state1 = state1;
+        	this.features = features;
+        }
         @Override
         public String toString()
         {
@@ -239,40 +252,38 @@ public class SerializedExpFamMixture
 
     public static SerializedExpFamMixture kimura1980()
     {
-        return fromResource("/conifer/ctmc/expfam/kimura1980-expfam.txt");
+        return FeatureFactory.kimura1980();
     }
 
     public static SerializedExpFamMixture dnaGTR()
     {
-        return fromResource("/conifer/ctmc/expfam/dnaGTR-expfam.txt");
+        return FeatureFactory.dnaGTR();
     }
 
-    public static SerializedExpFamMixture accordance()
-    {
-        return fromResource("/conifer/ctmc/expfam/accordance-expfam.txt");
-    }
 
     public static SerializedExpFamMixture polarity()
     {
-        return fromResource("/conifer/ctmc/expfam/polarity-expfam.txt");
+    	return FeatureFactory.polarity();
     }
 
-    public static SerializedExpFamMixture polaritySize()
+
+
+	public static SerializedExpFamMixture polaritySize()
     {
-        return fromResource("/conifer/ctmc/expfam/polaritySize-expfam.txt");
+        return  FeatureFactory.polaritySize();
+        	
     }
 
     public static SerializedExpFamMixture polaritySizeGTR()
     {
-        return fromResource("/conifer/ctmc/expfam/polaritySizeGTR-expfam.txt");
+        return  FeatureFactory.polaritySizeGTR();
     }
 
     public static SerializedExpFamMixture proteinSimpleGTR(){
 
-        return fromResource("/conifer/ctmc/expfam/proteinSimpleGTR-expfam.txt");
+        return FeatureFactory.proteinSimpleGTR();
+        		
     }
-
-
 
 
 }

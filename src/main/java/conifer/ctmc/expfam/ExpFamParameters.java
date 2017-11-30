@@ -3,30 +3,19 @@ package conifer.ctmc.expfam;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
-import blang.mcmc.RealVariableOverRelaxedSlice;
 import com.google.common.collect.Lists;
 
+import blang.mcmc.Samplers;
 import conifer.ctmc.RateMatrixUtils;
 import conifer.moves.PhyloHMCMove;
-import conifer.moves.RealVectorAdaptiveMHProposal;
-import conifer.moves.RealVectorMHProposal;
-import conifer.moves.RealVectorOverRelaxedSlice;
-import conifer.processors.ExpFamParamProcessor;
-import blang.annotations.Processors;
-import blang.annotations.Samplers;
-import blang.factors.IIDRealVectorGenerativeFactor;
-import blang.variables.RealVectorInterface;
+
 import briefj.Indexer;
 import briefj.collections.Counter;
 
 
-@Samplers({
-        PhyloHMCMove.class
-})
-
-
-public class ExpFamParameters implements RealVectorInterface
+// public class ExpFamParameters implements RealVectorInterface
+@Samplers({PhyloHMCMove.class})
+public class ExpFamParameters 
 {
     public final CTMCExpFam<CTMCState> globalExponentialFamily;
     public Counter<Object> weights;
@@ -161,13 +150,6 @@ public class ExpFamParameters implements RealVectorInterface
      */
     public String toString() {
         double[][] rateMatrix = this.getRateMatrix(0);
-
-//	  for (int i = 0; i < rateMatrix.length; i++) {
-//		  for (int j = 0; j < rateMatrix[i].length; j++) {
-//			  System.out.println(rateMatrix[i][j]);
-//		  }
-//	  }
-
         return "RateMatrix [rateMatrix=" + Arrays.deepToString(rateMatrix) + "]";
     }
 }

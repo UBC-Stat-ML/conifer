@@ -78,14 +78,12 @@ public class NonClockTreePriorUtils<P>
   }
   
   public static UnrootedTree sampleBalancedUnrootedBinaryTree(
-	      Random random, 
 	      double defaultLength,
 	      Collection<TreeNode> leaves)
 	  {
 	    UnrootedTree result = new UnrootedTree();
 	    
 	    List<TreeNode> shuffled = Lists.newArrayList(leaves);
-	    Collections.shuffle(shuffled, random);
 	    Queue<TreeNode> queue = Lists.newLinkedList(shuffled);
 	   
 	    if (queue.isEmpty())
@@ -98,7 +96,6 @@ public class NonClockTreePriorUtils<P>
 	    
 	    List<TreeNode> firstNRemainderLeaves = shuffled.subList(0, (remainder));
 	    List<TreeNode> binaryLeaves = shuffled.subList(remainder,(shuffled.size()));
-	    Collections.shuffle(firstNRemainderLeaves, random);
 	    Queue<TreeNode> queueRemainder = Lists.newLinkedList(firstNRemainderLeaves);
 	    Queue<TreeNode> binaryQueue = Lists.newLinkedList(binaryLeaves);
 	   
@@ -249,7 +246,7 @@ public static void main(String[] args){
 	Random rand = new Random(1);
 	double defaultLength = 1.0;
 	Collection<TreeNode> leaves = TopologyUtils.syntheticTaxaList((int) 15);
-	UnrootedTree unrootedTree = sampleBalancedUnrootedBinaryTree(rand, defaultLength,leaves);
+	UnrootedTree unrootedTree = sampleBalancedUnrootedBinaryTree(defaultLength,leaves);
 	System.out.println(unrootedTree.toNewick());	
 	}
 

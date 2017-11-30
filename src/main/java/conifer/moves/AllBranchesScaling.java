@@ -20,49 +20,41 @@ import conifer.factors.UnrootedTreeLikelihood;
 
 
 
-public class AllBranchesScaling extends MHSampler
+public class AllBranchesScaling extends MHSampler<UnrootedTree>
 {
   // original code AllBranchesScaling extends NodeMove
-  UnrootedTree tree;
   UnrootedTreeLikelihood likelihood;
   NonClockTreePriorUtils<Exponential.Parameters> prior;
   
 
   @Override
   public void propose(Random random, Callback callback) {
-  	// TODO Auto-generated method stub
-  	
-  }
-  
-  
-  public void execute(Random rand)
-  {
-    // hack for now to make this sampled less often
-	// TODO: @Sohrab What does this hack affect?
-    if (rand.nextInt(10) != 0)
-      return;
-    
-    // case likelihood to be MultiCategorySubstitutionModel
-    List<PoissonAuxiliarySample> auxVars = ((MultiCategorySubstitutionModel) likelihood.getEvolutionaryModel()).samplePoissonAuxiliaryVariables(rand, likelihood.getObservations(), likelihood.getTree());
+		// TODO: @Sohrab What does this hack affect?
+	    if (random.nextInt(10) != 0)
+	      return;
+	    
+	    // case likelihood to be MultiCategorySubstitutionModel
+	    List<PoissonAuxiliarySample> auxVars = ((MultiCategorySubstitutionModel) likelihood.getEvolutionaryModel()).samplePoissonAuxiliaryVariables(random, likelihood.getObservations(), likelihood.getTree());
 
-    final double alpha = 1.0;
-    final double beta = prior.branchDistributionParameters.getRate();
-    
-    // loop over edges
-    for (UnorderedPair<TreeNode, TreeNode> edge : likelihood.getTree().getTopology().edgeSet())
-    {
-      double updatedShape = alpha;
-      double updatedRate = beta;
-      for (PoissonAuxiliarySample aux : auxVars)
-      {
-        updatedShape += aux.getTransitionCount(edge.getFirst(), edge.getSecond());
-        updatedRate += aux.rate * aux.getSampleCount(edge.getFirst(), edge.getSecond());
-      }
-      // sample new branch length
-      final double newBranchLengths = Gamma.generate(rand, updatedRate, updatedShape);
-      tree.updateBranchLength(edge, newBranchLengths);
-    }
-    
+	    final double alpha = 1.0;
+	    final double beta = prior.branchDistributionParameters.getRate();
+	    
+	    // loop over edges
+	    for (UnorderedPair<TreeNode, TreeNode> edge : likelihood.getTree().getTopology().edgeSet())
+	    {
+	      double updatedShape = alpha;
+	      double updatedRate = beta;
+	      for (PoissonAuxiliarySample aux : auxVars)
+	      {
+	        updatedShape += aux.getTransitionCount(edge.getFirst(), edge.getSecond());
+	        updatedRate += aux.rate * aux.getSampleCount(edge.getFirst(), edge.getSecond());
+	      }
+	      // sample new branch length
+	      final double newBranchLengths = Gamma.generate(random, updatedRate, updatedShape);
+	      variable.updateBranchLength(edge, newBranchLengths);
+	    }
+  
+  } 
 //    
 //    if (hyperParametersInitialized())
 //    {
@@ -89,7 +81,9 @@ public class AllBranchesScaling extends MHSampler
 //    }
 //    
 //    parameters.setVector(newPoint);
-  }
-
-
+  
+  
 }
+
+
+

@@ -17,8 +17,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jblas.DoubleMatrix;
 
 import com.google.common.collect.Lists;
-
-import conifer.SingleProteinModel;
 import conifer.ctmc.PathStatistics;
 import conifer.ctmc.expfam.CTMCExpFam;
 import conifer.ctmc.expfam.CTMCState;
@@ -28,11 +26,12 @@ import conifer.ctmc.expfam.ExpFamParameters;
 import conifer.ctmc.expfam.ExpectedStatistics;
 import conifer.factors.UnrootedTreeLikelihoodUtils;
 import conifer.models.MultiCategorySubstitutionModel;
-import bayonet.distributions.Normal.MeanVarianceParameterization;
-import blang.factors.IIDRealVectorGenerativeFactor;
+import conifer.RandomUtils.Normal;
+import conifer.RandomUtils.Normal.MeanVarianceParameterization;
 import blang.mcmc.ConnectedFactor;
-import blang.mcmc.NodeMove;
+import blang.mcmc.MHSampler;
 import blang.mcmc.SampledVariable;
+import blang.mcmc.internals.Callback;
 import briefj.BriefIO;
 import briefj.Indexer;
 import briefj.opt.Option;
@@ -40,12 +39,10 @@ import briefj.run.Results;
 
 
 
-public class PhyloHMCMove extends NodeMove
+public class PhyloHMCMove extends MHSampler<ExpFamParameters>
 {
-    ExpFamParameters parameters;
-
     UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
-    IIDRealVectorGenerativeFactor<MeanVarianceParameterization> prior;
+    Normal<MeanVarianceParameterization> prior;
 
     public static Double epsilon = null;
 
@@ -60,31 +57,35 @@ public class PhyloHMCMove extends NodeMove
     private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("HMC.experiment.details.txt"));
 
     @Override
-    public void execute(Random rand)
+    public void propose(Random rand, Callback callback)
     {
         // hack for now to make this sampled less often
         if (rand.nextInt(10) != 0)
             return;
-
-        if (prior.marginalDistributionParameters.mean.getValue() != 0.0)
-            throw new RuntimeException();
-        final double variance = prior.marginalDistributionParameters.variance.getValue();
+        if(prior.parameters.getMean()!=0.0)
+        	 throw new RuntimeException("The mean of prior of each weight element should be zero");
+       
+        
+        // here we assume that the multivariate Normal of the prior distribution has zero mean and equal variance
+        final double variance = prior.parameters.getVariance(); 
+        // find the relationship between the cholesky decomposition of the variance and the precision matrix
+        
         CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective auxObjective = null;
         CTMCExpFam<CTMCState>.ExpectedReversibleObjectiveUpdateExpectedStat noAuxObjective =null;
         if(useAuxiliaryVariable){
 
             List<PathStatistics> pathStatistics = likelihood.evolutionaryModel.samplePosteriorPaths(rand, likelihood.observations, likelihood.tree);
 
-            ExpectedStatistics<CTMCState> convertedStat = convert(pathStatistics, parameters, likelihood);
-            auxObjective = parameters.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0/variance, convertedStat);
+            ExpectedStatistics<CTMCState> convertedStat = convert(pathStatistics, variable, likelihood);
+            auxObjective = variable.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0/variance, convertedStat);
 
         }else{
-            ExpectedStatistics<CTMCState> expectedStatistics = likelihood.evolutionaryModel.getTotalExpectedStatistics(likelihood.observations, likelihood.tree, parameters.globalExponentialFamily);
-            noAuxObjective = parameters.globalExponentialFamily.getExpectedReversibleObjectiveUpdateExpectedStat(1.0/variance, likelihood.observations,
-                    likelihood.tree, likelihood.evolutionaryModel, expectedStatistics, parameters);
+            ExpectedStatistics<CTMCState> expectedStatistics = likelihood.evolutionaryModel.getTotalExpectedStatistics(likelihood.observations, likelihood.tree, variable.globalExponentialFamily);
+            noAuxObjective = variable.globalExponentialFamily.getExpectedReversibleObjectiveUpdateExpectedStat(1.0/variance, likelihood.observations,
+                    likelihood.tree, likelihood.evolutionaryModel, expectedStatistics, variable);
         }
 
-        double [] initialPoint = parameters.getVector();
+        double [] initialPoint = variable.getVector();
         double [] newPoint= initialPoint;
 
 
@@ -126,7 +127,7 @@ public class PhyloHMCMove extends NodeMove
             logToFile("optimal L" + "" + L);
         }
 
-        parameters.setVector(newPoint);
+        variable.setVector(newPoint);
     }
 
     private boolean hyperParametersInitialized()

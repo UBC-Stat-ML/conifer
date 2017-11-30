@@ -1,20 +1,21 @@
 package conifer.io;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 import briefj.BriefCollections;
 import briefj.BriefIO;
 import briefj.BriefLog;
 import briefj.Indexer;
 
+import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 
 import blang.inits.DesignatedConstructor;
 import blang.inits.Input;
+import conifer.ctmc.expfam.RateMtxNames;
 
 
 /**
@@ -45,19 +46,125 @@ public class PhylogeneticObservationFactory
    * 
    * @return The PhylogeneticObservationFactory corresponding to the standard iupac encodings.
    */
+
+	
   public static PhylogeneticObservationFactory nucleotidesFactory()
   {
     if (_nucleotideFactory == null)
       _nucleotideFactory = fromResource("/conifer/io/dna-iupac-encoding.txt");
     return _nucleotideFactory;
   }
-  
+
   public static PhylogeneticObservationFactory proteinFactory()
   {
     if(_proteinFactory == null)
       _proteinFactory = fromResource("/conifer/io/protein-iupac-encoding.txt");
     return _proteinFactory;
    }
+  
+  
+  public static Set<String> mapAmbiguousCodonsToAllPossibleCodons(String codons){
+	  
+	  // check if the input codon consists of three DNA letters, if it is not three digits, throw an exception
+	  if(codons.length()!=3)
+		  throw new RuntimeException("The length of the codon string is not three");
+	  
+	  // get the ambiguous symbols from DNA
+	  PhylogeneticObservationFactory dnaFactory = nucleotidesFactory();
+	  List<String> dnaStates = dnaFactory.orderedSymbols;
+	  
+	  Map<String, Set<String>> ambiguousDNAMap = dnaFactory.ambiguousSymbols;
+	  Set<String> allAmbiguousDNASymbols = ambiguousDNAMap.keySet();
+	  // if there is no ambiguous symbols, return itself,
+	  // if there exists an ambiguous symbol, return all possible codons, but remove the duplicates
+	  List<Set<String>> result = Lists.newArrayList(new HashSet<>());
+	  
+	  for(int i=0; i < codons.length(); i++){
+		  String element = String.valueOf(codons.charAt(i));
+		  boolean eleIsAmbiguousSymbol = allAmbiguousDNASymbols.contains(element);
+		  if(!dnaStates.contains(element) && !eleIsAmbiguousSymbol)
+			  throw new RuntimeException("The character of the codon is not valid");
+		  // loop over all the keys of the ambiguousSymbols
+		  if(eleIsAmbiguousSymbol){
+			  result.add(i, ambiguousDNAMap.get(element));
+		  }else{
+			  Set<String> storeElement = new HashSet<>();
+			  storeElement.add(element);
+			  result.add(i, storeElement);
+		  }
+	   }
+	  
+	   Set<String> possibleCodons = new HashSet<>();
+	   Set<String> possibleCodonsContainer = new HashSet<>();
+	   // enumerate all combinations of the possible codons based on the string of the three positions
+	   int iter = 0;
+	   while(iter < codons.length()){
+		   
+		   Set<String> allSymbolsCurPosition = result.get(iter);
+		   if(possibleCodons.isEmpty()){
+			   possibleCodons.addAll(allSymbolsCurPosition);
+		   }else{
+			   List<String> backupList = Lists.newArrayList();
+			   int count = possibleCodons.size();
+			   while(backupList.size() < count){
+				   for(String element:possibleCodons){
+					   for(String elementOfCurPosition: allSymbolsCurPosition){
+						   String combinedElement = element.concat(elementOfCurPosition);
+						   possibleCodonsContainer.add(combinedElement);					   
+					   		}	
+					   backupList.add(element);
+				   }
+			   }
+			   possibleCodons.clear();
+			   possibleCodons.addAll(possibleCodonsContainer);
+			   possibleCodonsContainer.clear();
+		   }
+		   iter++;
+	   }
+	   
+	   return possibleCodons;
+  }
+  
+  public static PhylogeneticObservationFactory codonFactory(){
+	  
+	  boolean caseSensitive = false;
+	  List<String> compressedCodonCodes = Lists.newArrayList("GCN", "CGN", "MGR", "AAY", "GAY", "TGY", "CAR", "GAR", "GGN", "CAY",
+			  "ATH", "YTR", "CTN", "AAR", "TTY", "CCN", "TCN", "AGY", "ACN", "TAY", "GTN");
+	  Map<String, Set<String>> ambiguousSymbols = new HashMap<>();
+	  for(String element : compressedCodonCodes){
+		  ambiguousSymbols.put(element, mapAmbiguousCodonsToAllPossibleCodons(element));
+	  }
+	  
+	  List<String> allDNAStates = nucleotidesFactory().orderedSymbols;
+	  List<String> stoppingCodons = Lists.newArrayList("TAA", "TAG", "TGA");
+	  
+	  List<String> orderedSymbols = Lists.newArrayList();
+	  // write code to generate all codon states
+	  for(String ele1:allDNAStates){
+		  for(String ele2:allDNAStates){
+			  for(String ele3:allDNAStates){
+				  String result = ele1.concat(ele2).concat(ele3);
+				  orderedSymbols.add(result);
+				  }			  
+			  }	  
+		   }
+	  orderedSymbols.removeAll(stoppingCodons);
+	  
+	  return new PhylogeneticObservationFactory(orderedSymbols, ambiguousSymbols, caseSensitive);
+  }
+  
+  
+
+  public static PhylogeneticObservationFactory selectedFactory(final RateMtxNames selectedRateMtx)
+  {
+    PhylogeneticObservationFactory result = null;
+    if (selectedRateMtx == null) {
+      throw new IllegalArgumentException("model is null!");
+    }
+    
+    return selectedRateMtx.getFactory();
+    
+  }
   
   /**
    * Reads the specifications of a PhylogeneticObservationFactory from a JSON file.
@@ -74,13 +181,15 @@ public class PhylogeneticObservationFactory
   }
   
   @DesignatedConstructor
-  public static PhylogeneticObservationFactory parse(@Input(formatDescription = "DNA, protein, or path to JSON spec") String description)
+  public static PhylogeneticObservationFactory parse(@Input(formatDescription = "DNA, protein, codon or path to JSON spec") String description)
   {
     String cleanedDescr = description.trim().toUpperCase();
     if (cleanedDescr.equals("DNA"))
       return nucleotidesFactory();
     else if (cleanedDescr.equals("PROTEIN"))
       return proteinFactory();
+    else if (cleanedDescr.equals("CODON"))
+      return codonFactory();
     else
       return fromJSONFile(new File(description));
   }
@@ -169,9 +278,9 @@ public class PhylogeneticObservationFactory
     return _indicators;
   }
   
-  private final List<String> orderedSymbols;
-  private final Map<String, Set<String>> ambiguousSymbols;
-  private final boolean caseSensitive;
+  public final List<String> orderedSymbols;
+  public final Map<String, Set<String>> ambiguousSymbols;
+  public final boolean caseSensitive;
   
   private transient Integer chunkLength = null;
   private transient Indexer<String> _indexer;
@@ -214,7 +323,7 @@ public class PhylogeneticObservationFactory
       throw new RuntimeException();
   }
   
-  private PhylogeneticObservationFactory(List<String> orderedSymbols,
+  public PhylogeneticObservationFactory(List<String> orderedSymbols,
       Map<String, Set<String>> ambiguousSymbols, boolean caseSensitive)
   {
     this.orderedSymbols = orderedSymbols;
@@ -224,4 +333,31 @@ public class PhylogeneticObservationFactory
   
   private static PhylogeneticObservationFactory _nucleotideFactory = null;
   private static PhylogeneticObservationFactory _proteinFactory = null;
+  public int nSites()
+  {
+    return BriefCollections.pick(getIndicators().values()).length;
+    //return BriefCollections.pick(getIndicators().values()).length()/factory.getChunkLength());
+  }
+
+  public static void main(String[] args) {
+
+    PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.codonFactory();
+    boolean caseSensitive = factory.caseSensitive;
+    System.out.println(caseSensitive);
+    
+    // check if the function is correct when we input a codon that doesn't have ambiguous characters
+    System.out.println(mapAmbiguousCodonsToAllPossibleCodons("AGA"));
+    
+
+    System.out.println(Arrays.deepToString(factory.orderedSymbols.toArray()));
+    System.out.println(factory.orderedSymbols.size());
+
+    // print all the keys and values of a HashMap
+    for(String name: factory.ambiguousSymbols.keySet()){
+      String key = name.toString();
+      Set<String> value = factory.ambiguousSymbols.get(key);
+      System.out.println(key+" "+ Arrays.deepToString(value.toArray()));
+    }
+  }
+
 }
