@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.rits.cloning.Immutable;
 
 import blang.inits.ConstructorArg;
 import blang.inits.DesignatedConstructor;
@@ -18,6 +19,7 @@ import conifer.TreeNode;
 /**
  * By Fixed, we mean that the alignment is not altered. 
  */
+@Immutable
 public class FixedTreeObservations implements TreeObservations  
 {
   private final LinkedHashMap<TreeNode, double[][]> data = Maps.newLinkedHashMap();
@@ -70,7 +72,8 @@ public class FixedTreeObservations implements TreeObservations
   {
     double[][] cast = (double[][])point;
     if (cast.length != nSites)
-      throw new RuntimeException();
+      throw new RuntimeException("Make sure the data is aligned. Number of sites seems to differ for different leaves: " + cast.length + " vs " + nSites);
+    
     data.put(leaf, cast);
   }
 

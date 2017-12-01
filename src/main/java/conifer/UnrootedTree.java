@@ -10,6 +10,8 @@ import org.jgrapht.UndirectedGraph;
 
 import bayonet.graphs.GraphUtils;
 import bayonet.marginal.algo.EdgeSorter;
+import blang.inits.ConstructorArg;
+import blang.inits.DesignatedConstructor;
 import blang.mcmc.Samplers;
 import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
@@ -210,7 +212,8 @@ public class UnrootedTree
    * 
    * See {@link #fromNewickString(String) fromNewickStrin(String)}
    */
-  public static UnrootedTree fromNewick(File f)
+  @DesignatedConstructor
+  public static UnrootedTree fromNewick(@ConstructorArg("newickFile") File f)
   {
     return UnrootedTreeUtils.fromNewick(f);
   }

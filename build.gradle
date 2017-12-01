@@ -1,12 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
-apply plugin: 'download-task'
 apply plugin:'application'
-mainClassName ="conifer.TestSimuDataLocalSampler"
-
-
-import de.undercouch.gradle.tasks.download.Download
 
 uploadArchives {
   repositories.mavenDeployer {
@@ -29,26 +24,7 @@ test {
   }
 }
 
-task fetchDataFiles(type: Download) {
-  src([
-    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/UTY.ape.4.nwk',
-    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/UTY_4.fasta',
-    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/UTY_4.g.fasta',
-    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES_8.g.fasta',
-    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES_8.fasta',
-    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES_4.g.fasta',
-    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES.ape.8.nwk',
-    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES_4.fasta',
-    'https://raw.githubusercontent.com/sohrabsa/conifer/master/src/main/resources/conifer/sampleInput/FES.ape.4.nwk'
-  ])
 
-  def destDir = new File('src/main/resources/conifer/sampleInput/')
-  if (!destDir.isDirectory()) {
-    destDir.mkdirs()
-  }
-
-  dest destDir
-}
 
 repositories {
   mavenCentral()
@@ -71,7 +47,7 @@ dependencies {
   compile group: 'ca.ubc.stat', name: 'tutorialj', version: '2.0.2'
   compile group: 'ca.ubc.stat', name: 'binc', version: '1.2.1'
   compile group: 'ca.ubc.stat', name: 'briefj', version: '2.4.15'
-  compile group: 'ca.ubc.stat', name: 'blangSDK', version: '1.1.0'
+  compile group: 'ca.ubc.stat', name: 'blangSDK', version: '1.2.3'
   compile group: 'ca.ubc', name: 'ahmc-java', version: '1.0.1'
   compile group: 'org.jgrapht', name: 'jgrapht-dist', version: '0.9.0'
   compile group: 'jebl', name: 'jebl', version: '2.0'
@@ -96,8 +72,6 @@ task(tutorialj, dependsOn: ['build','testClasses'], type: JavaExec) {
   }
 }
 
-apply plugin: 'versions'
-
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
     from sourceSets.main.allSource
@@ -113,21 +87,6 @@ artifacts {
     archives sourcesJar
     archives javadocJar
 }
-
-
-buildscript {
-  repositories {
-    maven { url "https://github.com/ben-manes/gradle-versions-plugin/raw/mvnrepo" }
-    mavenCentral()
-  }
-
-  dependencies {
-    classpath 'com.github.ben-manes:gradle-versions-plugin:0.5-beta-1'
-    classpath 'de.undercouch:gradle-download-task:1.0'
-  }
-}
-
-compileJava.dependsOn(fetchDataFiles)
 
 if (JavaVersion.current().isJava8Compatible()) {
   allprojects {

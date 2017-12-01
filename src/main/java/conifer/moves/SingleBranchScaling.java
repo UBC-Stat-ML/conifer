@@ -1,22 +1,26 @@
 package conifer.moves;
 
 import java.util.List;
-import java.util.Random;
 
 import blang.mcmc.internals.Callback;
 import blang.mcmc.MHSampler;
+import blang.mcmc.SampledVariable;
 import briefj.collections.UnorderedPair;
 
 import com.google.common.collect.Lists;
 
+import bayonet.distributions.Random;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.RandomUtils.DiscreteUniform;
 
 
 
-public class SingleBranchScaling extends MHSampler<UnrootedTree>
+public class SingleBranchScaling extends MHSampler
 {
+  @SampledVariable
+  UnrootedTree variable;
+  
   private static final double lambda = 2.0 * Math.log(2.0);
 
   @Override

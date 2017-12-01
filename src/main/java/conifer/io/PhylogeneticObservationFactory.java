@@ -12,6 +12,7 @@ import briefj.Indexer;
 import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.rits.cloning.Immutable;
 
 import blang.inits.DesignatedConstructor;
 import blang.inits.Input;
@@ -40,6 +41,7 @@ import conifer.ctmc.expfam.RateMtxNames;
  * @author Alexandre Bouchard (alexandre.bouchard@gmail.com)
  * @author Sohrab Salehi (sohrab.salehi@gmail.com)
  */
+@Immutable
 public class PhylogeneticObservationFactory
 {
   /**

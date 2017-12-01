@@ -14,7 +14,7 @@ import briefj.collections.Counter;
 
 
 // public class ExpFamParameters implements RealVectorInterface
-@Samplers({PhyloHMCMove.class})
+//@Samplers({PhyloHMCMove.class})
 public class ExpFamParameters 
 {
     public final CTMCExpFam<CTMCState> globalExponentialFamily;

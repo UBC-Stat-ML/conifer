@@ -1,14 +1,15 @@
 package conifer.moves;
 
 import java.util.List;
-import java.util.Random;
 
 import org.jgrapht.Graphs;
 
 import com.google.common.collect.Lists;
 
+import bayonet.distributions.Random;
 import blang.mcmc.internals.Callback;
-import blang.mcmc.MHSampler;    
+import blang.mcmc.MHSampler;
+import blang.mcmc.SampledVariable;
 import briefj.collections.UnorderedPair;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
@@ -16,8 +17,11 @@ import conifer.UnrootedTree;
 import conifer.RandomUtils.DiscreteUniform;
 
 
-public class SingleNNI extends MHSampler<UnrootedTree>
+public class SingleNNI extends MHSampler
 {
+  @SampledVariable
+  UnrootedTree variable;
+  
   @Override
   public void propose(Random rand, Callback callback)
   {
@@ -30,7 +34,7 @@ public class SingleNNI extends MHSampler<UnrootedTree>
     TreeNode moved2 = sampleMovedEndpoint(referenceEdge, referenceEdge.getSecond(), rand);
     variable.interchange(moved1, referenceEdge.getFirst(), moved2, referenceEdge.getSecond());
     if (!callback.sampleAcceptance())
-      variable.interchange(moved1, referenceEdge.getFirst(), moved2, referenceEdge.getSecond());
+      variable.interchange(moved2, referenceEdge.getFirst(), moved1, referenceEdge.getSecond());
   }
   
   private TreeNode sampleMovedEndpoint(
@@ -47,4 +51,5 @@ public class SingleNNI extends MHSampler<UnrootedTree>
       throw new RuntimeException();
     return DiscreteUniform.sample(choices, rand);
   }
+
 }

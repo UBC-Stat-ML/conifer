@@ -17,13 +17,12 @@ import briefj.collections.UnorderedPair;
 
 import com.google.common.collect.Lists;
 
-import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 
 
 
-public class NonClockTreePriorUtils<P>
+public class NonClockTreePriorUtils
 {
   /**
    * Generate a tree with a topology uniformly distributed
@@ -77,14 +76,15 @@ public class NonClockTreePriorUtils<P>
     return result;
   }
   
-  public static UnrootedTree sampleBalancedUnrootedBinaryTree(
-	      double defaultLength,
+  
+  public static UnrootedTree unrootedTree(
 	      Collection<TreeNode> leaves)
 	  {
+      double defaultLength = 1.0;
 	    UnrootedTree result = new UnrootedTree();
 	    
-	    List<TreeNode> shuffled = Lists.newArrayList(leaves);
-	    Queue<TreeNode> queue = Lists.newLinkedList(shuffled);
+	    List<TreeNode> leavesList = Lists.newArrayList(leaves);
+	    Queue<TreeNode> queue = Lists.newLinkedList(leavesList);
 	   
 	    if (queue.isEmpty())
 	      return result;
@@ -94,8 +94,8 @@ public class NonClockTreePriorUtils<P>
 	    int nBinaryLeaves = (int) Math.pow(2, initialHeight);
 	    int  remainder = nLeaves - nBinaryLeaves;
 	    
-	    List<TreeNode> firstNRemainderLeaves = shuffled.subList(0, (remainder));
-	    List<TreeNode> binaryLeaves = shuffled.subList(remainder,(shuffled.size()));
+	    List<TreeNode> firstNRemainderLeaves = leavesList.subList(0, (remainder));
+	    List<TreeNode> binaryLeaves = leavesList.subList(remainder,(leavesList.size()));
 	    Queue<TreeNode> queueRemainder = Lists.newLinkedList(firstNRemainderLeaves);
 	    Queue<TreeNode> binaryQueue = Lists.newLinkedList(binaryLeaves);
 	   
@@ -236,18 +236,4 @@ public class NonClockTreePriorUtils<P>
       result.add(list.get(i));
     return result;
   }
-
-public P branchDistributionParameters;
-
-public static void main(String[] args){
-	
-	// create a tree of 18 leaves and see if the generated tree is correct or not
-	// create a collection of leaves
-	Random rand = new Random(1);
-	double defaultLength = 1.0;
-	Collection<TreeNode> leaves = TopologyUtils.syntheticTaxaList((int) 15);
-	UnrootedTree unrootedTree = sampleBalancedUnrootedBinaryTree(defaultLength,leaves);
-	System.out.println(unrootedTree.toNewick());	
-	}
-
 }

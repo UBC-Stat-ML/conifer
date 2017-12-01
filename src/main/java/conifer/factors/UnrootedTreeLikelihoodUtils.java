@@ -6,27 +6,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import conifer.RandomUtils.Exponential;
-import bayonet.marginal.FactorGraph;
 import blang.types.RealScalar;
 import briefj.BriefCollections;
-import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
-import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.RateMatrices;
 import conifer.ctmc.SimpleRateMatrix;
-import conifer.ctmc.expfam.ExpFamMixture;
+import conifer.ctmc.expfam.RateMtxNames;
 import conifer.io.FastaUtils;
 import conifer.io.FixedTreeObservations;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
 import conifer.models.DiscreteGammaMixture;
-import conifer.models.EvolutionaryModel;
-import conifer.models.EvolutionaryModelUtils;
-import conifer.models.LikelihoodComputationContext;
 import conifer.models.MultiCategorySubstitutionModel;
-import conifer.ctmc.expfam.RateMtxNames;
 
 /**
  * Many phylogenetic likelihoods can be viewed as a factor that connects a 
@@ -122,24 +114,15 @@ public class UnrootedTreeLikelihoodUtils<M>
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, observations.nSites());
     return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, observations);
   }
-  
-    
- 
-   
-//  public static UnrootedTree defaultTree(Collection<TreeNode> leaves)
-//  {
-//    Random rand = new Random(1);
-//    return NonClockTreePriorUtils.sample(rand, Exponential.on(new RealScalar(0)), leaves);
-//  }
 
  /** 
  * @param leaves
  * @return A default tree obtained by sampling a nonclock unrooted balanced tree with default branch length 1.0 
  *         and a fixed seed.
  */
- public static UnrootedTree defaultTree(Collection<TreeNode> leaves){
+  public static UnrootedTree defaultTree(Collection<TreeNode> leaves){
 
-	  return NonClockTreePriorUtils.sampleBalancedUnrootedBinaryTree(1.0, leaves);
+	  return NonClockTreePriorUtils.unrootedTree(leaves);
   }
   
   public static void main(String [] args)

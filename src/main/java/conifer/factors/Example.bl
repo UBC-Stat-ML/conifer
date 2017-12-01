@@ -2,19 +2,35 @@ package conifer.factors
 
 import conifer.UnrootedTree
 import conifer.models.EvolutionaryModel
+import conifer.io.FixedTreeObservations 
+
+import static conifer.factors.NonClockTreePriorUtils.unrootedTree
 import conifer.models.MultiCategorySubstitutionModel
 import conifer.models.DiscreteGammaMixture
 import conifer.ctmc.SimpleRateMatrix
-import conifer.io.FixedTreeObservations 
 
 model Example {
   
+  random RealVar shape ?: realVar
+  random RealVar rate ?: realVar
   random FixedTreeObservations observations
-  random UnrootedTree tree 
-  param EvolutionaryModel evoModel 
+  random UnrootedTree tree ?: unrootedTree(observations.observedTreeNodes)
+  param EvolutionaryModel evoModel ?:    
+    new MultiCategorySubstitutionModel(
+      new DiscreteGammaMixture(
+        0.0, 
+        1.0, 
+        SimpleRateMatrix::fromResource("/conifer/ctmc/kimura1980.txt"), 
+        1
+      ), 
+      observations.nSites
+    )
+  
   
   laws {
-    	tree ~ NonClockTreePrior(Exponential.distribution(1.0))
+    shape ~ Exponential(1.0)
+    rate ~ Exponential(1.0)
+    	tree | shape, rate ~ NonClockTreePrior(Gamma.distribution(shape, rate))
   	  observations | tree, evoModel ~ UnrootedTreeLikelihood(tree, evoModel) 
   }
   

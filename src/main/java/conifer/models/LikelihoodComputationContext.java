@@ -4,9 +4,6 @@ import java.util.List;
 
 import bayonet.marginal.FactorGraph;
 import bayonet.marginal.UnaryFactor;
-import bayonet.marginal.algo.SumProduct;
-
-import com.google.common.collect.Lists;
 
 import conifer.TreeNode;
 
