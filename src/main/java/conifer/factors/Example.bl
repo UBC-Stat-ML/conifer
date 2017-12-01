@@ -5,9 +5,7 @@ import conifer.models.EvolutionaryModel
 import conifer.io.FixedTreeObservations 
 
 import static conifer.factors.NonClockTreePriorUtils.unrootedTree
-import conifer.models.MultiCategorySubstitutionModel
-import conifer.models.DiscreteGammaMixture
-import conifer.ctmc.SimpleRateMatrix
+import static conifer.factors.ExampleUtils.kimura;
 
 model Example {
   
@@ -15,16 +13,7 @@ model Example {
   random RealVar rate ?: realVar
   random FixedTreeObservations observations
   random UnrootedTree tree ?: unrootedTree(observations.observedTreeNodes)
-  param EvolutionaryModel evoModel ?:    
-    new MultiCategorySubstitutionModel(
-      new DiscreteGammaMixture(
-        0.0, 
-        1.0, 
-        SimpleRateMatrix::fromResource("/conifer/ctmc/kimura1980.txt"), 
-        1
-      ), 
-      observations.nSites
-    )
+  param EvolutionaryModel evoModel ?: kimura(observations.nSites)
   
   
   laws {
