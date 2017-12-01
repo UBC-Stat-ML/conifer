@@ -1,33 +1,6 @@
 package conifer.moves;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.jgrapht.Graphs;
-
-import conifer.RandomUtils.DiscreteUniform;
-import bayonet.distributions.Multinomial;
-import bayonet.graphs.GraphUtils;
-import bayonet.marginal.UnaryFactor;
-import bayonet.marginal.algo.SumProduct;
-import blang.mcmc.ConnectedFactor;
-import blang.mcmc.MHSampler;
-import blang.mcmc.SampledVariable;
-import blang.mcmc.internals.Callback;
-import briefj.collections.UnorderedPair;
-
-import com.google.common.collect.Lists;
-
-import conifer.TreeNode;
-import conifer.UnrootedTree;
-import conifer.factors.NonClockTreePrior;
-import conifer.factors.UnrootedTreeLikelihood;
-import conifer.models.EvolutionaryModel;
-import conifer.models.EvolutionaryModelUtils;
-import conifer.models.LikelihoodComputationContext;
 
 
 /**

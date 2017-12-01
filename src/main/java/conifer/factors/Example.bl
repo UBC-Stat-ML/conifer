@@ -9,8 +9,7 @@ import static conifer.factors.ExampleUtils.kimura;
 
 model Example {
   
-  random RealVar shape ?: realVar
-  random RealVar rate ?: realVar
+  random RealVar shape ?: realVar, rate ?: realVar
   random FixedTreeObservations observations
   random UnrootedTree tree ?: unrootedTree(observations.observedTreeNodes)
   param EvolutionaryModel evoModel ?: kimura(observations.nSites)
