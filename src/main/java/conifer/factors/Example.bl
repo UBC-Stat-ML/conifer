@@ -1,19 +1,12 @@
-package conifer.factors
-
-import conifer.UnrootedTree
-import conifer.models.EvolutionaryModel
-import conifer.io.FixedTreeObservations 
-
-import static conifer.factors.NonClockTreePriorUtils.unrootedTree
-import static conifer.factors.ExampleUtils.kimura;
+import conifer.*
+import static conifer.Utils.*
 
 model Example {
   
   random RealVar shape ?: realVar, rate ?: realVar
-  random FixedTreeObservations observations
+  random SequenceAlignment observations
   random UnrootedTree tree ?: unrootedTree(observations.observedTreeNodes)
   param EvolutionaryModel evoModel ?: kimura(observations.nSites)
-  
   
   laws {
     shape ~ Exponential(1.0)
@@ -21,5 +14,4 @@ model Example {
     	tree | shape, rate ~ NonClockTreePrior(Gamma.distribution(shape, rate))
   	  observations | tree, evoModel ~ UnrootedTreeLikelihood(tree, evoModel) 
   }
-  
 }

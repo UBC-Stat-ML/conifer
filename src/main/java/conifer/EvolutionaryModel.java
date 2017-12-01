@@ -1,4 +1,4 @@
-package conifer.models;
+package conifer;
 
 import java.util.Random;
 
@@ -6,9 +6,9 @@ import org.jgrapht.UndirectedGraph;
 
 import bayonet.marginal.FactorGraph;
 import briefj.collections.UnorderedPair;
-import conifer.TreeNode;
-import conifer.UnrootedTree;
 import conifer.io.TreeObservations;
+import conifer.models.LikelihoodComputationContext;
+import conifer.models.LikelihoodFactoryContext;
 
 
 

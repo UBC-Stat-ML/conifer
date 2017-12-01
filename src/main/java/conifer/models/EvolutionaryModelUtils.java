@@ -10,6 +10,7 @@ import bayonet.marginal.algo.SumProduct;
 
 import com.google.common.collect.Lists;
 
+import conifer.EvolutionaryModel;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.io.TreeObservations;

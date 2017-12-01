@@ -2,7 +2,7 @@ package conifer.factors
 
 import conifer.io.TreeObservations
 import conifer.UnrootedTree
-import conifer.models.EvolutionaryModel
+import conifer.EvolutionaryModel
 import conifer.TreeNode;
 import conifer.models.LikelihoodComputationContext
 import conifer.TopologyUtils

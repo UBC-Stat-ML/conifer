@@ -8,13 +8,13 @@ import java.util.Random;
 
 import blang.types.RealScalar;
 import briefj.BriefCollections;
+import conifer.SequenceAlignment;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.ctmc.RateMatrices;
 import conifer.ctmc.SimpleRateMatrix;
 import conifer.ctmc.expfam.RateMtxNames;
 import conifer.io.FastaUtils;
-import conifer.io.FixedTreeObservations;
 import conifer.io.PhylogeneticObservationFactory;
 import conifer.io.TreeObservations;
 import conifer.models.DiscreteGammaMixture;
@@ -75,7 +75,7 @@ public class UnrootedTreeLikelihoodUtils<M>
     SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
     DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(new RealScalar(0.1), new RealScalar(1.0), baseRateMatrix, 4);
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
-    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(selectedRateMtx.getFactory(), nSites));
+    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new SequenceAlignment(selectedRateMtx.getFactory(), nSites));
   }
 
   /**
@@ -92,7 +92,7 @@ public class UnrootedTreeLikelihoodUtils<M>
     SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
     DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(new RealScalar(0), new RealScalar(1.0), baseRateMatrix, 1);
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, nSites);
-    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new FixedTreeObservations(selectedRateMtx.getFactory(), nSites));
+    return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, new SequenceAlignment(selectedRateMtx.getFactory(), nSites));
   }
   
   /**
@@ -109,7 +109,7 @@ public class UnrootedTreeLikelihoodUtils<M>
     SimpleRateMatrix baseRateMatrix = RateMatrices.rateMtxModel(selectedRateMtx);
     DiscreteGammaMixture gammaMixture = new DiscreteGammaMixture(new RealScalar(0.1),new RealScalar(1.0), baseRateMatrix, 4);
     PhylogeneticObservationFactory factory = PhylogeneticObservationFactory.selectedFactory(selectedRateMtx);
-    TreeObservations observations = new FixedTreeObservations(selectedRateMtx.getFactory(), BriefCollections.pick(data.values()).length()/factory.getChunkLength());
+    TreeObservations observations = new SequenceAlignment(selectedRateMtx.getFactory(), BriefCollections.pick(data.values()).length()/factory.getChunkLength());
     // MultiCategorySubstitutionModel.loadObservations(observations, data, factory); 
     MultiCategorySubstitutionModel<DiscreteGammaMixture> subModel = new MultiCategorySubstitutionModel<DiscreteGammaMixture>(gammaMixture, observations.nSites());
     return new UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<DiscreteGammaMixture>>(tree, subModel, observations);

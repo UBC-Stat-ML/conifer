@@ -28,6 +28,7 @@ import briefj.collections.UnorderedPair;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import conifer.EvolutionaryModel;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;

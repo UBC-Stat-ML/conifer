@@ -1,4 +1,4 @@
-package conifer.io;
+package conifer;
 
 import java.io.File;
 import java.util.Arrays;
@@ -14,33 +14,35 @@ import blang.inits.DesignatedConstructor;
 import blang.inits.GlobalArg;
 import blang.runtime.Observations;
 import briefj.BriefCollections;
-import conifer.TreeNode;
+import conifer.io.FastaUtils;
+import conifer.io.PhylogeneticObservationFactory;
+import conifer.io.TreeObservations;
 
 /**
  * By Fixed, we mean that the alignment is not altered. 
  */
 @Immutable
-public class FixedTreeObservations implements TreeObservations  
+public class SequenceAlignment implements TreeObservations  
 {
   private final LinkedHashMap<TreeNode, double[][]> data = Maps.newLinkedHashMap();
   private final int nSites;
   
   public final PhylogeneticObservationFactory factory;
   
-  public FixedTreeObservations(PhylogeneticObservationFactory factory, int nSites) 
+  public SequenceAlignment(PhylogeneticObservationFactory factory, int nSites) 
   {
     this.factory = factory;
     this.nSites = nSites;
   }
   
   @DesignatedConstructor
-  public static FixedTreeObservations loadObservedData( 
+  public static SequenceAlignment loadObservedData( 
       @ConstructorArg(value = "file",     description = "Path to FASTA alignment")             File                           file,
       @ConstructorArg(value = "encoding", description = "Encoding used to read the alignment") PhylogeneticObservationFactory factory,
       @GlobalArg Observations observations)
   {
     LinkedHashMap<TreeNode, String> readFasta = FastaUtils.readFasta(file); 
-    FixedTreeObservations result = new FixedTreeObservations(factory, BriefCollections.pick(readFasta.values()).length());
+    SequenceAlignment result = new SequenceAlignment(factory, BriefCollections.pick(readFasta.values()).length());
     for (TreeNode treeNode : readFasta.keySet())
     {
         String rawString = readFasta.get(treeNode); 
