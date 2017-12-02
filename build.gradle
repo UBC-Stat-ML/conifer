@@ -7,27 +7,6 @@ plugins {
   id 'application'
 }
 
-uploadArchives {
-  repositories.mavenDeployer {
-    repository(url: "file:///${System.properties['user.home']}/artifacts/")
-    pom.version = "2.0.2"
-    pom.artifactId = "conifer"
-    pom.groupId = "ca.ubc.stat"
-  }
-}
-
-eclipse { 
-  classpath {
-    defaultOutputDir = file('bin')
-  }
-}
-
-test {
-  testLogging {
-    exceptionFormat = 'full'
-  }
-}
-
 repositories {
   mavenCentral()
   jcenter()
@@ -51,12 +30,7 @@ xtend {
   }
 }
 
-def blangVersion = '3.23.2'
-
 dependencies {
-  xtextLanguages "ca.ubc.stat.blang:ca.ubc.stat.blang:${blangVersion}"
-  compile "ca.ubc.stat.blang:ca.ubc.stat.blang:${blangVersion}"
-  compile group: 'org.eclipse.xtext', name: 'org.eclipse.xtext.xbase.lib', version: '2.12.0'
   compile group: 'ca.ubc.stat', name: 'blangSDK', version: '1.2.4'
   compile group: 'com.google.guava', name: 'guava', version: '18.0'
   testCompile group: 'junit', name: 'junit', version: '4.11'
@@ -77,6 +51,42 @@ dependencies {
   compile 'org.jblas:jblas:1.2.3'
   compile 'gov.nist.math.jama:gov.nist.math.jama:1.1.1'
   compile 'net.sourceforge.parallelcolt:parallelcolt:0.10.0'
+}
+
+xtext {
+  languages {
+    blang {
+      setup = 'ca.ubc.stat.blang.BlangDslStandaloneSetup'
+      fileExtension = 'bl'
+      generator.outlet.producesJava = true
+      generator.javaSourceLevel = '1.8'
+    }
+  }
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+  allprojects {
+    //noinspection SpellCheckingInspection
+    tasks.withType(Javadoc) {
+      // disable the crazy super-strict doclint tool in Java 8
+      //noinspection SpellCheckingInspection
+      options.addStringOption('Xdoclint:none', '-quiet')
+    }
+  }
+}
+
+
+uploadArchives {
+  repositories.mavenDeployer {
+    repository(url: "file:///${System.properties['user.home']}/artifacts/")
+    pom.version = "2.0.3"
+    pom.artifactId = "conifer"
+    pom.groupId = "ca.ubc.stat"
+  }
+}
+
+jar {
+    from { fileTree(dir: 'src/main/java', includes: [ '**/*.bl' ]) }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -100,23 +110,3 @@ configurations.archives.with {
     artifacts.remove artifacts.find { it.archiveTask.is distTar }
 }
 
-if (JavaVersion.current().isJava8Compatible()) {
-  allprojects {
-    //noinspection SpellCheckingInspection
-    tasks.withType(Javadoc) {
-      // disable the crazy super-strict doclint tool in Java 8
-      //noinspection SpellCheckingInspection
-      options.addStringOption('Xdoclint:none', '-quiet')
-    }
-  }
-}
-
-task printClasspath {
-    doLast {
-        configurations.testRuntime.each { println it }
-    }
-}
-
-jar {
-    from { fileTree(dir: 'src/main/java', includes: [ '**/*.bl' ]) }
-}
