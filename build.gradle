@@ -10,7 +10,7 @@ plugins {
 uploadArchives {
   repositories.mavenDeployer {
     repository(url: "file:///${System.properties['user.home']}/artifacts/")
-    pom.version = "2.0.0"
+    pom.version = "2.0.1"
     pom.artifactId = "conifer"
     pom.groupId = "ca.ubc.stat"
   }

@@ -1,4 +1,4 @@
-package conifer.factors
+package conifer
 
 import conifer.UnrootedTree
 
