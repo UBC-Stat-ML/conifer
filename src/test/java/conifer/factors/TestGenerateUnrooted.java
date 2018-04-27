@@ -7,8 +7,9 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Test;
 
-import conifer.RandomUtils.Exponential;
-import conifer.RandomUtils.Exponential.RateParameterization;
+import blang.core.RealConstant;
+import blang.core.RealDistribution;
+import blang.distributions.Exponential;
 import briefj.Indexer;
 import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
@@ -27,7 +28,7 @@ public class TestGenerateUnrooted
   {
     Counter<Set<UnorderedPair<Clade, Clade>>> biparts = new Counter<Set<UnorderedPair<Clade,Clade>>>();
     Indexer<TreeNode> tipIndexer = null;
-    Exponential<RateParameterization> exp = Exponential.newExponential();
+    RealDistribution exp = Exponential.distribution(new RealConstant(1.0)); 
     Random rand = new Random(1);
     List<TreeNode> leaves = TopologyUtils.syntheticTaxaList(6);
     

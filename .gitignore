@@ -113,3 +113,4 @@ gradle-app.setting
 src/test/xtend-gen
 data.fasta
 small.fasta
+.gitignore

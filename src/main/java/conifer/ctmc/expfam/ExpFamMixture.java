@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 
 import briefj.Indexer;
-import conifer.RandomUtils.PriorOfWeights;
 import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.RateMatrixToEmissionModel;
 import conifer.ctmc.SimpleRateMatrix;
@@ -60,7 +59,7 @@ public class ExpFamMixture implements RateMatrixMixture
     return mixture;
   }
   
-  public static ExpFamMixture fromSerialized(SerializedExpFamMixture serialized, Indexer<String> observationIndexer, boolean isNormalized, PriorOfWeights<?> priorOfWeights)
+  public static ExpFamMixture fromSerialized(SerializedExpFamMixture serialized, Indexer<String> observationIndexer, boolean isNormalized, WeightPrior<?> priorOfWeights)
   {
     CTMCExpFam<CTMCState> globalExponentialFamily = new CTMCExpFam<CTMCState>(serialized.getSupport(), serialized.getCTMCStateIndexer(), isNormalized, priorOfWeights);
     globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singletonList(serialized.getBivariateFeatureExtractor()));
@@ -83,7 +82,7 @@ public class ExpFamMixture implements RateMatrixMixture
    return fromSerialized(SerializedExpFamMixture.rateMtxModel(selectedRateMtx), Indexers.modelIndexer(selectedRateMtx), isNormalized);
      }
   
-  public static ExpFamMixture rateMtxModel(RateMtxNames selectedRateMtx, boolean isNormalized, PriorOfWeights<?> priorOfWeights)
+  public static ExpFamMixture rateMtxModel(RateMtxNames selectedRateMtx, boolean isNormalized, WeightPrior<?> priorOfWeights)
   {
    return fromSerialized(SerializedExpFamMixture.rateMtxModel(selectedRateMtx), Indexers.modelIndexer(selectedRateMtx), isNormalized, priorOfWeights);
      }

@@ -26,8 +26,6 @@ import conifer.ctmc.expfam.ExpFamParameters;
 import conifer.ctmc.expfam.ExpectedStatistics;
 import conifer.factors.UnrootedTreeLikelihoodUtils;
 import conifer.models.MultiCategorySubstitutionModel;
-import conifer.RandomUtils.Normal;
-import conifer.RandomUtils.Normal.MeanVarianceParameterization;
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.MHSampler;
 import blang.mcmc.SampledVariable;

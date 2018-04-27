@@ -3,15 +3,13 @@ package conifer.ctmc;
 import java.util.List;
 import java.util.Random;
 
-import briefj.opt.Option;
-import org.ejml.simple.SimpleMatrix;
 import org.jblas.DoubleMatrix;
 
-import conifer.RandomUtils.Exponential;
+import com.google.common.collect.Lists;
+
 import bayonet.distributions.Multinomial;
 import bayonet.math.SpecialFunctions;
-
-import com.google.common.collect.Lists;
+import conifer.Utils;
 
 
 /**
@@ -191,7 +189,7 @@ public class EndPointSampler
     double sum = 0.0;
     for (int i = 0; i < nTimes; i++)
     {
-      final double cur = Exponential.generate(rand, 1.0);
+      final double cur = Utils.sampleUnitRateExponential(rand);
       sum += cur;
       result[i] = cur;
     }

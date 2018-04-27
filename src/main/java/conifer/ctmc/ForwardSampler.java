@@ -2,8 +2,8 @@ package conifer.ctmc;
 
 import java.util.Random;
 
-import conifer.RandomUtils.Exponential;
 import bayonet.distributions.Multinomial;
+import conifer.Utils;
 
 
 
@@ -36,7 +36,7 @@ public class ForwardSampler
       double currentRate = -rateMatrix[state][state];
       double time = currentRate == 0 ? // absorbing state
           T - totalTime :
-          Exponential.generate(rand, currentRate);
+          Utils.sampleExponential(rand, currentRate);
       
       totalTime += time;
       boolean finished = false;

@@ -7,8 +7,8 @@ import bayonet.distributions.Multinomial;
 import blang.core.RealVar;
 
 import com.google.common.collect.Lists;
-import conifer.RandomUtils.Gamma;
 
+import conifer.Utils;
 import conifer.ctmc.CTMC;
 import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.InvariantCTMCParameters;
@@ -83,7 +83,7 @@ public class DiscreteGammaMixture implements RateMatrixMixture
     
     double [] rates = new double[nPositiveCategories];
     for (int i = 0; i < nPositiveCategories; i++)
-      rates[i] = Gamma.quantile((2.0 * i + 1.0) / (2.0 * nPositiveCategories), shapeParameter, 1.0 / shapeParameter); // from BEAST
+      rates[i] = Utils.gammaQuantile((2.0 * i + 1.0) / (2.0 * nPositiveCategories), shapeParameter, 1.0 / shapeParameter); // from BEAST
     final double mean = remainingMass * Multinomial.getNormalization(rates) / nPositiveCategories;
     
     for (int i = 0; i < nPositiveCategories; i++)

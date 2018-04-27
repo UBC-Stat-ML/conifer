@@ -1,8 +1,8 @@
-package conifer.RandomUtils;
+package conifer.ctmc.expfam;
 
 import java.util.Random;
 
-public interface PriorOfWeights<P>{
+public interface WeightPrior<P>{
 	
 	public double logDensity(double x);
 	public double gradientOflogDensity(double x);

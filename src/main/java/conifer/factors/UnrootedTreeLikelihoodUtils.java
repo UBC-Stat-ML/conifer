@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import blang.types.RealScalar;
+import blang.types.internals.RealScalar;
 import briefj.BriefCollections;
 import conifer.SequenceAlignment;
 import conifer.TreeNode;

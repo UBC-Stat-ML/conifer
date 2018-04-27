@@ -14,7 +14,7 @@ import briefj.collections.UnorderedPair;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
-import conifer.RandomUtils.DiscreteUniform;
+import conifer.Utils;
 
 
 public class SingleNNI extends MHSampler
@@ -29,7 +29,7 @@ public class SingleNNI extends MHSampler
     if (nonTerminalEdges.isEmpty())
       return;
     callback.setProposalLogRatio(0.0);
-    UnorderedPair<TreeNode, TreeNode> referenceEdge = DiscreteUniform.sample(nonTerminalEdges, rand);
+    UnorderedPair<TreeNode, TreeNode> referenceEdge = Utils.sample(nonTerminalEdges, rand);
     TreeNode moved1 = sampleMovedEndpoint(referenceEdge, referenceEdge.getFirst(), rand);
     TreeNode moved2 = sampleMovedEndpoint(referenceEdge, referenceEdge.getSecond(), rand);
     variable.interchange(moved1, referenceEdge.getFirst(), moved2, referenceEdge.getSecond());
@@ -49,7 +49,7 @@ public class SingleNNI extends MHSampler
         choices.add(neibhbor);
     if (choices.size() < 2)
       throw new RuntimeException();
-    return DiscreteUniform.sample(choices, rand);
+    return Utils.sample(choices, rand);
   }
 
 }

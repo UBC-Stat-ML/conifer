@@ -4,21 +4,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import conifer.TreeNode;
-import conifer.UnrootedTree;
-import conifer.RandomUtils.Normal;
-import conifer.RandomUtils.Normal.MeanVarianceParameterization;
-import conifer.RandomUtils.PriorOfWeights;
-import conifer.io.TreeObservations;
-import conifer.models.MultiCategorySubstitutionModel;
-import conifer.models.RateMatrixMixture;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jblas.DoubleMatrix;
 import org.jgrapht.Graphs;
 import org.jgrapht.UndirectedGraph;
-
-import utils.MultiVariateObj;
-import utils.Objective;
 
 import bayonet.distributions.Multinomial;
 import bayonet.graphs.GraphUtils;
@@ -28,7 +17,12 @@ import bayonet.opt.LBFGSMinimizer;
 import bayonet.opt.OptimizationOptions;
 import briefj.Indexer;
 import briefj.collections.Counter;
+import conifer.UnrootedTree;
 import conifer.ctmc.RateMatrixUtils;
+import conifer.io.TreeObservations;
+import conifer.models.MultiCategorySubstitutionModel;
+import utils.MultiVariateObj;
+import utils.Objective;
 
 
 
@@ -44,7 +38,7 @@ public class CTMCExpFam<S>
     public final Indexer<Object> featuresIndexer = new Indexer<Object>();
     public final  boolean  isNormalized;
     public int nFeatures() { return nFeatures; }
-    public PriorOfWeights<?> priorOfWeights;
+    public WeightPrior<?> priorOfWeights;
 
     public CTMCExpFam(
             UndirectedGraph<S,?> support,
@@ -79,7 +73,7 @@ public class CTMCExpFam<S>
             UndirectedGraph<S,?> support,
             Indexer<S> indexer,
             boolean isNormalized,
-            PriorOfWeights<?> priorOfWeights)
+            WeightPrior<?> priorOfWeights)
     {
         // create support info
         this.stateIndexer = indexer; //= new Indexer<S>(support.vertexSet());
@@ -265,7 +259,7 @@ public class CTMCExpFam<S>
             return result;
         }
 
-        private Pair<Double, double[]> calculate(double[] x, PriorOfWeights<?> priorOfWeights)
+        private Pair<Double, double[]> calculate(double[] x, WeightPrior<?> priorOfWeights)
         {
             final double [] gradient = fixedDerivative.clone();
             double value = 0.0;
