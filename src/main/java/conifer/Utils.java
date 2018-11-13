@@ -6,6 +6,7 @@ import java.util.Random;
 
 import bayonet.math.SpecialFunctions;
 import blang.core.RealConstant;
+import conifer.ctmc.RateMatrices;
 import conifer.ctmc.SimpleRateMatrix;
 import conifer.factors.NonClockTreePriorUtils;
 import conifer.models.DiscreteGammaMixture;
@@ -27,6 +28,22 @@ public class Utils
         new RealConstant(0.0), 
         new RealConstant(1.0), 
         SimpleRateMatrix.fromResource("/conifer/ctmc/kimura1980.txt"), 
+        1
+      ), 
+      nSites
+    );
+  }
+  
+  
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public static MultiCategorySubstitutionModel codon(int nSites)
+  { 
+	Random rand = new Random();  
+    return new MultiCategorySubstitutionModel(
+      new DiscreteGammaMixture(
+        new RealConstant(0.0), 
+        new RealConstant(1.0), 
+        RateMatrices.randomGTR(rand, 61),
         1
       ), 
       nSites
