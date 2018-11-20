@@ -1,0 +1,18 @@
+package conifer
+
+import conifer.ctmc.expfam.ExpFamMixture
+import conifer.models.MultiCategorySubstitutionModel
+import conifer.io.TreeObservations
+
+model GLMExample {
+  param UnrootedTree tree ?: {
+    throw new RuntimeException
+  }
+  random MultiCategorySubstitutionModel<ExpFamMixture> evolutionaryModel
+  random TreeObservations observations
+  
+  laws {
+    tree ~ NonClockTreePrior(Gamma.distribution(1.0, 1.0))
+    evolutionaryModel, observations | tree ~ EvoGLM(1.0, tree)
+  }
+}
