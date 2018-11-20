@@ -1,5 +1,6 @@
 package conifer.moves;
 
+import conifer.EvoGLM;
 import conifer.TopologyUtils;
 import conifer.TreeNode;
 import hmc.AHMC;
@@ -10,13 +11,14 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jblas.DoubleMatrix;
 
 import com.google.common.collect.Lists;
+
+import bayonet.distributions.Random;
 import conifer.ctmc.PathStatistics;
 import conifer.ctmc.expfam.CTMCExpFam;
 import conifer.ctmc.expfam.CTMCState;
@@ -26,19 +28,49 @@ import conifer.ctmc.expfam.ExpFamParameters;
 import conifer.ctmc.expfam.ExpectedStatistics;
 import conifer.factors.UnrootedTreeLikelihoodUtils;
 import conifer.models.MultiCategorySubstitutionModel;
+import blang.core.Factor;
+import blang.core.RealVar;
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.MHSampler;
 import blang.mcmc.SampledVariable;
+import blang.mcmc.Sampler;
 import blang.mcmc.internals.Callback;
+import blang.mcmc.internals.ExponentiatedFactor;
+import blang.mcmc.internals.SamplerBuilderContext;
+import blang.runtime.internals.objectgraph.Node;
+import blang.runtime.internals.objectgraph.StaticUtils;
 import briefj.BriefIO;
 import briefj.Indexer;
-import briefj.opt.Option;
 import briefj.run.Results;
 
 
 
-public class PhyloHMCMove //extends MHSampler<ExpFamParameters>
+public class PhyloHMCMove implements Sampler
 {
+  @SampledVariable(skipFactorsFromSampledModel = true)
+  public EvoGLM fullModel;
+  
+  private RealVar annealingParameter;
+
+  @Override
+  public boolean setup(SamplerBuilderContext context) {
+    Node observationNode = StaticUtils.node(fullModel.getObservations());
+    List<Factor> connectedFactors = context.connectedFactors(observationNode);
+    if (connectedFactors.size() != 1) throw new RuntimeException();
+    ExponentiatedFactor cast = (ExponentiatedFactor) connectedFactors.get(0);
+    RealVar annealingParam = cast.getAnnealingParameter();
+    if (annealingParam == null) throw new RuntimeException();
+    this.annealingParameter = annealingParam;
+    // initializations
+    return true;
+  }
+
+  @Override
+  public void execute(Random rand) {
+    throw new RuntimeException();
+  }
+  
+  
 //    UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood;
 //    Normal<MeanVarianceParameterization> prior;
 //

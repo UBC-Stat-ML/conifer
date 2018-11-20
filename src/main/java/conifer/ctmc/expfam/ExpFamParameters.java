@@ -5,21 +5,33 @@ import java.util.List;
 import java.util.Map;
 import com.google.common.collect.Lists;
 
-import blang.mcmc.Samplers;
+import blang.core.WritableRealVar;
 import conifer.ctmc.RateMatrixUtils;
-import conifer.moves.PhyloHMCMove;
 
 import briefj.Indexer;
 import briefj.collections.Counter;
 
 
-// public class ExpFamParameters implements RealVectorInterface
-//@Samplers({PhyloHMCMove.class})
 public class ExpFamParameters 
 {
     public final CTMCExpFam<CTMCState> globalExponentialFamily;
     public Counter<Object> weights;
     private final CTMCStateSpace stateSpace;
+    
+    public WritableRealVar getRealVar(Object key) {
+      final Counter<Object> weights = this.weights;
+      return new WritableRealVar() {
+        @Override
+        public double doubleValue() {
+          return weights.getCount(key);
+        }
+
+        @Override
+        public void set(double value) {
+          weights.setCount(key, value);
+        }
+      };
+    }
 
     private CTMCExpFam<CTMCState>.LearnedReversibleModel _cachedModel = null;
     public CTMCExpFam<CTMCState>.LearnedReversibleModel getModel()
