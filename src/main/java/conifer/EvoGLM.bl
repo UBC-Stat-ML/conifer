@@ -1,0 +1,24 @@
+package conifer
+
+import conifer.io.TreeObservations
+import conifer.models.MultiCategorySubstitutionModel
+import conifer.ctmc.expfam.ExpFamMixture
+import conifer.moves.PhyloHMCMove
+
+@Samplers(PhyloHMCMove)
+model EvoGLM {
+  param RealVar variance
+  param UnrootedTree tree
+  random MultiCategorySubstitutionModel<ExpFamMixture> evolutionaryModel
+  random TreeObservations observations
+  
+  laws {
+    // prior
+    for (Object key : evolutionaryModel.rateMatrixMixture.parameters.weights.keySet) {
+      evolutionaryModel.rateMatrixMixture.parameters.getRealVar(key) | variance ~ Normal(0.0, variance)
+    }
+    
+    // likelihood
+    observations | tree, evolutionaryModel ~ UnrootedTreeLikelihood(tree, evolutionaryModel)
+  }
+}
