@@ -60,22 +60,6 @@ public class ExpFamMixture implements RateMatrixMixture
     return mixture;
   }
   
-  public static ExpFamMixture fromSerialized(SerializedExpFamMixture serialized, Indexer<String> observationIndexer, boolean isNormalized, WeightPrior<?> priorOfWeights)
-  {
-    CTMCExpFam<CTMCState> globalExponentialFamily = new CTMCExpFam<CTMCState>(serialized.getSupport(), serialized.getCTMCStateIndexer(), isNormalized, priorOfWeights);
-    globalExponentialFamily.extractReversibleBivariateFeatures(Collections.singletonList(serialized.getBivariateFeatureExtractor()));
-    globalExponentialFamily.extractUnivariateFeatures(Collections.singletonList(serialized.getUnivariateFeatureExtractor()));
-    nFeatures = globalExponentialFamily.nFeatures();
-    RateMatrixToEmissionModel emissionModel = serialized.getEmissionModel();
-    Indexer<String> latentIndexer = serialized.getLatentIndexer();
-    if (emissionModel == null)
-      if (!latentIndexer.equals(observationIndexer))
-        throw new RuntimeException();
-    CTMCStateSpace stateSpace = new CTMCStateSpace(observationIndexer, latentIndexer, serialized.nCategories, SerializedExpFamMixture.partition);
-    ExpFamParameters params = new ExpFamParameters(globalExponentialFamily, stateSpace);
-    ExpFamMixture mixture = new ExpFamMixture(params, emissionModel, stateSpace);
-    return mixture;
-  }
   
   
   public static ExpFamMixture rateMtxModel(RateMtxNames selectedRateMtx, boolean isNormalized)
@@ -83,11 +67,7 @@ public class ExpFamMixture implements RateMatrixMixture
    return fromSerialized(SerializedExpFamMixture.rateMtxModel(selectedRateMtx), Indexers.modelIndexer(selectedRateMtx), isNormalized);
      }
   
-  public static ExpFamMixture rateMtxModel(RateMtxNames selectedRateMtx, boolean isNormalized, WeightPrior<?> priorOfWeights)
-  {
-   return fromSerialized(SerializedExpFamMixture.rateMtxModel(selectedRateMtx), Indexers.modelIndexer(selectedRateMtx), isNormalized, priorOfWeights);
-     }
-
+ 
   public static ExpFamMixture randomGTR(RateMtxNames selectedRateMtx)
   {
     final int nCat = 1;
