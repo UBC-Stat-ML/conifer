@@ -32,6 +32,7 @@ import conifer.io.TreeObservations;
 import conifer.models.MultiCategorySubstitutionModel;
 import blang.distributions.Normal;
 import blang.core.Factor;
+import blang.core.LogScaleFactor;
 import blang.core.RealVar;
 import blang.mcmc.ConnectedFactor;
 import blang.mcmc.SampledVariable;
@@ -50,6 +51,9 @@ public class PhyloHMCMove implements Sampler
   @SampledVariable(skipFactorsFromSampledModel = true)
   public EvoGLM fullModel;
   
+  @ConnectedFactor // TODO: check they only affect the tree? 
+  protected List<LogScaleFactor> numericFactors;
+  
   private RealVar annealingParameter;
 
   public static boolean useAuxiliaryVariable = true;
@@ -62,46 +66,33 @@ public class PhyloHMCMove implements Sampler
 
   public static int nItersPerPathAuxVar = 1000;
   
-  final double variance = fullModel.getVariance().doubleValue();
-  
-  TreeObservations observations = fullModel.getObservations();
-  
-  UnrootedTree tree = fullModel.getTree();
-  
-  ExpFamParameters parameters = fullModel.getEvolutionaryModel().rateMatrixMixture.parameters;
-  
-  UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood = new UnrootedTreeLikelihoodUtils(tree, fullModel.getEvolutionaryModel(), observations);
-  
   private final PrintWriter detailWriter = BriefIO.output(Results.getFileInResultFolder("HMC.experiment.details.txt"));
 
   @Override
   public boolean setup(SamplerBuilderContext context) {
-    Node observationNode = StaticUtils.node(fullModel.getObservations());
-    List<Factor> connectedFactors = context.connectedFactors(observationNode);
-    if (connectedFactors.size() != 1) throw new RuntimeException();
-    ExponentiatedFactor cast = (ExponentiatedFactor) connectedFactors.get(0);
-    RealVar annealingParam = cast.getAnnealingParameter();
-    if (annealingParam == null) throw new RuntimeException();
-    this.annealingParameter = annealingParam;
-    // initializations
+    this.annealingParameter = context.getAnnealingParameter();
     return true;
   }
 
   @Override
   public void execute(Random rand) {
+    double variance = fullModel.getVariance().doubleValue();
+    
+    ExpFamMixture mix = fullModel.getEvolutionaryModel().rateMatrixMixture;
+    
 	  CTMCExpFam<CTMCState>.ExpectedCompleteReversibleObjective auxObjective = null;
 	  CTMCExpFam<CTMCState>.ExpectedReversibleObjectiveUpdateExpectedStat noAuxObjective =null; 
       if(useAuxiliaryVariable){
-   	 	List<PathStatistics> pathStatistics = fullModel.getEvolutionaryModel().samplePosteriorPaths(rand, observations, tree);
-   	 	ExpectedStatistics<CTMCState> convertedStat = convert(pathStatistics, parameters, likelihood);
-        auxObjective = parameters.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0/variance, convertedStat);
+   	 	List<PathStatistics> pathStatistics = fullModel.getEvolutionaryModel().samplePosteriorPaths(rand, fullModel.getObservations(), fullModel.getTree());
+   	 	ExpectedStatistics<CTMCState> convertedStat = convert(pathStatistics, mix.parameters, mix.stateSpace);
+        auxObjective = mix.parameters.globalExponentialFamily.getExpectedCompleteReversibleObjective(1.0/variance, convertedStat);
         }else{
-       	 ExpectedStatistics<CTMCState> expectedStatistics = fullModel.getEvolutionaryModel().getTotalExpectedStatistics(observations, tree, parameters.globalExponentialFamily);
-       	 noAuxObjective = parameters.globalExponentialFamily.getExpectedReversibleObjectiveUpdateExpectedStat(1.0/variance, observations,
-              tree, fullModel.getEvolutionaryModel(), expectedStatistics, parameters);
+       	 ExpectedStatistics<CTMCState> expectedStatistics = fullModel.getEvolutionaryModel().getTotalExpectedStatistics(fullModel.getObservations(), fullModel.getTree(), mix.parameters.globalExponentialFamily);
+       	 noAuxObjective = mix.parameters.globalExponentialFamily.getExpectedReversibleObjectiveUpdateExpectedStat(1.0/variance, fullModel.getObservations(),
+       	    fullModel.getTree(), fullModel.getEvolutionaryModel(), expectedStatistics, mix.parameters);
        	 }
       
-      double [] initialPoint = parameters.getVector();
+      double [] initialPoint = mix.parameters.getVector();
       double [] newPoint= initialPoint;
       
       if (hyperParametersInitialized())
@@ -140,7 +131,7 @@ public class PhyloHMCMove implements Sampler
           logToFile("optimal L" + "" + L);
       }
 
-      parameters.setVector(newPoint);	 
+      mix.parameters.setVector(newPoint);	  
   }
   
   
@@ -157,10 +148,9 @@ public class PhyloHMCMove implements Sampler
   }
   public static ExpectedStatistics<CTMCState> convert(
 		  List<PathStatistics> pathStatistics,ExpFamParameters parameters,
-		  UnrootedTreeLikelihoodUtils<MultiCategorySubstitutionModel<ExpFamMixture>> likelihood)
+		  CTMCStateSpace space)
   {
 	  ExpectedStatistics<CTMCState> result = new ExpectedStatistics<CTMCState>(parameters.globalExponentialFamily);
-	  CTMCStateSpace space = likelihood.evolutionaryModel.rateMatrixMixture.stateSpace;
 	  for (int category = 0; category < pathStatistics.size(); category++)
 	  {
 		  PathStatistics currentStat = pathStatistics.get(category);
@@ -180,11 +170,7 @@ public class PhyloHMCMove implements Sampler
 			  }
 		  }
 	  return result;
-	  
   }
-  
-  
-	
 
   public static List<CTMCState> states(int category, CTMCStateSpace space)
   {
