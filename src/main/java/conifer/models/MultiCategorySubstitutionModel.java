@@ -7,6 +7,8 @@ import conifer.ctmc.*;
 import conifer.ctmc.expfam.CTMCExpFam;
 import conifer.ctmc.expfam.CTMCState;
 import conifer.ctmc.expfam.ExpectedStatistics;
+import conifer.ctmc.expfam.SerializedExpFamMixture;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.ejml.simple.SimpleMatrix;
 import org.jblas.DoubleMatrix;
@@ -21,6 +23,8 @@ import bayonet.marginal.UnaryFactor;
 import bayonet.marginal.algo.ExactSampler;
 import bayonet.marginal.algo.SumProduct;
 import bayonet.math.NumericalUtils;
+import blang.inits.ConstructorArg;
+import blang.inits.DesignatedConstructor;
 import briefj.BriefMath;
 import briefj.collections.Counter;
 import briefj.collections.UnorderedPair;
@@ -58,7 +62,8 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
 
     public final int nSites;
 
-    public MultiCategorySubstitutionModel(T rateMatrixMixture, int nSites)
+    @DesignatedConstructor
+    public MultiCategorySubstitutionModel(@ConstructorArg("mixture") T rateMatrixMixture, @ConstructorArg("nSites") int nSites)
     {
         this.rateMatrixMixture = rateMatrixMixture;
         this.nSites = nSites;

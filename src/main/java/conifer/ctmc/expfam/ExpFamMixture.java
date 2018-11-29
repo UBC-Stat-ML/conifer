@@ -3,6 +3,7 @@ package conifer.ctmc.expfam;
 import java.util.Collections;
 import java.util.List;
 
+import blang.inits.DesignatedConstructor;
 import briefj.Indexer;
 import conifer.ctmc.CTMCParameters;
 import conifer.ctmc.RateMatrixToEmissionModel;

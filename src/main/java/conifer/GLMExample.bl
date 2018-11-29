@@ -2,14 +2,18 @@ package conifer
 
 import conifer.ctmc.expfam.ExpFamMixture
 import conifer.models.MultiCategorySubstitutionModel
-import conifer.io.TreeObservations
+
+import static conifer.Utils.unrootedTree
+import conifer.ctmc.expfam.SerializedExpFamMixture
 
 model GLMExample {
-  param UnrootedTree tree ?: {
-    throw new RuntimeException
+  random SequenceAlignment observations
+  param UnrootedTree tree ?: unrootedTree(observations.observedTreeNodes)
+  param SerializedExpFamMixture evoModel 
+  random MultiCategorySubstitutionModel<ExpFamMixture> evolutionaryModel ?: {
+    val ExpFamMixture mixture = ExpFamMixture.fromSerialized(evoModel, observations.factory.indexer, true) 
+    new MultiCategorySubstitutionModel(mixture, observations.nSites)
   }
-  random MultiCategorySubstitutionModel<ExpFamMixture> evolutionaryModel
-  random TreeObservations observations
   
   laws {
     tree ~ NonClockTreePrior(Gamma.distribution(1.0, 1.0))

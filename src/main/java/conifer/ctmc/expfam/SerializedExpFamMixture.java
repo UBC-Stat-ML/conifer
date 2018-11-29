@@ -3,11 +3,12 @@ package conifer.ctmc.expfam;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.lang.reflect.*;
 
 import org.jgrapht.UndirectedGraph;
 
 import bayonet.graphs.GraphUtils;
+import blang.inits.DesignatedConstructor;
+import blang.inits.Input;
 import briefj.BriefIO;
 import briefj.Indexer;
 import briefj.collections.Counter;
@@ -18,7 +19,6 @@ import com.google.gson.Gson;
 
 import conifer.ctmc.RateMatrixToEmissionModel;
 import conifer.io.FeatureFactory;
-import conifer.io.PhylogeneticObservationFactory;
 
 
 
@@ -143,11 +143,17 @@ public class SerializedExpFamMixture
         return result;
     }
 
+    @DesignatedConstructor
+    public static SerializedExpFamMixture fromJSON(@Input String file)
+    {
+        return fromJSONString(BriefIO.fileToString(new File(file)));
+    }
+    
     public static SerializedExpFamMixture fromJSON(File file)
     {
         return fromJSONString(BriefIO.fileToString(file));
     }
-
+    
     public static SerializedExpFamMixture fromJSONString(String string)
     {
         return new Gson().fromJson(string, SerializedExpFamMixture.class);
