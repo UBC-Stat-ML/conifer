@@ -18,12 +18,19 @@ import conifer.ctmc.expfam.RateMtxNames;
 
 public class ExpFamMixture implements RateMatrixMixture
 {
+  
+  
   public final ExpFamParameters parameters;
+  
+
   public final RateMatrixToEmissionModel emissionModel;
+  
   public final CTMCStateSpace stateSpace;
   
   public static int nFeatures;
   public int nFeatures() { return nFeatures; }
+  
+  
   
   public static Indexer<CTMCState> simpleDNAStateIndexer(int nCategories, final RateMtxNames selectedRateMtx)
   {
