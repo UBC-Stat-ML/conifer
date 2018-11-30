@@ -4,13 +4,17 @@ import conifer.io.TreeObservations
 import conifer.models.MultiCategorySubstitutionModel
 import conifer.ctmc.expfam.ExpFamMixture
 import conifer.moves.PhyloHMCMove
+import static conifer.Utils.*
+import conifer.GLMCTMC
 
 @Samplers(PhyloHMCMove)
 model EvoGLM {
-  param RealVar variance
-  param UnrootedTree tree
-  random MultiCategorySubstitutionModel<ExpFamMixture> evolutionaryModel
-  random TreeObservations observations
+  param RealVar variance ?:fixedReal(1.0) 
+  random SequenceAlignment observations
+  param UnrootedTree tree ?: unrootedTree(observations.observedTreeNodes)
+  random MultiCategorySubstitutionModel<ExpFamMixture> evolutionaryModel?: new GLMCTMC("GTR", "DNA").getSubstitutionModel("GTR", "DNA",observations.nSites())
+
+  
   
   laws {
     // prior
