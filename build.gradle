@@ -1,11 +1,14 @@
 plugins {
-  id 'org.xtext.xtend' version '1.0.19'
-  id 'org.xtext.builder' version '1.0.19'
+  id 'org.xtext.xtend' version '2.0.4'
+  id 'org.xtext.builder' version '2.0.4'
   id 'java'
   id 'eclipse'
   id 'maven'
   id 'application'
 }
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 repositories {
   mavenCentral()
@@ -30,25 +33,27 @@ xtend {
   }
 }
 
+def blangVersion = '4.0.1' // Note to self: not the one that changes often!
+
 dependencies {
-  xtextLanguages "ca.ubc.stat.blang:ca.ubc.stat.blang:3.25.2"
-  compile group: 'ca.ubc.stat', name: 'blangSDK', version: '1.21.0'
-  compile group: 'com.google.guava', name: 'guava', version: '18.0'
-  testCompile group: 'junit', name: 'junit', version: '4.11'
-  compile group: 'junit', name: 'junit', version: '4.11'
+  xtextLanguages "ca.ubc.stat.blang:ca.ubc.stat.blang:${blangVersion}"
+  compile group: 'ca.ubc.stat', name: 'blangSDK', version: '2.0.8'
+  compile group: 'com.google.guava', name: 'guava', version: '19.0'
+  testCompile group: 'junit', name: 'junit', version: '4.12'
+  compile group: 'junit', name: 'junit', version: '4.12'
   compile group: 'ca.ubc.stat', name: 'tutorialj', version: '2.0.2'
-  compile group: 'ca.ubc.stat', name: 'binc', version: '1.2.1'
-  compile group: 'ca.ubc.stat', name: 'briefj', version: '2.4.15'
+  compile group: 'ca.ubc.stat', name: 'binc', version: '2.0.5'
+  compile group: 'ca.ubc.stat', name: 'briefj', version: '2.6.1'
   compile group: 'ca.ubc', name: 'ahmc-java', version: '1.0.1'
   compile group: 'org.jgrapht', name: 'jgrapht-dist', version: '0.9.0'
   compile group: 'jebl', name: 'jebl', version: '2.0'
-  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2'
+  compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
   compile group: 'org.apache.commons', name: 'commons-math3', version: '3.0'
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.4.4'
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.4.4'
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.4.4'
   compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24'
-  compile 'com.google.code.gson:gson:2.3'
+  compile 'com.google.code.gson:gson:2.7'
   compile 'org.jblas:jblas:1.2.3'
   compile 'gov.nist.math.jama:gov.nist.math.jama:1.1.1'
   compile 'net.sourceforge.parallelcolt:parallelcolt:0.10.0'
@@ -80,6 +85,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 uploadArchives {
   repositories.mavenDeployer {
     repository(url: "file:///${System.properties['user.home']}/artifacts/")
+    snapshotRepository(url: "file:///${System.properties['user.home']}/artifacts/")
     pom.version = "2.0.4"
     pom.artifactId = "conifer"
     pom.groupId = "ca.ubc.stat"
@@ -100,14 +106,17 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
   from 'build/docs/javadoc'
 }
 
+startScripts.enabled = false
+run.enabled = false
+
 artifacts {
   archives jar
   archives sourcesJar
   archives javadocJar
 }
 
+// Put before TRIM line otherwise large file gets generated 
 configurations.archives.with {
-    artifacts.remove artifacts.find { it.archiveTask.is distZip }
-    artifacts.remove artifacts.find { it.archiveTask.is distTar }
+  artifacts.remove artifacts.find { it.file =~ 'tar' }
+  artifacts.remove artifacts.find { it.file =~ 'zip' }
 }
-
