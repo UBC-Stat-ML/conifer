@@ -17,6 +17,6 @@ model GLMExample {
   
   laws {
     tree ~ NonClockTreePrior(Gamma.distribution(1.0, 1.0))
-    evolutionaryModel, observations | tree ~ EvoGLM(1.0, tree)
+    observations, evolutionaryModel | tree ~ EvoGLM(1.0, tree)
   }
 }

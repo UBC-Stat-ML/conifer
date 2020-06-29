@@ -10,18 +10,10 @@ plugins {
 repositories {
   mavenCentral()
   jcenter()
-  maven {
-    url "file:///${System.properties['user.home']}/artifacts/"
-  }
-  maven {
-    url "https://ubc-stat-ml.github.io/artifacts/"
-  }
-  maven {
-    url "https://www.stat.ubc.ca/~bouchard/maven/"
-  }
-  maven {
-    url "http://www.biojava.org/download/maven/"
-  }
+  maven { url "file:///${System.properties['user.home']}/artifacts/" }
+  maven { url 'https://jitpack.io' }
+  maven { url "https://ubc-stat-ml.github.io/artifacts/" }
+  maven { url "https://www.stat.ubc.ca/~bouchard/maven/" }
 }
 
 xtend {
@@ -30,15 +22,17 @@ xtend {
   }
 }
 
+def blangVersion = '4.0.1' // Note to self: not the one that changes often!
+
 dependencies {
-  xtextLanguages "ca.ubc.stat.blang:ca.ubc.stat.blang:3.25.2"
-  compile group: 'ca.ubc.stat', name: 'blangSDK', version: '1.21.0'
+  xtextLanguages "com.github.UBC-Stat-ML.blangDSL:ca.ubc.stat.blang:${blangVersion}"
+  compile "com.github.UBC-Stat-ML.blangDSL:ca.ubc.stat.blang:${blangVersion}"
+  compile group: 'com.github.UBC-Stat-ML', name: 'blangSDK', version: '2.7.0'
   compile group: 'com.google.guava', name: 'guava', version: '18.0'
   testCompile group: 'junit', name: 'junit', version: '4.11'
   compile group: 'junit', name: 'junit', version: '4.11'
-  compile group: 'ca.ubc.stat', name: 'tutorialj', version: '2.0.2'
-  compile group: 'ca.ubc.stat', name: 'binc', version: '1.2.1'
-  compile group: 'ca.ubc.stat', name: 'briefj', version: '2.4.15'
+  compile group: 'com.github.UBC-Stat-ML', name: 'binc', version: '1.2.1'
+  compile group: 'com.github.UBC-Stat-ML', name: 'briefj', version: '2.6.1'
   compile group: 'ca.ubc', name: 'ahmc-java', version: '1.0.1'
   compile group: 'org.jgrapht', name: 'jgrapht-dist', version: '0.9.0'
   compile group: 'jebl', name: 'jebl', version: '2.0'
@@ -80,9 +74,9 @@ if (JavaVersion.current().isJava8Compatible()) {
 uploadArchives {
   repositories.mavenDeployer {
     repository(url: "file:///${System.properties['user.home']}/artifacts/")
-    pom.version = "2.0.4"
+    pom.version = "2.0.5"
     pom.artifactId = "conifer"
-    pom.groupId = "ca.ubc.stat"
+    pom.groupId = "com.github.UBC-Stat-ML"
   }
 }
 
