@@ -1,0 +1,9 @@
+#Mon Jun 29 20:47:54 PDT 2020
+includeDateInGenerated=false
+BuilderConfiguration.is_project_specific=true
+eclipse.preferences.version=1
+generateGeneratedAnnotation=false
+useJavaCompilerCompliance=false
+generateSuppressWarnings=true
+ValidatorConfiguration.is_project_specific=true
+targetJavaVersion=Java8

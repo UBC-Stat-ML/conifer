@@ -9,7 +9,7 @@ import briefj.BriefIO;
 import briefj.BriefLog;
 import briefj.Indexer;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.rits.cloning.Immutable;

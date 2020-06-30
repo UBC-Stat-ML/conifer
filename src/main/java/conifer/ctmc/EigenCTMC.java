@@ -6,7 +6,6 @@ import org.ejml.factory.EigenDecomposition;
 import org.ejml.ops.EigenOps;
 import org.ejml.simple.SimpleMatrix;
 
-import tutorialj.Tutorial;
 import bayonet.distributions.Multinomial;
 import bayonet.math.EJMLUtils;
 import bayonet.math.NumericalUtils;
@@ -144,7 +143,6 @@ public class EigenCTMC implements CTMC
      * Use the diagonalization method covered in class, using
      * the eigen-decomposition functionalities provided by EJML.
      */
-    @Tutorial(showSource = false, showLink = true)
     public double [][] marginalTransitionProbability(double branchLength)
     {
 

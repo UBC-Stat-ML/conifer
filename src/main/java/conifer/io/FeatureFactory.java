@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 
 import blang.inits.DesignatedConstructor;
 import blang.inits.Input;

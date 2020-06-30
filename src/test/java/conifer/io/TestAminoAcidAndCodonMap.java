@@ -10,7 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 
 import conifer.io.featurefactory.AminoAcidAndCodonMap;
 

@@ -9,7 +9,6 @@ import org.jgrapht.Graphs;
 
 import com.google.common.collect.Lists;
 
-import bayonet.distributions.DiscreteUniform;
 import bayonet.distributions.Multinomial;
 import bayonet.distributions.Random;
 import bayonet.graphs.GraphUtils;
@@ -25,6 +24,7 @@ import conifer.NonClockTreePrior;
 import conifer.TreeNode;
 import conifer.UnrootedTree;
 import conifer.UnrootedTreeLikelihood;
+import conifer.Utils;
 import conifer.models.EvolutionaryModelUtils;
 import conifer.models.LikelihoodComputationContext;
 
@@ -54,7 +54,7 @@ public class SPRMove extends MHSampler
 	      return;
 	    
 	    // pick an internal node at random
-	    TreeNode removedRoot = DiscreteUniform.sample(internalNodes, random);
+	    TreeNode removedRoot = Utils.sample(internalNodes, random);
 	    
 	    // one neighbor will from the edge to disconnect, and another one, the new root
 	    List<UnorderedPair<TreeNode,TreeNode>> neighbors = Lists.newArrayList(variable.getTopology().edgesOf(removedRoot));

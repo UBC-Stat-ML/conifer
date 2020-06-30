@@ -29,8 +29,8 @@ import briefj.collections.Counter;
 import briefj.collections.Tree;
 import briefj.collections.UnorderedPair;
 
-import com.beust.jcommander.internal.Maps;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import conifer.io.newick.NewickParser;
