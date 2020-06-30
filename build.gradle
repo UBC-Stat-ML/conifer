@@ -36,7 +36,7 @@ dependencies {
   compile group: 'junit', name: 'junit', version: '4.11'
   compile group: 'com.github.UBC-Stat-ML', name: 'binc', version: '1.2.1'
   compile group: 'com.github.UBC-Stat-ML', name: 'briefj', version: '2.6.1'
-  compile group: 'ca.ubc', name: 'ahmc-java', version: '1.0.1'
+  compile group: 'com.github.UBC-Stat-ML', name: 'ahmc', version: '1.0.2'
   compile group: 'org.jgrapht', name: 'jgrapht-dist', version: '0.9.0'
   compile group: 'jebl', name: 'jebl', version: '2.0'
   compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
