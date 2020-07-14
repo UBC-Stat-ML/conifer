@@ -17,7 +17,5 @@ public interface RateMatrixToEmissionModel
    * 
    * @return A matrix with rows being latent states and columns being observed.
    */
-  public double [][] getMatrixStatesToObservationProbabilities();
-  
-//  public Indexer<String> getObservationsIndexer();
+  public double [][] getMatrixStatesToObservationProbabilities(double observationAnnealing);
 }

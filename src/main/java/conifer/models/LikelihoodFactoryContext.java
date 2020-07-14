@@ -24,18 +24,22 @@ public class LikelihoodFactoryContext
 
   private final TreeObservations observations;
   private final int factorGraphIndex;
+  
+  private final double observationAnnealing;
 
   private final UnrootedTree tree;
   
-  LikelihoodFactoryContext(
+  public LikelihoodFactoryContext(
       FactorGraph<TreeNode> factorGraph,
       UnrootedTree tree, TreeObservations observations, 
-      int factorGraphIndex)
+      int factorGraphIndex,
+      double observationAnnealing)
   {
     this.factorGraph = factorGraph;
     this.observations = observations;
     this.factorGraphIndex = factorGraphIndex;
     this.tree = tree;
+    this.observationAnnealing = observationAnnealing;
   }
 
   public TreeObservations getObservations()
@@ -65,6 +69,10 @@ public class LikelihoodFactoryContext
   public double getBranchLength(TreeNode parent, TreeNode children)
   {
     return tree.getBranchLength(parent, children);
+  }
+
+  public double getObservationAnnealing() {
+    return observationAnnealing;
   }
 
 }

@@ -49,7 +49,7 @@ public class EvolutionaryModelUtils
     for (int i = 0; i < evolutionaryModel.nFactorGraphs(); i++)
     {
       FactorGraph<TreeNode> factorGraph = evolutionaryModel.newFactorGraph(tree.getTopology());
-      LikelihoodFactoryContext context = new LikelihoodFactoryContext(factorGraph, tree, observations, i);
+      LikelihoodFactoryContext context = new LikelihoodFactoryContext(factorGraph, tree, observations, i, 1.0);
       
       // add observations
       if (observations != null)

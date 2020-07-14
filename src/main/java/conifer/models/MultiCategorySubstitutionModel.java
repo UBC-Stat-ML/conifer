@@ -251,7 +251,7 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
         RateMatrixToEmissionModel emissionModel = rateMatrixMixture.getRateMatrix(categoryIndex).getEmissionModel();
         if (emissionModel != null)
         {
-            double [][] latent2Observation = emissionModel.getMatrixStatesToObservationProbabilities();
+            double [][] latent2Observation = emissionModel.getMatrixStatesToObservationProbabilities(context.getObservationAnnealing());
             observationUnary = context.getDiscreteFactorGraph().marginalize(new SimpleMatrix(latent2Observation), observationUnary);
         }
         context.getDiscreteFactorGraph().unaryTimesEqual(leaf, observationUnary);

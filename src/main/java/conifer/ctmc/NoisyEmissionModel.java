@@ -1,5 +1,6 @@
 package conifer.ctmc;
 
+import blang.types.StaticUtils;
 
 public class NoisyEmissionModel implements RateMatrixToEmissionModel
 {
@@ -7,22 +8,33 @@ public class NoisyEmissionModel implements RateMatrixToEmissionModel
   private final int nObserved;
 
   public final blang.core.RealVar errorProbability;
-  // TODO: will definitely need bounds here on the real variable
-  //       if you want to allow resampling the errorPr 
 
   @Override
-  public double[][] getMatrixStatesToObservationProbabilities()
+  public double[][] getMatrixStatesToObservationProbabilities(double observationAnnealing)
   {
-    // TODO: cache ? 
-    // decide and check on a policy regarding storing transient stuff in Factors
+    if (observationAnnealing < 1.0 && errorProbability.doubleValue() == 0.0)
+      StaticUtils.invalidParameter();
     
+    if (errorProbability.doubleValue() < 0.0 || errorProbability.doubleValue() > 1.0)
+      StaticUtils.invalidParameter();
+        
     final int nLatents  = latent2observed.length;
-    
     final double[][] result = new double[nLatents][nObserved];
     
-    final double individualErrorPr = errorProbability.doubleValue()/(((double) nObserved) - 1.0);
-    final double correctPr = 1.0 - errorProbability.doubleValue();
+    double individualErrorPr = errorProbability.doubleValue()/(((double) nObserved) - 1.0);
+    double correctPr = 1.0 - errorProbability.doubleValue();
     
+    if (observationAnnealing < 1.0) 
+    {
+      final double individualErrorPrAnnealedUnnorm = Math.pow(individualErrorPr, observationAnnealing);
+      final double correctPrAnnealedUnnorm = Math.pow(correctPr, observationAnnealing);
+      
+      final double norm = correctPrAnnealedUnnorm + (nObserved - 1.0) * individualErrorPrAnnealedUnnorm;
+      
+      individualErrorPr = individualErrorPrAnnealedUnnorm / norm;
+      correctPr = correctPrAnnealedUnnorm / norm;
+    }
+      
     for (int latentIndex = 0; latentIndex < nLatents; latentIndex++)
       for (int obsIndex = 0; obsIndex < nObserved; obsIndex++)
         result[latentIndex][obsIndex] = latent2observed[latentIndex] == obsIndex ? correctPr : individualErrorPr;
