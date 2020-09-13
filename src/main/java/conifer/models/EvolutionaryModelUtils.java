@@ -51,15 +51,20 @@ public class EvolutionaryModelUtils
       FactorGraph<TreeNode> factorGraph = evolutionaryModel.newFactorGraph(tree.getTopology());
       LikelihoodFactoryContext context = new LikelihoodFactoryContext(factorGraph, tree, observations, i, 1.0);
       
+      // initial distribution
+      /* NB: this should be done before observation
+       * as the process of setting observations may involve calling marginalization 
+       * when an observation model is used, which needs to know the number of sites. */
+      if (useInitialDistribution)
+        evolutionaryModel.buildInitialDistribution(root, context);
+      
       // add observations
       if (observations != null)
         for (TreeNode observedNode : observations.getObservedTreeNodes())
           if (tree.getTopology().vertexSet().contains(observedNode)) // this check is useful when the data contains nodes not in the tree (see for example SRPMove for a use case)
             evolutionaryModel.buildObservation(observedNode, context);
         
-      // initial distribution
-      if (useInitialDistribution)
-        evolutionaryModel.buildInitialDistribution(root, context);
+      
       
       // add transitions
       for (Pair<TreeNode,TreeNode> edge : orientedEdges)

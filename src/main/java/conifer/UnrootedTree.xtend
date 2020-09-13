@@ -15,8 +15,6 @@ import briefj.collections.Counter
 import briefj.collections.UnorderedPair
 import com.google.common.collect.Lists
 import com.google.common.collect.Maps
-import conifer.moves.AllBranchesScaling
-import conifer.moves.SPRMove
 import conifer.moves.SingleBranchScaling
 import conifer.moves.SingleNNI
 

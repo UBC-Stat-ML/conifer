@@ -13,6 +13,7 @@ import blang.inits.ConstructorArg;
 import blang.inits.DesignatedConstructor;
 import blang.inits.GlobalArg;
 import blang.runtime.Observations;
+import blang.runtime.internals.objectgraph.SkipDependency;
 import briefj.BriefCollections;
 import conifer.io.FastaUtils;
 import conifer.io.PhylogeneticObservationFactory;
@@ -21,12 +22,14 @@ import conifer.io.TreeObservations;
 /**
  * By Fixed, we mean that the alignment is not altered. 
  */
-@Immutable
 public class SequenceAlignment implements TreeObservations  
 {
+  @SkipDependency(isMutable = true)
   private final LinkedHashMap<TreeNode, double[][]> data = Maps.newLinkedHashMap();
+  
   private final int nSites;
   
+  @SkipDependency(isMutable = false)
   public final PhylogeneticObservationFactory factory;
   
   public SequenceAlignment(PhylogeneticObservationFactory factory, int nSites) 
