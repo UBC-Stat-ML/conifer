@@ -68,7 +68,13 @@ public class EigenCTMC implements CTMC
   
   public double [][] marginalTransitionProbability(double branchLength)
   {
+    return marginalTransitionProbability(eigenDecomp, branchLength);
+  }
+  
+  public static double [][] marginalTransitionProbability(SimpleEigenDecomposition eigenDecomp, double branchLength)
+  {
     double [][] result =  EJMLUtils.copyMatrixToArray(EJMLUtils.matrixExponential(eigenDecomp, branchLength));
+    RateMatrixUtils.removeSmallNegativeEntries(result);
     NumericalUtils.checkIsTransitionMatrix(result);
     for (int row = 0; row < result.length; row++)
       Multinomial.normalize(result[row]);

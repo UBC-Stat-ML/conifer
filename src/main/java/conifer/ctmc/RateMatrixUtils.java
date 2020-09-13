@@ -7,7 +7,6 @@ import bayonet.math.NumericalUtils;
 import org.jblas.DoubleMatrix;
 import org.jblas.MatrixFunctions;
 
-import java.util.Arrays;
 
 
 /**
@@ -193,6 +192,16 @@ public class RateMatrixUtils
         final EigenvalueDecomposition ed = new EigenvalueDecomposition(M);
         final Matrix V = ed.getV();
         return exp(V, V.inverse(), ed.getD());
+    }
+
+    public static void removeSmallNegativeEntries(double[][] result) {
+      for (int i = 0; i < result.length; i++)
+        for (int j = 0; j < result[i].length; j++)
+        {
+          double current = result[i][j];
+          if (current < 0.0 && current > 0.0 - NumericalUtils.THRESHOLD)
+            result[i][j] = 0.0;
+        }
     }
 
 }
