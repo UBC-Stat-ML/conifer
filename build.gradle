@@ -46,7 +46,7 @@ dependencies {
   compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.4.4'
   compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24'
   compile 'com.google.code.gson:gson:2.7'
-  compile 'org.jblas:jblas:1.2.5'
+  compile 'org.jblas:jblas:1.2.3'
   compile 'gov.nist.math.jama:gov.nist.math.jama:1.1.1'
   compile 'net.sourceforge.parallelcolt:parallelcolt:0.10.0'
 }
@@ -77,7 +77,7 @@ if (JavaVersion.current().isJava8Compatible()) {
 uploadArchives {
   repositories.mavenDeployer {
     repository(url: "file:///${System.properties['user.home']}/artifacts/")
-    pom.version = "2.1.1"
+    pom.version = "2.1.2"
     pom.artifactId = "conifer"
     pom.groupId = "com.github.UBC-Stat-ML"
   }
