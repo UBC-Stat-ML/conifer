@@ -498,8 +498,9 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
         List<Map<TreeNode, double[][]>> allSamples = Lists.newArrayList();
         int nSites = -1;
         List<SumProduct<TreeNode>> sumProds = Lists.newArrayList();
-        for (FactorGraph<TreeNode> factorGraph : factorGraphs)
+        for (int fIndex = 0; fIndex < factorGraphs.size(); fIndex++) 
         {
+            FactorGraph<TreeNode> factorGraph = factorGraphs.get(fIndex);
             Sampler<TreeNode> innerSampler = ((DiscreteFactorGraph)factorGraph).getSampler();
             SumProduct<TreeNode> sumProd = isPrior ? null : new SumProduct<TreeNode>(factorGraph);
             sumProds.add(sumProd);
@@ -511,6 +512,31 @@ public class MultiCategorySubstitutionModel<T extends RateMatrixMixture> impleme
             for (TreeNode leaf : tree.getTopology().vertexSet())
             {
                 double [][] current = DiscreteFactorGraph.getNormalizedCopy(samples.get(leaf));
+                /* 
+                 * ExactSampler.priorSampler does not behave correctly when there is an emission model,
+                 * since the emission model is collapsed to a leaf factor by buildFactorGraphs, however 
+                 * those are ignored at the leaves by ExactSampler.priorSampler.
+                 * So we perform the emission model simulation manually
+                 */
+                if (isPrior) {
+                  RateMatrixToEmissionModel emissionModel = rateMatrixMixture.getRateMatrix(fIndex).getEmissionModel(); 
+                  if (emissionModel != null) {
+                    double[][] matrixStatesToObservationProbabilities = emissionModel.getMatrixStatesToObservationProbabilities(1.0);
+                    
+                    for (int site = 0; site < current.length; site++) {
+                      // find the observation index 
+                      int found = -1;
+                      for (int state = 0; state < current[site].length; state++)
+                        if (current[site][state] == 1.0) {
+                          if (found != -1) throw new RuntimeException();
+                          found = state;
+                        }
+                      current[site][found] = 0.0;
+                      int sampled = Multinomial.sampleMultinomial(rand, matrixStatesToObservationProbabilities[found]);
+                      current[site][sampled] = 1.0;
+                    }
+                  }
+                }
                 nSites = current.length;
                 transformedSamples.put(leaf, current);
             }
