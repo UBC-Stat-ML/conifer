@@ -25,7 +25,7 @@ public class AminoAcidAndCodonMap {
 	
 	private static Map<String, Set<String>> fromResource(String resourceURL)
 	{
-	    String jsonString = BriefIO.resourceToString(resourceURL); 
+	    String jsonString = BriefIO.resourceToString(resourceURL, AminoAcidAndCodonMap.class); 
 	    return fromJSONString(jsonString);
 	    }
 	  

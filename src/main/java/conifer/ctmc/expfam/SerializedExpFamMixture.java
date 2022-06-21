@@ -161,7 +161,7 @@ public class SerializedExpFamMixture
 
     public static SerializedExpFamMixture fromResource(String resourceURL)
     {
-        String jsonString = BriefIO.resourceToString(resourceURL);
+        String jsonString = BriefIO.resourceToString(resourceURL, SerializedExpFamMixture.class);
         return fromJSONString(jsonString);
     }
 

@@ -302,7 +302,7 @@ public class PhylogeneticObservationFactory
   
   private static PhylogeneticObservationFactory fromResource(String resourceURL)
   {
-    String jsonString = BriefIO.resourceToString(resourceURL); 
+    String jsonString = BriefIO.resourceToString(resourceURL, PhylogeneticObservationFactory.class); 
     return fromJSONString(jsonString);
   }
   

@@ -25,7 +25,7 @@ public class MapAminoAcidToPolarity implements MapSingleStateToFeatures {
 	
 	private static Map<String, Set<String>> fromResource(String resourceURL)
 	{
-	    String jsonString = BriefIO.resourceToString(resourceURL); 
+	    String jsonString = BriefIO.resourceToString(resourceURL, MapAminoAcidToPolarity.class); 
 	    return fromJSONString(jsonString);
 	    }
 	  

@@ -23,7 +23,7 @@ public class MapAminoAcidToSize implements MapSingleStateToFeatures {
 	
 	private static Map<String, Set<String>> fromResource(String resourceURL)
 	{
-	    String jsonString = BriefIO.resourceToString(resourceURL); 
+	    String jsonString = BriefIO.resourceToString(resourceURL, MapAminoAcidToSize.class); 
 	    return fromJSONString(jsonString);
 	    }
 	  
