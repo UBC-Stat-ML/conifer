@@ -13,7 +13,7 @@ public class NoisyEmissionModel implements RateMatrixToEmissionModel
   public double[][] getMatrixStatesToObservationProbabilities(double observationAnnealing)
   {
     if (observationAnnealing < 1.0 && errorProbability.doubleValue() == 0.0)
-      StaticUtils.invalidParameter();
+      throw new RuntimeException();
     
     if (errorProbability.doubleValue() < 0.0 || errorProbability.doubleValue() > 1.0)
       StaticUtils.invalidParameter();

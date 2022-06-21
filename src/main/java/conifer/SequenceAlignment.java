@@ -24,7 +24,7 @@ import conifer.io.TreeObservations;
  */
 public class SequenceAlignment implements TreeObservations  
 {
-  @SkipDependency(isMutable = true)
+  @SkipDependency(isMutable = false)
   private final LinkedHashMap<TreeNode, double[][]> data = Maps.newLinkedHashMap();
   
   private final int nSites;
